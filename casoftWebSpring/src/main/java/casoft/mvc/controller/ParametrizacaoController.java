@@ -53,7 +53,7 @@ public class ParametrizacaoController {
                 try{
                     File uploadFolder = new File("src/main/resources/templates/img/");
                     if (!uploadFolder.exists())
-                        uploadFolder.mkdir();
+                        uploadFolder.mkdirs();
                     file.transferTo(new File(uploadFolder.getAbsoluteFile()+"\\"+"logo.png"));
                     cnpj=cnpj.replaceAll("[^\\d]", "");
                     cep=cep.replaceAll("[^\\d]", "");

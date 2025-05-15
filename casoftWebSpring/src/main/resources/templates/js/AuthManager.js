@@ -4,7 +4,7 @@ class AuthManager {
   constructor() {
     this.tokenKey = "authToken";
     this.nivelKey = "userNivel";
-    this.apiBaseUrl = "http://localhost:8080";
+    this.apiBaseUrl = "http://localhost:8080";       
   }
 
   // Salva dados de autenticação

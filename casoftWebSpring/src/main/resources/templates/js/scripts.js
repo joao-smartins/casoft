@@ -64,8 +64,8 @@ function enviarFormulario(event) {
     // Obtendo o token do localStorage
     const token = authManager.getToken();
 
-    const metodo = modoCadastro ? "POST" : "PUT";
     const URL = "http://localhost:8080/apis/param";
+    const metodo = modoCadastro ? "POST" : "PUT";
     let formData = new FormData(fdados);
 
     fetch(URL, {
@@ -181,16 +181,17 @@ window.addEventListener('resize', function() {
     content.style.marginLeft = '250px';
   }
 });
-let modoCadastro = true;
+modoCadastro = true;
 // Função para verificar se já existe uma empresa cadastrada
 function carregarEmpresa() {
+    modoCadastro = true;
     const URL = "http://localhost:8080/apis/param/1";
-    const token = authManager.getToken(); // Obtém o token do localStorage
+    const token = authManager.getToken();
     console.log("Token enviado:", token);
     fetch(URL, {
         method: "GET",
         headers: {
-            "Authorization": `Bearer ${token}`, // Adiciona o token no cabeçalho
+            "Authorization": "Bearer " + token // Adiciona o token no cabeçalho
         },
     })
     .then((response) => {
@@ -217,7 +218,7 @@ function carregarEmpresa() {
         document.getElementById('telefone').value = formatarTelefone(data.telefone);
         document.getElementById('email').value = data.email;
         atualizarTexto(true);
-        modoCadastro=false;
+        modoCadastro = false;
     })
     .catch((error) => {
         console.error("Erro ao carregar os dados da empresa:", error);

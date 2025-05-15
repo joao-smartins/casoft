@@ -22,6 +22,7 @@ public class ParametrizacaoView {
     private ParametrizacaoController paramController;
     @GetMapping(value="/{id}")
     public ResponseEntity<Object> getParam(@PathVariable int id, HttpServletRequest httpServletRequest) {
+
         String token = httpServletRequest.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer "))
             token = token.substring(7);
@@ -37,7 +38,7 @@ public class ParametrizacaoView {
     }
     @PostMapping
     public ResponseEntity<Object> addParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestPart("file") MultipartFile file, HttpServletRequest httpServletRequest) {
-        System.out.println(httpServletRequest.getHeader("Authorization"));
+
         String token = httpServletRequest.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer "))
             token = token.substring(7);
@@ -55,6 +56,7 @@ public class ParametrizacaoView {
     }
     @PutMapping
     public ResponseEntity<Object> updtParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestPart("file") MultipartFile file,HttpServletRequest httpServletRequest) {
+        System.out.println(httpServletRequest.getHeader("Authorization"));
         Map<String,Object> json=new HashMap<>();
         String token = httpServletRequest.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer "))
