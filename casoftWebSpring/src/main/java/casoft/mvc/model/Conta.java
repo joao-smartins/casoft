@@ -8,6 +8,7 @@ public class Conta {
         this.agencia = agencia;
         this.identificador = identificador;
     }
+    public Conta(){}
 
     public String getAgencia() {
         return agencia;
