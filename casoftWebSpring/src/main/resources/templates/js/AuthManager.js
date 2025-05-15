@@ -1,4 +1,3 @@
-// authManager.js - Gerenciador de autenticação centralizado
 
 // Classe para gerenciar autenticação
 class AuthManager {
@@ -33,7 +32,7 @@ class AuthManager {
   logout() {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.nivelKey);
-    window.location.href = "login.html";
+    window.location.href = "ControleAcesso.html";
   }
 
   // Verifica se o token é válido no backend
@@ -68,7 +67,7 @@ class AuthManager {
   // Fazer login
   async login(login, senha) {
     try {
-      const response = await fetch(`${this.apiBaseUrl}/autenticar/${login}/${senha}`, {
+      const response = await fetch(`${this.apiBaseUrl}/${login}/${senha}`, {
         method: "GET"
       });
 

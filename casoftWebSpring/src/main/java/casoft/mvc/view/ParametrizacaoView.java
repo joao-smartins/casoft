@@ -9,12 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("apis/param")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ParametrizacaoView {
 
     @Autowired
@@ -36,6 +37,7 @@ public class ParametrizacaoView {
     }
     @PostMapping
     public ResponseEntity<Object> addParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestPart("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+        System.out.println(httpServletRequest.getHeader("Authorization"));
         String token = httpServletRequest.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer "))
             token = token.substring(7);
@@ -52,11 +54,16 @@ public class ParametrizacaoView {
 
     }
     @PutMapping
-    public ResponseEntity<Object> updtParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestPart("file") MultipartFile file) {
-        Map<String,Object> json =paramController.updtParam(nomeEmpresa,cnpj,logradouro,numero,bairro,cidade,estado,cep,telefone,email,file);
-        if(json.get("erro")==null)
-            return ResponseEntity.ok(new Mensagem(nomeEmpresa+" alterada com sucesso!"));
-        else
-            return ResponseEntity.badRequest().body(new Mensagem(json.get("erro").toString()));
+    public ResponseEntity<Object> updtParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestPart("file") MultipartFile file,HttpServletRequest httpServletRequest) {
+        Map<String,Object> json=new HashMap<>();
+        String token = httpServletRequest.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer "))
+            token = token.substring(7);
+        if(JWTTokenProvider.verifyToken(token)) {
+             json=paramController.updtParam(nomeEmpresa,cnpj,logradouro,numero,bairro,cidade,estado,cep,telefone,email,file);
+            if(json.get("erro")==null)
+                return ResponseEntity.ok(new Mensagem(nomeEmpresa+" alterada com sucesso!"));
+        }
+        return ResponseEntity.badRequest().body(new Mensagem(json.get("erro").toString()));
     }
 }

@@ -2,19 +2,16 @@ package casoft.mvc.view;
 
 import casoft.mvc.controller.AcessoController;
 import casoft.mvc.model.Usuario;
+import casoft.mvc.util.JWTTokenProvider;
 import casoft.mvc.util.Mensagem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("autenticar")
 public class AcessoView {
     @Autowired
     private AcessoController controller;
@@ -37,5 +34,23 @@ public class AcessoView {
         }
         else
             return ResponseEntity.badRequest().body(new Mensagem("Usuário não cadastrado"));
+    }
+    @GetMapping("/verificar-token")
+    public ResponseEntity<?> verificarToken(@RequestHeader("Authorization") String authHeader) {
+        try {
+            // Remover o prefixo "Bearer "
+            String token = authHeader.substring(7);
+
+            // Use seu serviço de validação de token aqui
+            boolean isValid = JWTTokenProvider.verifyToken(token);
+
+            if (isValid) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(401).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(401).build();
+        }
     }
 }

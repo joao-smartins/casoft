@@ -7,8 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Se não houver token, redireciona para a página de login
     if (!token) {
-      alert("Sessão não encontrada. Por favor, faça login.");
-      window.location.href = "login.html";
+      window.location.href = "ControleAcesso.html";
       return;
     }
     
@@ -63,5 +62,5 @@ document.addEventListener("DOMContentLoaded", function() {
       .catch(error => {
         console.error("Erro na verificação periódica do token:", error);
       });
-  }, 1 * 60 * 1000); // 5 minutos
+  }, 20 * 60 * 1000); // 20 minutos
 });
