@@ -40,8 +40,11 @@ document.addEventListener("DOMContentLoaded", function() {
     ];
     
     // Verifica se é uma página administrativa e o usuário não é admin
-    if (adminPages.some(page => path.endsWith(page)) && nivel !== "ADMIN") {
-      alert("Você não tem permissão para acessar esta página.");
+    if(nivel==null){
+      window.location.href = "ControleAcesso.html";
+    }
+    else if (adminPages.some(page => path.endsWith(page)) && nivel !== "ADMIN") {
+      alert("Você não tem permissão para acessar esta página.",nivel);
       window.location.href = "home.html";
     }
   }
