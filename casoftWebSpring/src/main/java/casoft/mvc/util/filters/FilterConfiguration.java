@@ -13,11 +13,21 @@ public class FilterConfiguration {
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
-        config.addAllowedMethod("PATCH");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("POST");
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.addAllowedOriginPattern("*"); // Ou especifique seu domínio, ex: "http://localhost:3000"
+        config.setAllowCredentials(true);
+
         config.addAllowedMethod("GET");
+        config.addAllowedMethod("POST");
+        config.addAllowedMethod("PUT");      // Adicione PUT aqui
+        config.addAllowedMethod("DELETE");
+        config.addAllowedMethod("PATCH");
+        config.addAllowedMethod("OPTIONS"); // OPTIONS é usado no preflight, importante liberar
+
+        config.addAllowedHeader("*");        // Libera todos os headers, incluindo Authorization
+        config.addExposedHeader("Authorization"); // Opcional, se quiser expor
+
         source.registerCorsConfiguration("/**", config);
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
         bean.setOrder(0);
