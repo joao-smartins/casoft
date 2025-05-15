@@ -11,6 +11,8 @@ import java.util.List;
 @Component
 public class Usuario {
 
+    public static final String NIVEL_ADMIN = "ADMIN";
+    public static final String NIVEL_PADRAO = "USER";
     private int id;
     private String nome;
     private String login;
