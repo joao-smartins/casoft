@@ -2,6 +2,7 @@ package casoft.mvc.controller;
 
 import casoft.mvc.model.TipoDespesas;
 import casoft.mvc.util.Singleton;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.HashMap;
 @Service
 public class TipoDespesasController
 {
-    //@Autowired
+    @Autowired
     private TipoDespesas despeModel;
 
     public List<Map<String,Object>> getDespesa(String filtro)
@@ -63,7 +64,7 @@ public class TipoDespesasController
     public Map<String,Object> addTipoDespesa(TipoDespesas tipoDespesa)
     {
         Singleton conexao = Singleton.getInstancia();
-        Map<String,Object> json= new HashMap<>();
+        Map<String,Object> json = new HashMap<>();
         if(conexao.conectar())
         {
             TipoDespesas tipo = new TipoDespesas(tipoDespesa.getId(), tipoDespesa.getDescricao());

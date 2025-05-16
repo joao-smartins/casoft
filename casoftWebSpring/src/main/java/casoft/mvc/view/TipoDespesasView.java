@@ -12,7 +12,7 @@ import java.util.Map;
 
 @CrossOrigin
 @RestController
-@RequestMapping("apis/despesas")
+@RequestMapping("apis/tipoDespesas")
 
 public class TipoDespesasView
 {
@@ -56,7 +56,7 @@ public class TipoDespesasView
         Map<String,Object> json = tipoDespesasController.addTipoDespesa(tipodespesa);
         if(json.get("erro") == null)
         {
-            return ResponseEntity.ok(new Mensagem(tipodespesa + "cadastrada com sucesso!"));
+            return ResponseEntity.ok(new Mensagem(tipodespesa.getDescricao() + " cadastrada com sucesso!"));
         }
         else
         {
@@ -70,7 +70,7 @@ public class TipoDespesasView
         Map<String,Object> json = tipoDespesasController.updateTipoDespesa(tipodespesa);
         if(json.get("erro") == null)
         {
-            return ResponseEntity.ok(new Mensagem("Tipo de despesa"+ tipodespesa.getDescricao() + "alterada com sucesso!"));
+            return ResponseEntity.ok(new Mensagem("Tipo de despesa" + tipodespesa.getDescricao() + " alterada com sucesso!"));
         }
         else
         {

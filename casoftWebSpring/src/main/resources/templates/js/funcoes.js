@@ -151,13 +151,13 @@ document.getElementById("desativarForm").addEventListener("submit", async (e) =>
 
 function cadastrarTipo()
 {
-  var tipoDespesa = document.getElementById("despesaPost").value;
+  var tipoDespesa = document.getElementById("despesaPost").value; debugger;
 
   var tipo = {
     descricao : tipoDespesa
   };
 
-  fetch("http://localhost:8080/apis/despesa", {
+  fetch("http://localhost:8080/apis/tipoDespesas", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -182,7 +182,7 @@ function cadastrarTipo()
 }
 
 function buscarTodosTipo(){
-  fetch("http://localhost:8080/apis/despesa")
+  fetch("http://localhost:8080/apis/tipoDespesas")
       .then(response => {
         console.log("Resposta recebida", response);
         if(response.ok)
@@ -220,7 +220,7 @@ function buscarTodosTipo(){
 function buscarTipoId(){
   var id = document.getElementById("despesaGetID").value;
 
-  fetch(`http://localhost:8080/apis/despesa/${id}`)
+  fetch(`http://localhost:8080/apis/tipoDespesas/${id}`)
       .then(response => {
         if(response.ok)
         {
@@ -241,7 +241,7 @@ function buscarTipoId(){
 function deletarTipo(){
   var id = document.getElementById("despesaDelete").value;
 
-  fetch(`http://localhost:8080/apis/despesa/${id}`,{
+  fetch(`http://localhost:8080/apis/tipoDespesas/${id}`,{
     method: "DELETE"
   })
       .then(response => {
@@ -266,7 +266,7 @@ function alterarTipo(){
     descricao: nome
   };
 
-  fetch("http://localhost:8080/apis/despesa", {
+  fetch("http://localhost:8080/apis/tipoDespesas", {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
