@@ -1,7 +1,6 @@
 package casoft.mvc.view;
 
 import casoft.mvc.controller.AcessoController;
-import casoft.mvc.model.Usuario;
 import casoft.mvc.util.JWTTokenProvider;
 import casoft.mvc.util.Mensagem;
 import org.springframework.beans.factory.annotation.Autowired;
