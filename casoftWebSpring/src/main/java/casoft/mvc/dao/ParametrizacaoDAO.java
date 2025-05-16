@@ -13,8 +13,8 @@ public class ParametrizacaoDAO implements IDAO<Parametrizacao> {
     @Override
     public Parametrizacao gravar(Parametrizacao entidade, Singleton conexao) {
         String sql = """
-        INSERT INTO parametrizacao (nome_empresa, cnpj, logradouro, numero, bairro, cidade, estado, cep, telefone,email) 
-        VALUES ('#1', '#2', '#3', #4, '#5', '#6', '#7', '#8', '#9','#A');
+        INSERT INTO parametrizacao (nome_empresa, cnpj, logradouro, numero, bairro, cidade, estado, cep, telefone,email,complemento) 
+        VALUES ('#1', '#2', '#3', #4, '#5', '#6', '#7', '#8', '#9','#A','#B');
         """;
         sql = sql.replace("#1", entidade.getNomeEmpresa());
         sql = sql.replace("#2", entidade.getCnpj());
@@ -26,6 +26,7 @@ public class ParametrizacaoDAO implements IDAO<Parametrizacao> {
         sql = sql.replace("#8", entidade.getCep());
         sql = sql.replace("#9", entidade.getTelefone());
         sql = sql.replace("#A", entidade.getEmail());
+        sql = sql.replace("#B", entidade.getComplemento());
 
         if (conexao.getConexao().manipular(sql)) {
             return entidade;
@@ -47,7 +48,8 @@ public class ParametrizacaoDAO implements IDAO<Parametrizacao> {
             estado = '#7',
             cep = '#8',
             telefone = '#9',
-            email = '#A'
+            email = '#A',
+            complemento = '#C'
         WHERE id = #B;
         """;
         sql = sql.replace("#1", entidade.getNomeEmpresa())
@@ -60,7 +62,8 @@ public class ParametrizacaoDAO implements IDAO<Parametrizacao> {
                 .replace("#8", entidade.getCep())
                 .replace("#9", entidade.getTelefone())
                 .replace("#A", entidade.getEmail())
-                .replace("#B", String.valueOf(entidade.getId()));
+                .replace("#B", String.valueOf(entidade.getId()))
+                .replace("#C", String.valueOf(entidade.getComplemento()));
 
         if (conexao.getConexao().manipular(sql)) {
             return entidade;
@@ -93,6 +96,7 @@ public class ParametrizacaoDAO implements IDAO<Parametrizacao> {
                 p.setCep(rs.getString("cep"));
                 p.setTelefone(rs.getString("telefone"));
                 p.setEmail(rs.getString("email"));
+                p.setComplemento(rs.getString("complemento"));
                 return p;
             }
         } catch (Exception e) {
@@ -123,6 +127,7 @@ public class ParametrizacaoDAO implements IDAO<Parametrizacao> {
                 p.setCep(rs.getString("cep"));
                 p.setTelefone(rs.getString("telefone"));
                 p.setEmail(rs.getString("email"));
+                p.setComplemento(rs.getString("complemento"));
                 lista.add(p);
             }
         } catch (Exception e) {

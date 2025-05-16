@@ -143,6 +143,14 @@ body {
   display: none;
   margin: 0 auto;
 }
+.is-invalid {
+  border-color: red;
+}
+
+.invalid-feedback {
+  color: red;
+  font-size: 0.9em;
+}
 
 /* Media queries para responsividade */
 @media (max-width: 767.98px) {
