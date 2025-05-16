@@ -122,6 +122,32 @@ public class ContaDAO implements IDAO<Conta>{
         return lista;
     }
 
+    public List<Conta> listarTodos(Singleton conexao) {
+        List<Conta> contas = new ArrayList<>();
+        String sql = "SELECT * FROM contabancaria";
+
+        try (var rs = conexao.getConexao().consultar(sql)) {
+            while (rs.next()) {
+                Conta conta = new Conta();
+                conta.setId(rs.getInt("contab_id"));
+                conta.setAgencia(rs.getInt("contab_agencia"));
+                conta.setNumero(rs.getString("contab_numero"));
+                conta.setBanco(rs.getString("contab_banco"));
+                conta.setTelefone(rs.getString("contab_telefone"));
+                conta.setEndereco(rs.getString("contab_endereco"));
+                conta.setEnde_num(rs.getInt("contab_ende_num"));
+                conta.setGerente(rs.getString("contab_gerente"));
+
+                contas.add(conta);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar contas: " + e.getMessage(), e);
+        }
+
+        return contas;
+    }
+
+
     @Override
     public boolean apagar(Conta entidade, Singleton conexao) {
         if (entidade == null || entidade.getId() <= 0) {
