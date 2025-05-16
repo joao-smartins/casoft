@@ -1,7 +1,6 @@
 package casoft.mvc.dao;
 
 import casoft.mvc.model.TipoReceitas;
-import casoft.mvc.model.Evento;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 

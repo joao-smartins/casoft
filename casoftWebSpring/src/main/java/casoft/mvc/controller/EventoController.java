@@ -116,7 +116,7 @@ public class EventoController {
                 return json;
             }
             else
-                json.put("erro","Evento não encontrado");
+                json.put("erro","Evento não cadastrado");
             conexao.Desconectar();
         }
         else
