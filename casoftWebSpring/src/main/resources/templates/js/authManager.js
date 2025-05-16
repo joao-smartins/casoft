@@ -85,7 +85,7 @@ class AuthManager {
       // Redireciona com base no nível
       if (nivel === "ADMIN") {
         alert("Login bem-sucedido! Bem-vindo, Administrador!");
-        window.location.href = "cadastroEmpresa.html";
+        window.location.href = "home.html";
       } else {
         alert("Login bem-sucedido! Bem-vindo!");
         window.location.href = "home.html";
