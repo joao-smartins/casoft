@@ -33,9 +33,8 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Páginas administrativas
     const adminPages = [
-      "/cadastroEmpresa.html",
-      "/gerenciarUsuarios.html",
-      "/relatorios.html"
+      "/cadastroEmpresa.html"
+ 
       // Adicione outras páginas administrativas conforme necessário
     ];
     
