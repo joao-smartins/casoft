@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function() {
           // Se for válido, redireciona para a página apropriada
           const nivel = authManager.getNivel();
           if (nivel === "ADMIN") {
+
             window.location.href = "cadastroEmpresa.html";
           } else {
             window.location.href = "home.html";

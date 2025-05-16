@@ -187,7 +187,6 @@ function carregarEmpresa() {
     modoCadastro = true;
     const URL = "http://localhost:8080/apis/param/1";
     const token = authManager.getToken();
-    console.log("Token enviado:", token);
     fetch(URL, {
         method: "GET",
         headers: {
@@ -219,10 +218,6 @@ function carregarEmpresa() {
         document.getElementById('email').value = data.email;
         atualizarTexto(true);
         modoCadastro = false;
-    })
-    .catch((error) => {
-        console.error("Erro ao carregar os dados da empresa:", error);
-        alert("Erro ao carregar os dados da empresa. Verifique a conexão.");
     });
 }
 
