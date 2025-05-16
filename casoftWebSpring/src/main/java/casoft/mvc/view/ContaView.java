@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.util.List;
 import java.util.Map;
 @CrossOrigin
 @RestController
@@ -18,9 +19,13 @@ public class ContaView {
     @Autowired
     private ContaController contaController;
 
+    @GetMapping()
+    public List<Map<String, Object>> getContas() {
+        return contaController.getContas();
+    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getConta(@PathVariable  int id) {
+    public ResponseEntity<Object> getConta(@PathVariable("id") int id) {
         Map<String,Object> json;
         json=contaController.getConta(id);
         if (json!=null)
@@ -38,7 +43,7 @@ public class ContaView {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updtConta(@RequestParam int id_conta, @RequestBody Conta conta_atualizada) {
+    public ResponseEntity<Object> updtConta(@RequestParam("id_conta") int id_conta, @RequestBody Conta conta_atualizada) {
         Map<String,Object> json =contaController.updtConta(id_conta,conta_atualizada);
         if(json.get("erro")==null)
             return ResponseEntity.ok(new Mensagem("Conta do " + conta_atualizada.getBanco()+" alterada com sucesso!"));
@@ -47,7 +52,7 @@ public class ContaView {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteConta(@PathVariable int id) {
+    public ResponseEntity<Object> deleteConta(@PathVariable("id") int id) {
         Map<String, Object> json = contaController.deletarConta(id);
 
         if (json.get("erro") == null)
