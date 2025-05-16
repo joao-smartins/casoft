@@ -5,6 +5,7 @@ import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,10 +18,11 @@ public class EventoController {
 
     public List<Map<String,Object>> getAll(String filtro){
         Singleton conexao = Singleton.getInstancia();
+        Map<String,Object> jsonE = new HashMap<>();
+        List<Map<String,Object>> eventosList = new ArrayList<>();
         if(conexao.conectar()){
             List<Evento> lista =  eventoModel.consultar(filtro, conexao);
             if(!lista.isEmpty()){
-                List<Map<String,Object>> eventosList = new ArrayList<>();
                 for(Evento evento:lista){
                     Map<String,Object> json = new HashMap<>();
                     json.put("id",evento.getId());
@@ -34,17 +36,21 @@ public class EventoController {
                 return eventosList;
             }
             conexao.Desconectar();
-            return null;
+            jsonE.put("erro", "Eventos não encontrado");
+            eventosList.add(jsonE);
+            return eventosList;
         }
-        return null;
+        jsonE.put("erro", "Erro ao conectar ao banco de dados");
+        eventosList.add(jsonE);
+        return eventosList;
     }
 
     public Map<String,Object> getId(int id){
         Singleton conexao = Singleton.getInstancia();
+        Map<String,Object> json = new HashMap<>();
         if(conexao.conectar()){
             Evento e = eventoModel.consultar(id,conexao);
             if(e!=null){
-                Map<String,Object> json = new HashMap<>();
                 json.put("id",e.getId());
                 json.put("nome",e.getNome());
                 json.put("descricao",e.getDescricao());
@@ -53,9 +59,13 @@ public class EventoController {
                 conexao.Desconectar();
                 return json;
             }
-            return null;
+            else
+                json.put("erro","Evento não encontrado");
+            conexao.Desconectar();
         }
-        return null;
+        else
+            json.put("erro","Erro ao conectar ao banco de dados");
+        return json;
     }
 
     public boolean delete(int id){
@@ -71,10 +81,10 @@ public class EventoController {
 
     public Map<String, Object> update(Evento evento){
         Singleton conexao = Singleton.getInstancia();
+        Map<String, Object> json = new HashMap<>();
         if(conexao.conectar()){
             Evento e = eventoModel.update(evento, conexao);
             if(e!=null){
-                Map<String, Object> json = new HashMap<>();
                 json.put("id",e.getId());
                 json.put("nome",e.getNome());
                 json.put("descricao",e.getDescricao());
@@ -83,27 +93,38 @@ public class EventoController {
                 conexao.Desconectar();
                 return json;
             }
+            else
+                json.put("erro","Evento não encontrado");
             conexao.Desconectar();
         }
-        return null;
+        else
+            json.put("erro","Erro ao conectar ao banco de dados");
+        return json;
     }
 
     public Map<String, Object> create(Evento evento){
         Singleton conexao = Singleton.getInstancia();
+        Map<String, Object> json = new HashMap<>();
         if(conexao.conectar()){
             Evento e = eventoModel.create(evento, conexao);
             if(e!=null){
-                Map<String, Object> json = new HashMap<>();
+
                 json.put("id",e.getId());
                 json.put("nome",e.getNome());
                 json.put("descricao",e.getDescricao());
-                json.put("data",e.getData());
+                if(e.getData()!=null){
+                    json.put("data",e.getData());
+                    }
                 json.put("status",e.isStatus());
                 conexao.Desconectar();
                 return json;
             }
+            else
+                json.put("erro","Evento não cadastrado");
             conexao.Desconectar();
         }
-        return null;
+        else
+            json.put("erro","Erro ao conectar ao banco de dados");
+        return json;
     }
 }
