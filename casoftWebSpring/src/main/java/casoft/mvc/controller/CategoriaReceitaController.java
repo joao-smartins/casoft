@@ -17,12 +17,13 @@ public class CategoriaReceitaController {
 
     public List<Map<String,Object>> getAll(String filtro){
         Singleton conexao = Singleton.getInstancia();
-        Map<String,Object> json = new HashMap<>();
+        Map<String,Object> jsonE = new HashMap<>();
         List<Map<String,Object>> tipoReceitaList = new ArrayList<>();
         if(conexao.conectar()){
             List<CategoriaReceita> lista =  categoriaReceitaModel.consultar(filtro, conexao);
             if(!lista.isEmpty()){
                 for(CategoriaReceita categoriaReceita :lista){
+                    Map<String,Object> json = new HashMap<>();
                     json.put("id", categoriaReceita.getId());
                     json.put("nome", categoriaReceita.getNome());
                     tipoReceitaList.add(json);
@@ -31,12 +32,12 @@ public class CategoriaReceitaController {
                 return tipoReceitaList;
             }
             conexao.Desconectar();
-            json.put("erro", "Tipos de Receita não encontrados");
-            tipoReceitaList.add(json);
+            jsonE.put("erro", "Tipos de Receita não encontrados");
+            tipoReceitaList.add(jsonE);
             return tipoReceitaList;
         }
-        json.put("erro", "Erro ao conectar ao banco de dados");
-        tipoReceitaList.add(json);
+        jsonE.put("erro", "Erro ao conectar ao banco de dados");
+        tipoReceitaList.add(jsonE);
         return tipoReceitaList;
     }
 

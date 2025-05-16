@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,11 +54,11 @@ public class CategoriaReceitaView {
         return ResponseEntity.badRequest().body(new Mensagem(json.get("erro").toString()));
     }
 
-    @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody CategoriaReceita categoriaReceita){
-        if(categoriaReceitaController.delete(categoriaReceita.getId())){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> delete(@PathVariable int id){
+        if(categoriaReceitaController.delete(id)){
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.badRequest().body(new Mensagem("Tipo de Receita não deletado!"));
+        return ResponseEntity.badRequest().body(new Mensagem("Falha ao deletar!"));
     }
 }

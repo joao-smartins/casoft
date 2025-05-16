@@ -14,7 +14,7 @@ public class CategoriaReceitaDAO implements IDAO<CategoriaReceita> {
     public CategoriaReceita gravar(CategoriaReceita entidade, Singleton conexao)
     {
         String sql = """
-            INSERT INTO CategoriaRec (nome) 
+            INSERT INTO categoriarec (catrec_nome) 
             VALUES ('#1')
             """;
         sql = sql.replace("#1", entidade.getNome());
@@ -31,7 +31,7 @@ public class CategoriaReceitaDAO implements IDAO<CategoriaReceita> {
     public List<CategoriaReceita> get(String filtro, Singleton conexao) {
         List<CategoriaReceita> tipoReceitas = new ArrayList<>();
         String sql = """
-            SELECT * FROM CategoriaRec
+            SELECT * FROM categoriarec
             """;
         if (filtro != null && !filtro.isBlank()) {
             sql += " WHERE "+filtro;
@@ -40,8 +40,8 @@ public class CategoriaReceitaDAO implements IDAO<CategoriaReceita> {
         try {
             while (rs.next()) {
                 CategoriaReceita r = new CategoriaReceita();
-                r.setId(rs.getInt("id"));
-                r.setNome(rs.getString("nome"));
+                r.setId(rs.getInt("catrec_id"));
+                r.setNome(rs.getString("catrec_nome"));
                 tipoReceitas.add(r);
             }
 
@@ -55,8 +55,8 @@ public class CategoriaReceitaDAO implements IDAO<CategoriaReceita> {
     public CategoriaReceita alterar(CategoriaReceita entidade, Singleton conexao) {
         String sql = """
     UPDATE CategoriaRec SET 
-        nome = '#1'
-    WHERE CatReg_ID = #2;
+        catrec_nome = '#1'
+    WHERE catrec_id = #2;
     """;
         sql = sql.replace("#1", entidade.getNome())
                 .replace("#2", "" + entidade.getId());
@@ -71,7 +71,7 @@ public class CategoriaReceitaDAO implements IDAO<CategoriaReceita> {
 
     @Override
     public boolean apagar(CategoriaReceita entidade, Singleton conexao) {
-        String sql = "DELETE FROM CategoriaRec WHERE CatReg_ID = ";
+        String sql = "DELETE FROM categoriarec WHERE catrec_id = ";
         sql += entidade.getId();
         if(conexao.getConexao().manipular(sql)) {
             return true;
@@ -81,13 +81,13 @@ public class CategoriaReceitaDAO implements IDAO<CategoriaReceita> {
 
     @Override
     public CategoriaReceita get(int id, Singleton conexao) {
-        String sql = "SELECT * FROM CategoriaRec WHERE  CatRec_ID = " + id;
+        String sql = "SELECT * FROM categoriarec WHERE  catrec_id = " + id;
         var rs = conexao.getConexao().consultar(sql);
         try {
             if (rs.next()) {
                 CategoriaReceita r = new CategoriaReceita();
-                r.setId(rs.getInt("CatRec_ID"));
-                r.setNome(rs.getString("CatRec_nome"));
+                r.setId(rs.getInt("catrec_id"));
+                r.setNome(rs.getString("catrec_nome"));
                 return r;
             }
         } catch (Exception e) {
