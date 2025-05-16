@@ -58,24 +58,31 @@ function limparFormulario() {
 
 // Enviar formulário
 function enviarFormulario(event) {
-  event.preventDefault(); // Evita o recarregamento da página
-  var fdados = document.getElementById("formEmpresa");
+    event.preventDefault(); // Evita o recarregamento da página
+    var fdados = document.getElementById("formEmpresa");
 
-  const URL = "http://localhost:8080/apis/param";
-  let formData = new FormData(fdados);
+    // Obtendo o token do localStorage
+    const token = authManager.getToken();
 
-  fetch(URL, {
-    method: "POST",
-    body: formData
-  })
-  .then((response) => response.json())
-  .then((json) => {
-    alert(json.mensagem);
-  })
-  .catch((error) => {
-    alert("Erro ao cadastrar empresa. Por favor, tente novamente."+error.mensagem);
-  });
+    const URL = "http://localhost:8080/apis/param";
+    const metodo = modoCadastro ? "POST" : "PUT";
+    let formData = new FormData(fdados);
 
+    fetch(URL, {
+        method: metodo,
+        headers: {
+            "Authorization": "Bearer " + token // Enviando o token no cabeçalho
+        },
+        body: formData
+    })
+    .then((response) => response.json())
+    .then((json) => {
+        alert(json.mensagem);
+    })
+    .catch((error) => {
+        alert("Erro ao cadastrar empresa. Por favor, tente novamente. " + error.message);
+        console.error("Erro:", error);
+    });
 }
 
 // Event listeners para formatação de campos
@@ -174,3 +181,86 @@ window.addEventListener('resize', function() {
     content.style.marginLeft = '250px';
   }
 });
+modoCadastro = true;
+// Função para verificar se já existe uma empresa cadastrada
+function carregarEmpresa() {
+    modoCadastro = true;
+    const URL = "http://localhost:8080/apis/param/1";
+    const token = authManager.getToken();
+    console.log("Token enviado:", token);
+    fetch(URL, {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + token // Adiciona o token no cabeçalho
+        },
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error("Erro ao obter a empresa.");
+        }
+        return response.json();
+    })
+    .then((data) => {
+        if (Object.keys(data).length === 0) {
+            console.log("Nenhuma empresa cadastrada.");
+            atualizarTexto(false);
+            return;
+        }
+        // Preenche os campos com os dados da empresa
+        document.getElementById('nomeEmpresa').value = data.nomeEmpresa;
+        document.getElementById('cnpj').value = formatarCNPJ(data.cnpj);
+        document.getElementById('logradouro').value = data.logradouro;
+        document.getElementById('numero').value = data.numero;
+        document.getElementById('bairro').value = data.bairro;
+        document.getElementById('cidade').value = data.cidade;
+        document.getElementById('estado').value = data.estado;
+        document.getElementById('cep').value = formatarCEP(data.cep);
+        document.getElementById('telefone').value = formatarTelefone(data.telefone);
+        document.getElementById('email').value = data.email;
+        atualizarTexto(true);
+        modoCadastro = false;
+    })
+    .catch((error) => {
+        console.error("Erro ao carregar os dados da empresa:", error);
+        alert("Erro ao carregar os dados da empresa. Verifique a conexão.");
+    });
+}
+
+
+// Verificar ao carregar a página
+window.onload = carregarEmpresa;
+
+function atualizarTexto(alteracao) {
+    const tituloPagina = alteracao ? "Alteração de Empresa" : "Cadastro de Empresa";
+    const tituloCard = alteracao ? "Alteração de Empresa" : "Cadastro de Empresa";
+    const textoBotao = alteracao ? "Alterar" : "Cadastrar";
+
+    // Mudar o título da página
+    document.title = tituloPagina;
+
+    // Mudar o título do formulário
+    const titulo = document.querySelector(".card-section h3");
+    if (titulo) titulo.textContent = tituloCard;
+
+    // Mudar o texto do botão
+    const botao = document.querySelector("button[type='submit']");
+    if (botao) botao.textContent = textoBotao;
+
+    // Mudar os links da sidebar
+    const sidebarLinks = document.querySelectorAll(".sidebar a");
+    sidebarLinks.forEach((link) => {
+        if (link.textContent.includes("Cadastro")) {
+            link.textContent = link.textContent.replace("Cadastro", "Alteração");
+        }
+    });
+}
+function formatarCNPJ(cnpj) {
+        return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+    }
+
+    function formatarTelefone(telefone) {
+        return telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+    }
+    function formatarCEP(cep) {
+        return cep.replace(/^(\d{5})(\d{3})$/, "$1-$2");
+    }

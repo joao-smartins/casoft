@@ -15,9 +15,6 @@ import java.util.Map;
 public class ParametrizacaoController {
     @Autowired
     private Parametrizacao paramModel;
-
-
-
     public Map<String,Object> getParam(int id) {
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){
@@ -51,9 +48,9 @@ public class ParametrizacaoController {
 
             if (paramModel.isEmpty(conexao)) {
                 try{
-                    File uploadFolder = new File("src/main/resources/templates/img/");
+                    File uploadFolder = new File("casoftWebSpring/src/main/resources/templates/img/");
                     if (!uploadFolder.exists())
-                        uploadFolder.mkdir();
+                        uploadFolder.mkdirs();
                     file.transferTo(new File(uploadFolder.getAbsoluteFile()+"\\"+"logo.png"));
                     cnpj=cnpj.replaceAll("[^\\d]", "");
                     cep=cep.replaceAll("[^\\d]", "");
@@ -95,7 +92,7 @@ public class ParametrizacaoController {
         Map<String,Object> json= new HashMap<>();
         if(conexao.conectar()){
             try{
-                File uploadFolder = new File("src/main/resources/templates/img/");
+                File uploadFolder = new File("casoftWebSpring/src/main/resources/templates/img/");
                 if (!uploadFolder.exists())
                     uploadFolder.mkdir();
                 file.transferTo(new File(uploadFolder.getAbsoluteFile()+"\\"+"logo.png"));

@@ -10,10 +10,10 @@ import java.util.List;
 @Repository
 public class UsuarioDAO implements IDAO<Usuario> {
     @Override
-    public Object gravar(Usuario usuario, Singleton conexao) {
+    public Usuario gravar(Usuario usuario, Singleton conexao) {
         if (existeUsuarioComLogin(usuario.getLogin(),conexao)) {
             System.out.println("Erro: Já existe um usuário com este login!");
-            return false;
+            return null;
         }
 
         usuario.setCpf(formatarCPF(usuario.getCpf()));
@@ -30,20 +30,26 @@ public class UsuarioDAO implements IDAO<Usuario> {
                 .replace("#6", usuario.getCpf())
                 .replace("#7", usuario.getTelefone());
 
-        return conexao.getConexao().manipular(sql);
+        if(conexao.getConexao().manipular(sql)){
+            return usuario;
+        }
+        else{
+            System.out.println("Erro: " + conexao.getConexao().getMensagemErro());
+            return null;
+        }
     }
 
     @Override
-    public Object alterar(Usuario usuario, Singleton conexao) {
+    public Usuario alterar(Usuario usuario, Singleton conexao) {
         if (existeOutroUsuarioComLogin(usuario.getLogin(), usuario.getId(),conexao)) {
             System.out.println("Erro: Login já está em uso por outro usuário!");
-            return false;
+            return null;
         }
 
         if ("ADMIN".equals(usuario.getNivelAcesso()) && !usuario.isAtivo()) {
             if (isUltimoAdminAtivo(usuario.getId(),conexao)) {
                 System.out.println("Erro: Não é possível desativar o último ADMIN!");
-                return false;
+                return null;
             }
         }
 
@@ -60,7 +66,13 @@ public class UsuarioDAO implements IDAO<Usuario> {
                 .replace("#7", usuario.getTelefone())
                 .replace("#8", String.valueOf(usuario.getId()));
 
-        return conexao.getConexao().manipular(sql);
+        if(conexao.getConexao().manipular(sql)){
+            return usuario;
+        }
+        else{
+            System.out.println("Erro: " + conexao.getConexao().getMensagemErro());
+            return null;
+        }
     }
 
     @Override
@@ -121,7 +133,18 @@ public class UsuarioDAO implements IDAO<Usuario> {
         }
         return usuarios;
     }
-
+    public int contarUsuarios(Singleton conexao) {
+        String sql = "SELECT COUNT(*) FROM usuario";
+        var rs = conexao.getConexao().consultar(sql);
+        try {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar usuarios: "+e.getMessage());
+        }
+        return 0;
+    }
     private boolean existeUsuarioComLogin(String login,Singleton conexao) {
         String sql = "SELECT COUNT(*) FROM usuario WHERE login = '" + login + "'";
         ResultSet rs = conexao.getConexao().consultar(sql);
@@ -161,5 +184,28 @@ public class UsuarioDAO implements IDAO<Usuario> {
 
     private String formatarTelefone(String telefone) {
         return telefone.replaceAll("(\\d{2})(\\d{5})(\\d{4})", "($1) $2-$3");
+    }
+    public boolean existeLogin(String login, Singleton conexao) {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE login = '" + login + "'";
+        var rs = conexao.getConexao().consultar(sql);
+        try {
+            return rs.next() && rs.getInt(1) > 0;
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar login: "+e.getMessage());
+            return false;
+        }
+    }
+    public int contarAdminsAtivos(Singleton conexao) {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE nivel_acesso = '" +
+                Usuario.NIVEL_ADMIN + "' AND ativo = true";
+        var rs = conexao.getConexao().consultar(sql);
+        try {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar Admins ativos: "+e.getMessage());
+        }
+        return 0;
     }
 }

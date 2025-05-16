@@ -65,43 +65,42 @@ async function fazerRequisicao(url, metodo, dados) {
 }
 
 // Login
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const login = document.getElementById("login").value;
-  const senha = document.getElementById("senha").value;
+document.addEventListener("DOMContentLoaded", function() {
+  // Verificando se já existe um token salvo
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    // Se o token existir, verifica se ainda é válido
+    authManager.verificarToken()
+      .then(isValid => {
+        if (isValid) {
+          // Se for válido, redireciona para a página apropriada
+          const nivel = authManager.getNivel();
+          if (nivel === "ADMIN") {
+            window.location.href = "cadastroEmpresa.html";
+          } else {
+            window.location.href = "home.html";
+          }
+        }
+      })
+      .catch(error => {
+        console.error("Erro ao verificar token:", error);
+        // Em caso de erro, limpa o token e mantém na página de login
+        authManager.logout();
+      });
+  }
 
-  fetch(`http://localhost:8080/autenticar/${login}/${senha}`, {
-      method: "GET"
-  })
-  .then((response) => {
-      if (!response.ok) {
-          return response.json().then((errorData) => {
-              throw new Error(errorData.mensagem); // Lança erro para o .catch
-          });
-      }
-      return response.json(); // Extrai o objeto JSON contendo o token e o nível
-  })
-  .then((data) => {
-      const token = data.token;
-      const nivel = data.nivel;
-
-      // Armazenando o token e o nível no localStorage
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("userNivel", nivel);
-
-      // Redirecionando com base no nível do usuário
-      if (nivel === "ADMIN") {
-          alert("Login bem-sucedido! Bem-vindo, Administrador!");
-          window.location.href = "cadastroEmpresa.html";
-      } else {
-          alert("Login bem-sucedido! Bem-vindo!");
-          window.location.href = "home.html";
-      }
-  })
-  .catch((error) => {
-      console.error("Erro durante o login:", error);
-      alert("Erro ao tentar fazer login: " + error.message);
-  });
+  // Configurando o listener do formulário de login
+  const loginForm = document.getElementById("loginForm");
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const login = document.getElementById("login").value;
+      const senha = document.getElementById("senha").value;
+      
+      // Utiliza o gerenciador de autenticação para fazer login
+      authManager.login(login, senha);
+    });
+  }
 });
 
 
