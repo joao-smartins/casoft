@@ -5,6 +5,7 @@ import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,12 +18,13 @@ public class EventoController {
 
     public List<Map<String,Object>> getAll(String filtro){
         Singleton conexao = Singleton.getInstancia();
-        Map<String,Object> json = new HashMap<>();
+        Map<String,Object> jsonE = new HashMap<>();
         List<Map<String,Object>> eventosList = new ArrayList<>();
         if(conexao.conectar()){
             List<Evento> lista =  eventoModel.consultar(filtro, conexao);
             if(!lista.isEmpty()){
                 for(Evento evento:lista){
+                    Map<String,Object> json = new HashMap<>();
                     json.put("id",evento.getId());
                     json.put("nome",evento.getNome());
                     json.put("descricao",evento.getDescricao());
@@ -34,12 +36,12 @@ public class EventoController {
                 return eventosList;
             }
             conexao.Desconectar();
-            json.put("erro", "Eventos não encontrado");
-            eventosList.add(json);
+            jsonE.put("erro", "Eventos não encontrado");
+            eventosList.add(jsonE);
             return eventosList;
         }
-        json.put("erro", "Erro ao conectar ao banco de dados");
-        eventosList.add(json);
+        jsonE.put("erro", "Erro ao conectar ao banco de dados");
+        eventosList.add(jsonE);
         return eventosList;
     }
 
@@ -110,7 +112,9 @@ public class EventoController {
                 json.put("id",e.getId());
                 json.put("nome",e.getNome());
                 json.put("descricao",e.getDescricao());
-                json.put("data",e.getData());
+                if(e.getData()!=null){
+                    json.put("data",e.getData());
+                    }
                 json.put("status",e.isStatus());
                 conexao.Desconectar();
                 return json;

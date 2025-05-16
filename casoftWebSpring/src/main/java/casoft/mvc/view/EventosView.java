@@ -52,7 +52,7 @@ public class EventosView {
         if(json.get("erro")==null){
             return ResponseEntity.ok().body(json);
         }
-        return ResponseEntity.badRequest().body(new Mensagem(json.get("erro").toString()));
+        return ResponseEntity.badRequest().body(json);
     }
 
     @DeleteMapping
