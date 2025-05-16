@@ -81,11 +81,14 @@ class AuthManager {
       
       // Salva os dados de autenticação
       this.setAuthData(token, nivel);
-      
+      const empresaCadastrada = await this.verificaEmpresaCadastrada();
       // Redireciona com base no nível
       if (nivel === "ADMIN") {
         alert("Login bem-sucedido! Bem-vindo, Administrador!");
-        window.location.href = "home.html";
+        if(empresaCadastrada)
+          window.location.href = "home.html";
+        else
+          window.location.href = "cadastroEmpresa.html";
       } else {
         alert("Login bem-sucedido! Bem-vindo!");
         window.location.href = "home.html";
@@ -98,6 +101,20 @@ class AuthManager {
       return false;
     }
   }
+  async verificaEmpresaCadastrada() {
+    const URL = "http://localhost:8080/apis/param/1";
+    const token = authManager.getToken();
+    const response = await fetch(URL, {
+      method: "GET",
+      headers: {
+          "Authorization": "Bearer " + token, // Adiciona o token no cabeçalho
+      },
+    });
+    if (!response.ok) {
+        return false;
+    }
+    return true;
+    }
 }
 
 // Cria instância global do gerenciador de autenticação
