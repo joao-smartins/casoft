@@ -1,7 +1,7 @@
 package casoft.mvc.view;
 
-import casoft.mvc.controller.TipoReceitasController;
-import casoft.mvc.model.TipoReceitas;
+import casoft.mvc.controller.CategoriaReceitaController;
+import casoft.mvc.model.CategoriaReceita;
 import casoft.mvc.util.Mensagem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +12,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("apis/tiporeceita")
-public class TipoReceitaView {
+public class CategoriaReceitaView {
 
     @Autowired
-    private TipoReceitasController tipoReceitasController;
+    private CategoriaReceitaController categoriaReceitaController;
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getId(@PathVariable int id){
-        Map<String,Object> json = tipoReceitasController.getId(id);
+        Map<String,Object> json = categoriaReceitaController.getId(id);
         if(json.get("erro")==null){
             return ResponseEntity.ok().body(json);
         }
@@ -28,7 +28,7 @@ public class TipoReceitaView {
 
     @GetMapping
     public ResponseEntity<Object> getAll(){
-        List<Map<String,Object>> listJson = tipoReceitasController.getAll("");
+        List<Map<String,Object>> listJson = categoriaReceitaController.getAll("");
         if(listJson.getFirst().get("erro")==null){
             return ResponseEntity.ok().body(listJson);
         }
@@ -36,8 +36,8 @@ public class TipoReceitaView {
     }
 
     @PutMapping
-    public ResponseEntity<Object> update(@RequestBody TipoReceitas tipoReceitas){
-        Map<String, Object> json = tipoReceitasController.update(tipoReceitas);
+    public ResponseEntity<Object> update(@RequestBody CategoriaReceita categoriaReceita){
+        Map<String, Object> json = categoriaReceitaController.update(categoriaReceita);
         if(json.get("erro")==null){
             return ResponseEntity.ok().body(json);
         }
@@ -45,8 +45,8 @@ public class TipoReceitaView {
     }
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody TipoReceitas tipoReceitas){
-        Map<String,Object> json = tipoReceitasController.create(tipoReceitas);
+    public ResponseEntity<Object> create(@RequestBody CategoriaReceita categoriaReceita){
+        Map<String,Object> json = categoriaReceitaController.create(categoriaReceita);
         if(json.get("erro")==null){
             return ResponseEntity.ok().body(json);
         }
@@ -54,10 +54,10 @@ public class TipoReceitaView {
     }
 
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody TipoReceitas tipoReceitas){
-        if(tipoReceitasController.delete(tipoReceitas.getId())){
+    public ResponseEntity<Object> delete(@RequestBody CategoriaReceita categoriaReceita){
+        if(categoriaReceitaController.delete(categoriaReceita.getId())){
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.badRequest().body(new Mensagem("Evento não deletado!"));
+        return ResponseEntity.badRequest().body(new Mensagem("Tipo de Receita não deletado!"));
     }
 }

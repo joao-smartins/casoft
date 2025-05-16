@@ -1,6 +1,6 @@
 package casoft.mvc.dao;
 
-import casoft.mvc.model.TipoReceitas;
+import casoft.mvc.model.CategoriaReceita;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 
@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class TipoReceitasDAO implements IDAO<TipoReceitas> {
+public class CategoriaReceitaDAO implements IDAO<CategoriaReceita> {
 
     @Override
-    public TipoReceitas gravar(TipoReceitas entidade, Singleton conexao)
+    public CategoriaReceita gravar(CategoriaReceita entidade, Singleton conexao)
     {
         String sql = """
             INSERT INTO CategoriaRec (nome) 
@@ -28,8 +28,8 @@ public class TipoReceitasDAO implements IDAO<TipoReceitas> {
     }
 
     @Override
-    public List<TipoReceitas> get(String filtro, Singleton conexao) {
-        List<TipoReceitas> tipoReceitas = new ArrayList<>();
+    public List<CategoriaReceita> get(String filtro, Singleton conexao) {
+        List<CategoriaReceita> tipoReceitas = new ArrayList<>();
         String sql = """
             SELECT * FROM CategoriaRec
             """;
@@ -39,7 +39,7 @@ public class TipoReceitasDAO implements IDAO<TipoReceitas> {
         var rs = conexao.getConexao().consultar(sql);
         try {
             while (rs.next()) {
-                TipoReceitas r = new TipoReceitas();
+                CategoriaReceita r = new CategoriaReceita();
                 r.setId(rs.getInt("id"));
                 r.setNome(rs.getString("nome"));
                 tipoReceitas.add(r);
@@ -52,7 +52,7 @@ public class TipoReceitasDAO implements IDAO<TipoReceitas> {
     }
 
     @Override
-    public TipoReceitas alterar(TipoReceitas entidade, Singleton conexao) {
+    public CategoriaReceita alterar(CategoriaReceita entidade, Singleton conexao) {
         String sql = """
     UPDATE CategoriaRec SET 
         nome = '#1'
@@ -70,7 +70,7 @@ public class TipoReceitasDAO implements IDAO<TipoReceitas> {
     }
 
     @Override
-    public boolean apagar(TipoReceitas entidade, Singleton conexao) {
+    public boolean apagar(CategoriaReceita entidade, Singleton conexao) {
         String sql = "DELETE FROM CategoriaRec WHERE CatReg_ID = ";
         sql += entidade.getId();
         if(conexao.getConexao().manipular(sql)) {
@@ -80,12 +80,12 @@ public class TipoReceitasDAO implements IDAO<TipoReceitas> {
     }
 
     @Override
-    public TipoReceitas get(int id, Singleton conexao) {
+    public CategoriaReceita get(int id, Singleton conexao) {
         String sql = "SELECT * FROM CategoriaRec WHERE  CatRec_ID = " + id;
         var rs = conexao.getConexao().consultar(sql);
         try {
             if (rs.next()) {
-                TipoReceitas r = new TipoReceitas();
+                CategoriaReceita r = new CategoriaReceita();
                 r.setId(rs.getInt("CatRec_ID"));
                 r.setNome(rs.getString("CatRec_nome"));
                 return r;
