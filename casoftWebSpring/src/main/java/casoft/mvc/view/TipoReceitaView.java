@@ -1,27 +1,25 @@
 package casoft.mvc.view;
 
-import casoft.mvc.controller.EventoController;
-import casoft.mvc.model.Evento;
+import casoft.mvc.controller.TipoReceitasController;
+import casoft.mvc.model.TipoReceitas;
 import casoft.mvc.util.Mensagem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin
 @RestController
-@RequestMapping("apis/eventos")
-public class EventosView {
+@RequestMapping("apis/tiporeceita")
+public class TipoReceitaView {
 
     @Autowired
-    private EventoController eventoController;
+    private TipoReceitasController tipoReceitasController;
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getId(@PathVariable int id){
-        Map<String,Object> json = eventoController.getId(id);
+        Map<String,Object> json = tipoReceitasController.getId(id);
         if(json.get("erro")==null){
             return ResponseEntity.ok().body(json);
         }
@@ -30,16 +28,16 @@ public class EventosView {
 
     @GetMapping
     public ResponseEntity<Object> getAll(){
-        List<Map<String,Object>> listJson = eventoController.getAll("");
-        if(!listJson.isEmpty()){
+        List<Map<String,Object>> listJson = tipoReceitasController.getAll("");
+        if(listJson.getFirst().get("erro")==null){
             return ResponseEntity.ok().body(listJson);
         }
-        return ResponseEntity.badRequest().body(new Mensagem("Não há eventos registrados!"));
+        return ResponseEntity.badRequest().body(new Mensagem(listJson.getFirst().get("erro").toString()));
     }
 
     @PutMapping
-    public ResponseEntity<Object> update(@RequestBody Evento evento){
-        Map<String, Object> json = eventoController.update(evento);
+    public ResponseEntity<Object> update(@RequestBody TipoReceitas tipoReceitas){
+        Map<String, Object> json = tipoReceitasController.update(tipoReceitas);
         if(json.get("erro")==null){
             return ResponseEntity.ok().body(json);
         }
@@ -47,8 +45,8 @@ public class EventosView {
     }
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody Evento evento){
-        Map<String,Object> json = eventoController.create(evento);
+    public ResponseEntity<Object> create(@RequestBody TipoReceitas tipoReceitas){
+        Map<String,Object> json = tipoReceitasController.create(tipoReceitas);
         if(json.get("erro")==null){
             return ResponseEntity.ok().body(json);
         }
@@ -56,11 +54,10 @@ public class EventosView {
     }
 
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Evento evento){
-        Map<String,Object> json = new HashMap<>();
-         if(eventoController.delete(evento.getId())){
-             return ResponseEntity.noContent().build();
+    public ResponseEntity<Object> delete(@RequestBody TipoReceitas tipoReceitas){
+        if(tipoReceitasController.delete(tipoReceitas.getId())){
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.badRequest().body(json.put("erro","Tipo de Receita não deletado"));
+        return ResponseEntity.badRequest().body(new Mensagem("Evento não deletado!"));
     }
 }
