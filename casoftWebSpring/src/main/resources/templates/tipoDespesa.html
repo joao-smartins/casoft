@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciar Tipo de Despesas</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Gerenciar Tipo de Despesas</h1>
+
+    <div class="form-group">
+      <label for="despesaPost">Descrição:</label>
+      <div class="inline-group">
+        <input type="text" id="despesaPost" name="despesaPost" placeholder="Digite a descrição da despesa" />
+        <button type="button" onclick="cadastrarTipo()">Cadastrar</button>
+      </div>
+      <p id="mensagem"></p>
+    </div>
+
+    <div class="form-group">
+      <button onclick="buscarTodosTipo()">Carregar Tipos</button>
+      <div id="despesaGet" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="despesaGetID">Digite o ID para buscar:</label>
+      <div class="inline-group">
+        <input type="number" id="despesaGetID" placeholder="Digite o ID" />
+        <button onclick="buscarTipoId()">Buscar Tipo pelo ID</button>
+      </div>
+      <div id="resultado" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="despesaDelete">Digite o ID do Tipo para deletar:</label>
+      <div class="inline-group">
+        <input type="number" id="despesaDelete" placeholder="Digite o ID do Tipo para deletar" />
+        <button onclick="deletarTipo()">Deletar Tipo</button>
+      </div>
+    </div>
+
+    <div class="form-group update-group">
+      <label for="tipoDespesaUpdateID">Digite o ID do Tipo para atualizar:</label>
+      <input type="number" id="tipoDespesaUpdateID" placeholder="Digite o ID do Tipo" />
+
+      <label for="tipoDespesaUpdateNome">Digite o novo nome do Tipo:</label>
+      <input type="text" id="tipoDespesaUpdateNome" placeholder="Digite o novo nome do Tipo" />
+
+      <button onclick="alterarTipo()">Atualizar Tipo</button>
+    </div>
+  </div>
+
+  <script src="js/funcoes.js"></script>
+</body>
+</html>
