@@ -1007,6 +1007,9 @@ ALTER TABLE ONLY public.volun_even
     ADD CONSTRAINT volun_even_voluntario_volu_id_fkey FOREIGN KEY (voluntario_volu_id) REFERENCES public.voluntario(volu_id);
 
 
+ALTER TABLE parametrizacao
+    ADD COLUMN complemento VARCHAR(255);
+
 -- Completed on 2025-05-16 14:23:47 -03
 
 --
