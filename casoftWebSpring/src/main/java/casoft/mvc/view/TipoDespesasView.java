@@ -53,10 +53,11 @@ public class TipoDespesasView
     @PostMapping
     public ResponseEntity<Object> addDespesa(@RequestBody TipoDespesas tipodespesa)
     {
+
         Map<String,Object> json = tipoDespesasController.addTipoDespesa(tipodespesa);
         if(json.get("erro") == null)
         {
-            return ResponseEntity.ok(new Mensagem(tipodespesa.getDescricao() + " cadastrada com sucesso!"));
+            return ResponseEntity.ok(new Mensagem(tipodespesa.getNome() + " cadastrada com sucesso!"));
         }
         else
         {
@@ -70,7 +71,7 @@ public class TipoDespesasView
         Map<String,Object> json = tipoDespesasController.updateTipoDespesa(tipodespesa);
         if(json.get("erro") == null)
         {
-            return ResponseEntity.ok(new Mensagem("Tipo de despesa" + tipodespesa.getDescricao() + " alterada com sucesso!"));
+            return ResponseEntity.ok(new Mensagem("Tipo de despesa" + tipodespesa.getNome() + " alterada com sucesso!"));
         }
         else
         {

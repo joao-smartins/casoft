@@ -178,92 +178,345 @@ body {
 
 
 
+
+/* Tipos Despesas */
+
 body {
   font-family: Arial, sans-serif;
-  background: #eef2f7;
   margin: 0;
-  height: 100vh;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 0;
+  background-color: #f2f2f2;
 }
 
-.container {
-  background: #fff;
-  width: 450px;
-  padding: 30px 30px 40px 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-h1 {
-  margin-top: 0;
-  margin-bottom: 30px;
-  font-weight: 700;
-  color: #333;
+h2 {
+  color: #4CAF50;
   text-align: center;
+  margin-top: 20px;
 }
 
-.form-group {
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  margin: 20px;
+}
+
+.form-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
+  width: 100%;
+  max-width: 800px;
 }
 
-label {
-  font-weight: 600;
-  color: #555;
-  display: block;
-  margin-bottom: 8px;
-}
-
-input[type="text"],
-input[type="number"] {
-  width: calc(100% - 100px);
-  padding: 8px 10px;
-  border: 1.5px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-  vertical-align: middle;
-  transition: border-color 0.3s ease;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus {
-  border-color: #4a90e2;
-  outline: none;
+input[type="text"], input[type="number"], input[type="email"], select {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0 15px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 button {
-  width: 90px;
-  padding: 8px 0;
-  margin-left: 10px;
-  background-color: #4a90e2;
-  border: none;
+  background-color: #4CAF50;
   color: white;
-  font-weight: 600;
-  border-radius: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  vertical-align: middle;
+  width: 100%;
+  font-size: 16px;
 }
 
 button:hover {
-  background-color: #357abd;
+  background-color: #45a049;
 }
 
-/* Linha com input + botão alinhados lado a lado */
-.inline-group {
+#mensagem {
+  color: red;
+  margin-top: 10px;
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: #ecf0f1;
+}
+
+.sidebar {
+  height: 100%;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #2c3e50;
+  overflow-x: hidden;
+  padding-top: 20px;
+  color: white;
+}
+
+.sidebar a {
+  padding: 10px 15px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #ecf0f1;
+  display: block;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #34495e;
+  color: white;
+}
+
+.sidebar h4 {
+  color: white;
+  margin-left: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.main {
+  margin-left: 250px;
+  padding: 80px 20px; /* Adiciona padding para evitar sobreposição */
+  box-sizing: border-box; /* Garante que o padding não aumente a largura total */
+}
+
+.top-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  text-align: right;
+  z-index: 1000;
   display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-/* Para inputs maiores em atualização */
-#tipoDespesaUpdateNome {
-  width: calc(100% - 20px);
-  margin-top: 6px;
+.top-menu img {
+  max-height: 50px;
+  margin-right: auto;
 }
 
-/* Container para update com label e inputs separados */
-.update-group label {
-  margin-top: 12px;
+.top-menu button {
+  margin-left: auto;
+}
+
+.card-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.section-title {
+  color: #3498db;
+  margin-bottom: 15px;
+  font-size: 1.4em;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 5px;
+}
+
+.required {
+  color: red;
+  font-weight: bold;
+}
+
+.logo-preview {
+  max-width: 200px;
+  max-height: 200px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 5px;
+  margin-top: 10px;
+}
+
+/* Estilos adicionais para o cabeçalho e botão */
+.top-menu {
+  background-color: #2c3e50; /* Cor de fundo do cabeçalho */
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between; /* Espaçamento entre elementos */
+  align-items: center; /* Alinhamento vertical */
+}
+
+.top-menu img {
+  height: 50px; /* Altura do logo */
+}
+
+.top-menu button {
+  background-color: #e74c3c; /* Cor de fundo do botão */
+  color: white; /* Cor do texto do botão */
+  border: none; /* Remove a borda padrão */
+  padding: 10px 20px; /* Preenchimento do botão */
+  border-radius: 5px; /* Borda arredondada */
+  cursor: pointer; /* Cursor de mão ao passar por cima */
+  font-size: 16px; /* Tamanho da fonte */
+}
+
+.top-menu button:hover {
+  background-color: #c0392b; /* Cor de fundo do botão ao passar o mouse */
+}
+
+
+.sidebar {
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #2c3e50;
+  padding-top: 70px; /* Ajuste para evitar sobreposição com o menu superior fixo */
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.sidebar a {
+  padding: 15px 25px;
+  text-decoration: none;
+  font-size: 18px;
+  color: white;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #34495e;
+}
+
+.sidebar h4 {
+  color: white;
+  font-size: 20px;
+  margin: 20px 25px;
+}
+
+.main {
+  margin-left: 250px;
+  padding: 20px;
+}
+
+/* Estilos para formulários e botões */
+.form-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.form-container h5 {
+  color: #3498db;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 5px;
+}
+
+.form-container input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0 15px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-container button {
+  background-color: #2ecc71;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.form-container button:hover {
+  background-color: #27ae60;
+}
+
+/* Estilos para tabelas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f0f0f0;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: #ecf0f1;
+}
+
+/* Estilos para botões de ação na tabela */
+td button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 5px;
+  transition: background-color 0.3s ease;
+}
+
+td button:hover {
+  background-color: #2980b9;
+}
+
+td button.excluir {
+  background-color: #e74c3c;
+}
+
+td button.excluir:hover {
+  background-color: #c0392b;
 }

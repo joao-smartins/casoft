@@ -5,50 +5,61 @@
   <title>Gerenciar Tipo de Despesas</title>
   <link rel="stylesheet" href="css/estilo.css">
 </head>
-<body>
-  <div class="container">
-    <h1>Gerenciar Tipo de Despesas</h1>
+<body onload="buscarTodosTipo()">
 
-    <div class="form-group">
-      <label for="despesaPost">Descrição:</label>
-      <div class="inline-group">
-        <input type="text" id="despesaPost" name="despesaPost" placeholder="Digite a descrição da despesa" />
-        <button type="button" onclick="cadastrarTipo()">Cadastrar</button>
+  <div class="top-menu">
+    <img src="img/logo.png" alt="Logo da Empresa">
+    <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger">Deslogar</button>
+  </div>
+  <div class="sidebar" id="sidebar">
+    <h4 class="p-3">Menu</h4>
+    <a href="home.html">Home</a>
+    <a href="cadastroEmpresa.html">Empresa</a>
+    <a href="EventoHTML/homeEvento.html">Eventos</a>
+    <a href="TipoReceitasHTML/homeTPReceita.html">Tipos de Receita</a>
+    <a href="tipoDespesa.html">Tipos de Despesas</a>
+    <a href="#">Relatórios</a>
+    <a href="#">Configurações</a>
+  </div>
+
+  <div class="main">
+    <h2>Cadastro de Tipo de Despesas</h2>
+
+    <div class="flex-container">
+      <div class="form-container">
+        <h5 class="section-title">Cadastro</h5>
+        <input type="text" id="despesaPost" placeholder="Descrição da despesa">
+        <button onclick="cadastrarTipo()">Cadastrar</button>
       </div>
-      <p id="mensagem"></p>
-    </div>
 
-    <div class="form-group">
-      <button onclick="buscarTodosTipo()">Carregar Tipos</button>
-      <div id="despesaGet" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="form-group">
-      <label for="despesaGetID">Digite o ID para buscar:</label>
-      <div class="inline-group">
-        <input type="number" id="despesaGetID" placeholder="Digite o ID" />
-        <button onclick="buscarTipoId()">Buscar Tipo pelo ID</button>
+      <div class="form-container">
+        <h5 class="section-title">Filtro</h5>
+        <input type="text" id="filtro" placeholder="Filtrar por ID ou Nome" oninput="buscarTodosTipo()">
       </div>
-      <div id="resultado" style="margin-top:8px;"></div>
-    </div>
 
-    <div class="form-group">
-      <label for="despesaDelete">Digite o ID do Tipo para deletar:</label>
-      <div class="inline-group">
-        <input type="number" id="despesaDelete" placeholder="Digite o ID do Tipo para deletar" />
-        <button onclick="deletarTipo()">Deletar Tipo</button>
+      <div class="form-container" id="formAtualizar" style="display: none;">
+        <h5 class="section-title">Atualizar Tipo de Despesa</h5>
+        <label for="tipoDespesaUpdateID">ID:</label>
+        <input type="number" id="tipoDespesaUpdateID" placeholder="ID" readonly>
+        <label for="tipoDespesaUpdateNome">Nome:</label>
+        <input type="text" id="tipoDespesaUpdateNome" placeholder="Novo nome">
+        <button type="button" id="btnAtualizar" onclick="alterarTipo()">Atualizar</button>
       </div>
     </div>
 
-    <div class="form-group update-group">
-      <label for="tipoDespesaUpdateID">Digite o ID do Tipo para atualizar:</label>
-      <input type="number" id="tipoDespesaUpdateID" placeholder="Digite o ID do Tipo" />
+    <div id="mensagem" class="mensagem"></div>
 
-      <label for="tipoDespesaUpdateNome">Digite o novo nome do Tipo:</label>
-      <input type="text" id="tipoDespesaUpdateNome" placeholder="Digite o novo nome do Tipo" />
-
-      <button onclick="alterarTipo()">Atualizar Tipo</button>
-    </div>
+    <table id="tabelaDespesas">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Editar</th>
+        <th>Excluir</th>
+      </tr>
+      </thead>
+      <tbody id="tabelaTipos"></tbody>
+    </table>
   </div>
 
   <script src="js/funcoes.js"></script>

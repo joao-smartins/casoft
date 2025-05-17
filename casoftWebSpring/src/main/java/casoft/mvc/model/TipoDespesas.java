@@ -15,7 +15,7 @@ public class TipoDespesas
     private TipoDespesasDAO dao;
 
     private int id;
-    private String descricao;
+    private String nome;
 
 
     public TipoDespesas()
@@ -23,10 +23,10 @@ public class TipoDespesas
 
     }
 
-    public TipoDespesas(int id, String descricao)
+    public TipoDespesas(int id, String nome)
     {
         this.id = id;
-        this.descricao = descricao;
+        this.nome = nome;
     }
 
     public int getId()
@@ -39,14 +39,14 @@ public class TipoDespesas
         this.id = id;
     }
 
-    public String getDescricao()
+    public String getNome()
     {
-        return descricao;
+        return nome;
     }
 
-    public void setDescricao(String descricao)
+    public void setNome(String nome)
     {
-        this.descricao = descricao;
+        this.nome = nome;
     }
 
     public TipoDespesas consultar(int id, Singleton conexao)

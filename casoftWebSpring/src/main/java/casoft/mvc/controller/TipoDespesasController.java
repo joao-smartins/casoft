@@ -25,11 +25,11 @@ public class TipoDespesasController
             if(!lista.isEmpty())
             {
                 List<Map<String,Object>> despeList = new ArrayList<>();
-                for(TipoDespesas tipo: lista)
+                for(TipoDespesas tipoDespesa: lista)
                 {
                     Map<String,Object> json = new HashMap<>();
-                    json.put("id",tipo.getId());
-                    json.put("descricao",tipo.getDescricao());
+                    json.put("id",tipoDespesa.getId());
+                    json.put("nome",tipoDespesa.getNome());
                     despeList.add(json);
                 }
                 conexao.Desconectar();
@@ -52,7 +52,7 @@ public class TipoDespesasController
             {
                 Map<String,Object> json = new HashMap<>();
                 json.put("id",tipo.getId());
-                json.put("descricao",tipo.getDescricao());
+                json.put("nome",tipo.getNome());
                 conexao.Desconectar();
                 return json;
             }
@@ -65,25 +65,33 @@ public class TipoDespesasController
     {
         Singleton conexao = Singleton.getInstancia();
         Map<String,Object> json = new HashMap<>();
-        if(conexao.conectar())
+
+        if(tipoDespesa.getNome() == null || tipoDespesa.getNome().trim().isEmpty())
         {
-            TipoDespesas tipo = new TipoDespesas(tipoDespesa.getId(), tipoDespesa.getDescricao());
-            if(despeModel.gravar(tipo,conexao) != null)
-            {
-                json.put("id",tipo.getId());
-                json.put("descricao",tipo.getDescricao());
-                conexao.getConexao().commit();
-            }
-            else
-            {
-                json.put("erro", "Erro ao gravar tipo de despesa");
-                conexao.getConexao().rollback();
-            }
-            conexao.Desconectar();
+            json.put("erro!", "Campo esta vazio");
         }
         else
         {
-            json.put("erro","Erro ao conectar com o BD");
+            if(conexao.conectar())
+            {
+                TipoDespesas tipo = new TipoDespesas(tipoDespesa.getId(), tipoDespesa.getNome());
+                if(despeModel.gravar(tipo,conexao) != null)
+                {
+                    json.put("id",tipo.getId());
+                    json.put("nome",tipo.getNome());
+                    conexao.getConexao().commit();
+                }
+                else
+                {
+                    json.put("erro", "Erro ao gravar tipo de despesa");
+                    conexao.getConexao().rollback();
+                }
+                conexao.Desconectar();
+            }
+            else
+            {
+                json.put("erro","Erro ao conectar com o BD");
+            }
         }
         return json;
     }
@@ -94,11 +102,11 @@ public class TipoDespesasController
         Map<String,Object> json= new HashMap<>();
         if(conexao.conectar())
         {
-            TipoDespesas tipo = new TipoDespesas(tipoDespesa.getId(),tipoDespesa.getDescricao());
+            TipoDespesas tipo = new TipoDespesas(tipoDespesa.getId(),tipoDespesa.getNome());
             if(despeModel.alterar(tipo,conexao) != null)
             {
                 json.put("id",tipo.getId());
-                json.put("descricao",tipo.getDescricao());
+                json.put("nome",tipo.getNome());
                 conexao.getConexao().commit();
             }
             else
