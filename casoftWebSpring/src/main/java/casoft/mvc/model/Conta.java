@@ -5,6 +5,8 @@ import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class Conta {
 
@@ -105,6 +107,11 @@ public class Conta {
     public Conta consultar(int id_conta, Singleton conexao){
         return dao.get(id_conta,conexao);
     }
+
+    public List<Conta> consultarTodos(Singleton conexao){
+        return dao.listarTodos(conexao);
+    }
+    
     public boolean isEmpty(Singleton conexao){
         return dao.get("",conexao).isEmpty();
     }

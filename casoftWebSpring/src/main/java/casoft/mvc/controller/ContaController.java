@@ -16,8 +16,7 @@ public class ContaController {
 
     @Autowired
     private Conta contaModel;
-    @Autowired
-    private ContaDAO contaDAO;
+
 
     public Map<String, Object> getConta(int id_conta) {
         Map<String, Object> json = new HashMap<>();
@@ -54,7 +53,7 @@ public class ContaController {
 
         try {
             if (conexao.conectar()) {
-                List<Conta> contas = contaDAO.listarTodos(conexao);
+                List<Conta> contas = contaModel.consultarTodos(conexao);
 
                 for (Conta conta : contas) {
                     Map<String, Object> json = new HashMap<>();
