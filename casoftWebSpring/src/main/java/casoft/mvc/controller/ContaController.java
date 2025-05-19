@@ -16,8 +16,7 @@ public class ContaController {
 
     @Autowired
     private Conta contaModel;
-    @Autowired
-    private ContaDAO contaDAO;
+
 
     public Map<String, Object> getConta(int id_conta) {
         Map<String, Object> json = new HashMap<>();
