@@ -1,11 +1,14 @@
 package casoft.mvc.model;
 
 import casoft.mvc.dao.DespesaDAO;
+import casoft.mvc.util.Singleton;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-@Component
+@Repository
 public class Despesa {
 
     @Autowired
@@ -13,41 +16,36 @@ public class Despesa {
 
     private int id;
     private double valor;
-    private LocalDate data_venc;
-    private LocalDate data_lanc;
+    private String data_venc;
+    private String data_lanc;
     private double pagamento;
     private String descricao;
-    private boolean status_conci;
-    private TipoDespesas tipoDespesa;
-    private Usuario usuario;
-    private Evento evento;
-
-    public Despesa(double valor, LocalDate data_venc, LocalDate data_lanc, Double pagamento, String descricao, boolean status_conci, TipoDespesas tipoDespesa, Usuario usuario, Evento evento) {
-        this.valor = valor;
-        this.data_venc = data_venc;
-        this.data_lanc = data_lanc;
-        this.pagamento = pagamento;
-        this.descricao = descricao;
-        this.status_conci = status_conci;
-        this.tipoDespesa = tipoDespesa;
-        this.usuario = usuario;
-        this.evento = evento;
-    }
+    private String status_conci;
+    private int tipoDespesa_id;
+    private int usuario_id;
+    private int evento_id;
 
     public Despesa() {
     }
 
-    public Despesa(int id, double valor, LocalDate data_venc, LocalDate data_lanc, double pagamento, String descricao, boolean status_conci, TipoDespesas tipoDespesa, Usuario usuario, Evento evento) {
-        this.id = id;
+    public Despesa(double valor, String data_venc, String data_lanc, double pagamento, String descricao, String status_conci, int tipoDespesa_id, int usuario_id, int evento_id) {
         this.valor = valor;
         this.data_venc = data_venc;
         this.data_lanc = data_lanc;
         this.pagamento = pagamento;
         this.descricao = descricao;
         this.status_conci = status_conci;
-        this.tipoDespesa = tipoDespesa;
-        this.usuario = usuario;
-        this.evento = evento;
+        this.tipoDespesa_id = tipoDespesa_id;
+        this.usuario_id = usuario_id;
+        this.evento_id = evento_id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public double getValor() {
@@ -58,27 +56,27 @@ public class Despesa {
         this.valor = valor;
     }
 
-    public LocalDate getData_venc() {
+    public String getData_venc() {
         return data_venc;
     }
 
-    public void setData_venc(LocalDate data_venc) {
+    public void setData_venc(String data_venc) {
         this.data_venc = data_venc;
     }
 
-    public LocalDate getData_lanc() {
+    public String getData_lanc() {
         return data_lanc;
     }
 
-    public void setData_lanc(LocalDate data_lanc) {
+    public void setData_lanc(String data_lanc) {
         this.data_lanc = data_lanc;
     }
 
-    public Double getPagamento() {
+    public double getPagamento() {
         return pagamento;
     }
 
-    public void setPagamento(Double pagamento) {
+    public void setPagamento(double pagamento) {
         this.pagamento = pagamento;
     }
 
@@ -90,35 +88,39 @@ public class Despesa {
         this.descricao = descricao;
     }
 
-    public boolean isStatus_conci() {
+    public String getStatus_conci() {
         return status_conci;
     }
 
-    public void setStatus_conci(boolean status_conci) {
+    public void setStatus_conci(String status_conci) {
         this.status_conci = status_conci;
     }
 
-    public TipoDespesas getTipoDespesa() {
-        return tipoDespesa;
+    public int getTipoDespesa_id() {
+        return tipoDespesa_id;
     }
 
-    public void setTipoDespesa(TipoDespesas tipoDespesa) {
-        this.tipoDespesa = tipoDespesa;
+    public void setTipoDespesa_id(int tipoDespesa_id) {
+        this.tipoDespesa_id = tipoDespesa_id;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public int getUsuario_id() {
+        return usuario_id;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuario_id(int usuario_id) {
+        this.usuario_id = usuario_id;
     }
 
-    public Evento getEvento() {
-        return evento;
+    public int getEvento_id() {
+        return evento_id;
     }
 
-    public void setEvento(Evento evento) {
-        this.evento = evento;
+    public void setEvento_id(int evento_id) {
+        this.evento_id = evento_id;
+    }
+
+    public Despesa add(Despesa despesa, Singleton conexao) {
+        return despesaDAO.gravar(despesa,conexao);
     }
 }

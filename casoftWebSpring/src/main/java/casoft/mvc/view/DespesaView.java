@@ -21,13 +21,13 @@ public class DespesaView {
     private DespesaController controller;
 
     @PostMapping
-    public ResponseEntity<Object> addDespesa(@RequestBody Despesa despesa, HttpServletRequest httpServletRequest){
+    public ResponseEntity<Object> create(@RequestParam double valor, @RequestParam String data_venc, @RequestParam String data_lanc, @RequestParam double pagamento, @RequestParam String descricao, @RequestParam String status_conci, @RequestParam int tipoDespesa_id, @RequestParam int usuario_id, @RequestParam int evento_id,HttpServletRequest httpServletRequest){
         String token = httpServletRequest.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer "))
             token = token.substring(7);
         if(JWTTokenProvider.verifyToken(token)) {
             Map<String,Object> novaDespesa;
-            novaDespesa=controller.addDespesa(despesa);
+            novaDespesa=controller.addDespesa(new Despesa(valor,data_venc,data_lanc,pagamento,descricao,status_conci,tipoDespesa_id,usuario_id,evento_id));
             if (novaDespesa!=null)
                 return ResponseEntity.ok(novaDespesa);
             else

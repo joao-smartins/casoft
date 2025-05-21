@@ -27,8 +27,8 @@ public class DespesaController {
             List<Map<String,Object>> listJson=new ArrayList<>();
             for (TipoDespesas td : tipoDespesasList){
                 Map<String,Object> json= new HashMap<>();
-                json.put("despesa_id",td.getId());
-                json.put("despesa_val",td.getNome());
+                json.put("id",td.getId());
+                json.put("nome",td.getNome());
                 listJson.add(json);
             }
             conexao.Desconectar();
@@ -38,7 +38,27 @@ public class DespesaController {
     }
     public Map<String,Object> addDespesa(Despesa despesa){
         Map<String,Object> json = new HashMap<>();
+        Singleton conexao= Singleton.getInstancia();
+        if(conexao.conectar()){
+            System.out.println(despesa.getData_lanc());
+            Despesa novaDespesa=despesaModel.add(despesa,conexao);
+            if(novaDespesa!=null){
+                json.put("id",novaDespesa.getId());
+                json.put("val",novaDespesa);
+                json.put("data_venc",novaDespesa.getData_venc());
+                json.put("data_lanc",novaDespesa.getData_lanc());
+                json.put("pagamento",novaDespesa.getPagamento());
+                json.put("descricao",novaDespesa.getDescricao());
+                json.put("status",novaDespesa.getStatus_conci());
+                json.put("tipo_id",novaDespesa.getTipoDespesa_id());
+                json.put("usuario_id",novaDespesa.getUsuario_id());
+                json.put("evento_id",novaDespesa.getEvento_id());
+                conexao.Desconectar();
+                return json;
+            }
 
+            conexao.Desconectar();
+        }
         return json;
     }
 //    public Map<String,Object> getDespesa() {
