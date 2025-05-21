@@ -37,7 +37,7 @@ public class ParametrizacaoView {
         return ResponseEntity.badRequest().body(new Mensagem("Usuario nao autenticado"));
     }
     @PostMapping
-    public ResponseEntity<Object> addParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestParam("comlemento")String complemento,@RequestPart("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Object> addParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestParam("complemento")String complemento,@RequestPart("file") MultipartFile file, HttpServletRequest httpServletRequest) {
 
         String token = httpServletRequest.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer "))

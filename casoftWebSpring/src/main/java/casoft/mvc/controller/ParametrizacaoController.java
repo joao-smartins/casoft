@@ -15,10 +15,11 @@ import java.util.Map;
 public class ParametrizacaoController {
     @Autowired
     private Parametrizacao paramModel;
+
     public Map<String,Object> getParam(int id) {
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){
-            Parametrizacao param = paramModel.consultar(id,conexao);
+            Parametrizacao param = new Parametrizacao().consultar(id,conexao);
             if (param!=null){
                 Map<String,Object> json= new HashMap<>();
                 json.put("id",param.getId());

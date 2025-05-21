@@ -64,9 +64,7 @@ function enviarFormulario(event) {
     const cepValido = validarCampo('cep', 8, 'CEP deve ter 8 dígitos.');
     const telValido = validarCampo('telefone', 10, 'Telefone deve ter 10 ou 11 dígitos.');
   
-    if (!cnpjValido || !cepValido || !telValido) {
-      return false;
-    }
+
     // Obtendo o token do localStorage
     const token = authManager.getToken();
 
@@ -77,7 +75,7 @@ function enviarFormulario(event) {
     fetch(URL, {
         method: metodo,
         headers: {
-            "Authorization": "Bearer " + token // Enviando o token no cabeçalho
+            "Authorization": "Bearer " + token
         },
         body: formData
     })
