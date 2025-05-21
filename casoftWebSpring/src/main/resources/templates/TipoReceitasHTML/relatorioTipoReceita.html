@@ -51,20 +51,42 @@
 </div>
 
 <!-- Conteúdo principal -->
-<div class="content">
+<div class="content" style="height: 100vh; display: flex; align-items: center; justify-content: center;">
+  <div class="sidebar" id="sidebar">
+    <h4 class="p-3">Menu Tipo de Receita</h4>
+    <a href="criarTipoReceita.html">Cadastro</a>
+    <a href="relatorioTipoReceita.html">Relatórios</a>
+    <a href="#">Configurações</a>
+    <a href="../home.html">Voltar</a>
+  </div>
   <div class="container mt-5">
+
     <div class="row justify-content-center">
       <div class="col-md-8 col-lg-6">
         <div class="card shadow p-4">
           <h2 class="mb-4 text-center">Relatório de Tipos de Receita</h2>
 
           <!-- Área para mostrar todos os tipos de receitas -->
+          <div class="mb-3 d-flex justify-content-center align-items-end gap-3 flex-wrap">
+            <div>
+              <label for="filtroTipo" class="form-label">Tipo de filtro:</label>
+              <select id="filtroTipo" class="form-select">
+                <option value="começando">Começando com a letra</option>
+                <option value="contém">Contém a palavra</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="filtroNome" class="form-label">Filtro:</label>
+              <input type="text" class="form-control" id="filtroNome" placeholder="Digite a letra ou palavra">
+            </div>
+          </div>
+
           <div id="todosTiposReceitas" class="mt-4">
-            <h4>Todos os Tipos de Receita</h4>
             <div id="listaTiposReceitas"></div>
           </div>
+          <div id="mensagem" class="mensagem"></div>
         </div>
-        <div id="mensagem" class="mensagem"></div>
       </div>
     </div>
   </div>
@@ -111,25 +133,31 @@
   function deletarTipoReceita(id) {
     const URL = `http://localhost:8080/apis/tiporeceita/${id}`; // URL da API para deletar o tipo de receita
 
-    fetch(URL, {
-      method: "DELETE",
-    })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-              }
-              else {
-                const item = document.getElementById(`tipoReceita-${id}`);
-                if (item) item.remove();
-              }
-            })
-            .then(data => {
-              mostrarMensagem("Tipo de Receita deletado com sucesso!", false);
-            })
-            .catch(error => {
-              console.log("Erro capturado:", error.message);
-              mostrarMensagem(`Erro ao deletar: ${error.message}`, true);
-            });
+    let resposta = confirm(`Tem certeza que deseja deletar o tipo de receita "${localStorage.getItem("tipoReceitaEditNome")}"?`);
+    
+    if(resposta){
+      fetch(URL, {
+        method: "DELETE",
+      })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`Erro HTTP: ${response.status}`);
+                } else {
+                  const item = document.getElementById(`tipoReceita-${id}`);
+                  if (item) item.remove();
+                }
+              })
+              .then(data => {
+                document.getElementById("mensagem").innerHTML = '<div class="alert alert-success">Tipo de receita deletado com sucesso!</div>';
+                setTimeout(function () {
+                  document.getElementById("mensagem").innerHTML = '';
+                }, 2000);
+              })
+              .catch(error => {
+                console.log("Erro capturado:", error.message);
+                document.getElementById("mensagem").innerHTML = '<div class="alert alert-danger">Erro: ' + error.message + '</div>';
+              });
+    }
   }
 
 </script>

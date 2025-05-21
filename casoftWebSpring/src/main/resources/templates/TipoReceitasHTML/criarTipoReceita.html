@@ -30,19 +30,18 @@
 <div class="sidebar" id="sidebar">
     <h4 class="p-3">Menu Tipo de Receita</h4>
     <a href="criarTipoReceita.html">Cadastro</a>
-    <a href="#">Alterar</a>
-    <a href="deletarTpReceita.html">Deletar</a>
     <a href="relatorioTipoReceita.html">Relatórios</a>
     <a href="#">Configurações</a>
     <a href="../home.html">Voltar</a>
 </div>
 
 <!-- Conteúdo principal -->
+<div class="content" style="height: 100vh; display: flex; align-items: center; justify-content: center;">
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-8 col-lg-6">
                 <div class="card shadow p-4">
-                    <h2 class="text-center mb-4">Cadastro de Tipo de Receita</h2>
+                    <h2 class="mb-3 text-center">Cadastro de Tipo de Receita</h2>
                     <form id="formEvento">
                         <div class="mb-3">
                             <label for="nome" class="form-label">Nome<span class="required">*</span></label>
@@ -57,6 +56,7 @@
             </div>
         </div>
     </div>
+</div>
 <script>
     document.getElementById("formEvento").addEventListener("submit", function (e) {
         e.preventDefault();
