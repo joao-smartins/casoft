@@ -8,16 +8,19 @@
   <link href="css/estilo.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+  <!-- Overlay escuro -->
+  <div class="overlay" id="overlay"></div>
+
   <!-- Header fixo -->
   <header class="header">
     <div class="container">
       <div class="header-container d-flex align-items-center">
-        <img src="img/logo.png" alt="Logo">
-        <button class="menu-toggle d-md-none" id="menu-toggle" onclick="toggleSidebar()">
+        <button class="menu-toggle d-md-none" id="menu-toggle">
           <span></span>
           <span></span>
           <span></span>
         </button>
+        <img src="img/logo.png" alt="Logo">
         <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger ml-auto">Deslogar</button>
       </div>
     </div>

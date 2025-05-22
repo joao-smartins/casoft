@@ -1,7 +1,6 @@
 package casoft.mvc.dao;
 
 import casoft.mvc.model.Despesa;
-import casoft.mvc.model.Parametrizacao;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 
