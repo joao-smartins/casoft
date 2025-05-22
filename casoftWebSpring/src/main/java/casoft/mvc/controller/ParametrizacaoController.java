@@ -19,7 +19,7 @@ public class ParametrizacaoController {
     public Map<String,Object> getParam(int id) {
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){
-            Parametrizacao param = new Parametrizacao().consultar(id,conexao);
+            Parametrizacao param = paramModel.consultar(id,conexao);
             if (param!=null){
                 Map<String,Object> json= new HashMap<>();
                 json.put("id",param.getId());

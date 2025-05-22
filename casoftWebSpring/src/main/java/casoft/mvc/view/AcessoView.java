@@ -19,13 +19,8 @@ public class AcessoView {
     public ResponseEntity<Object> autenticar(@PathVariable String login, @PathVariable String senha){
         String token=controller.autenticar(login, senha);
         if(token!=null){
-            String nivel=controller.getNivel(login);
-            Map<String,Object> json= new HashMap<>();
-            json.put("token",token);
-            json.put("nivel",nivel);
+            Map<String,Object> json=controller.getUsuario(login,token);
             if(json.get("erro")==null){
-                System.out.println("Token gerado: "+json.get("token").toString());
-                System.out.println("Nivel: "+json.get("nivel").toString());
                 return ResponseEntity.ok(json);
             }
             else

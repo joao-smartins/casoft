@@ -92,13 +92,10 @@ public class Usuario {
         }
         return null;
     }
-    public String getNivel(String login,Singleton conexao){
+    public Usuario getUsuario(String login,Singleton conexao){
         List<Usuario> usuarios=usuarioDAO.get("login = "+"'"+login+"'",conexao);
         if(!usuarios.isEmpty()){
-            Usuario usuario= usuarios.getFirst();
-            if(usuario!=null){
-                return usuario.getNivelAcesso();
-            }
+            return usuarios.getFirst();
         }
         return null;
     }

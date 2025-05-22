@@ -9,23 +9,39 @@ import org.springframework.stereotype.Repository;
 public class DespesaDAO {
 
     public Despesa gravar(Despesa entidade, Singleton conexao) {
-        String sql = """
-    INSERT INTO despesa (
-        despesa_id, 
-        despesa_val, 
-        despesa_dt_venc, 
-        despesa_dt_lanc, 
-        despesa_pagamento, 
-        despesa_desc, 
-        despesa_statusconci, 
-        categoriadesp_catdesp_id, 
-        usuario_user_id, 
-        evento_evento_id
-    ) VALUES (
-        '#1', #2, '#3', '#4', '#5', '#6', '#7', #8, #9, #A
-    );
-    """;
-        sql = sql.replace("#1", String.valueOf(entidade.getId()));
+        String sql;
+        if(entidade.getEvento_id()==0)
+            sql = """
+            INSERT INTO despesa (
+                despesa_val, 
+                despesa_dt_venc, 
+                despesa_dt_lanc, 
+                despesa_pagamento, 
+                despesa_desc, 
+                despesa_statusconci, 
+                categoriadesp_catdesp_id, 
+                usuario_user_id
+            ) VALUES (
+                #2, '#3', '#4', '#5', '#6', '#7', #8, #9
+            );
+            """;
+        else
+            sql = """
+            INSERT INTO despesa (
+                despesa_val, 
+                despesa_dt_venc, 
+                despesa_dt_lanc, 
+                despesa_pagamento, 
+                despesa_desc, 
+                despesa_statusconci, 
+                categoriadesp_catdesp_id, 
+                usuario_user_id, 
+                evento_evento_id
+            ) VALUES (
+                #2, '#3', '#4', '#5', '#6', '#7', #8, #9, #A
+            );
+            """;
+
         sql = sql.replace("#2", String.valueOf(entidade.getValor()));
         sql = sql.replace("#3", entidade.getData_venc());
         sql = sql.replace("#4", entidade.getData_lanc());

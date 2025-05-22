@@ -14,20 +14,24 @@ import java.util.Map;
 @Service
 public class AcessoController {
     @Autowired
-    private Usuario usuario;
+    private Usuario usuarioModel;
 
     public String autenticar(String login, String senha){
         Singleton conexao=Singleton.getInstancia();
         if(conexao.conectar()){
-            String token=usuario.autenticar(login, senha,conexao);
-            return token;
+            return usuarioModel.autenticar(login, senha,conexao);
         }
         return null;
     }
-    public String getNivel(String login){
+    public Map<String,Object> getUsuario(String login,String token){
         Singleton conexao=Singleton.getInstancia();
         if(conexao.conectar()){
-            return usuario.getNivel(login,conexao);
+            Usuario usuario= usuarioModel.getUsuario(login,conexao);
+            Map<String,Object> json= new HashMap<>();
+            json.put("token",token);
+            json.put("nivel",usuario.getNivelAcesso());
+            json.put("id",usuario.getId());
+            return json;
         }
         return null;
     }

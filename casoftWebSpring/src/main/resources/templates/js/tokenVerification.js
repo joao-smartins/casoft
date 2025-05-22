@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Se não houver token, redireciona para a página de login
     if (!token) {
-      window.location.href = "ControleAcesso.html";
+      window.location.href = "../ControleAcesso.html";
       return;
     }
     
@@ -33,14 +33,14 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Páginas administrativas
     const adminPages = [
-      "/cadastroEmpresa.html"
+      "/ParametrizacaoHTML/cadastroEmpresa.html"
  
       // Adicione outras páginas administrativas conforme necessário
     ];
     
     // Verifica se é uma página administrativa e o usuário não é admin
     if(nivel==null){
-      window.location.href = "ControleAcesso.html";
+      window.location.href = "../ControleAcesso.html";
     }
     else if (adminPages.some(page => path.endsWith(page)) && nivel !== "ADMIN") {
       alert("Você não tem permissão para acessar esta página.",nivel);

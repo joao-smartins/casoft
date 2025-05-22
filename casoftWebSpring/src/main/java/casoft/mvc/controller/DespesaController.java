@@ -6,11 +6,10 @@ import casoft.mvc.model.TipoDespesas;
 import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.SQLOutput;
+import java.util.*;
 
 @Service
 public class DespesaController {
@@ -36,15 +35,25 @@ public class DespesaController {
         }
         return null;
     }
-    public Map<String,Object> addDespesa(Despesa despesa){
+    public Map<String,Object> addDespesa(String valor, String data_venc, String data_lanc, String pagamento, String descricao, String status_conci, String tipoDespesa_id, String usuario_id, String evento_id){
         Map<String,Object> json = new HashMap<>();
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){
-            System.out.println(despesa.getData_lanc());
-            Despesa novaDespesa=despesaModel.add(despesa,conexao);
+            int evento;
+            if(!Objects.equals(evento_id, ""))
+                evento=Integer.parseInt(evento_id);
+            else
+                evento=0;
+            Double pag;
+            if(!Objects.equals(pagamento, ""))
+                pag=Double.parseDouble(pagamento);
+            else
+                pag=0.0;
+            Despesa novaDespesa=new Despesa(Double.parseDouble(valor),data_venc,data_lanc,pag,descricao,status_conci,Integer.parseInt(tipoDespesa_id),Integer.parseInt(usuario_id),evento);
+            novaDespesa=despesaModel.add(novaDespesa,conexao);
             if(novaDespesa!=null){
                 json.put("id",novaDespesa.getId());
-                json.put("val",novaDespesa);
+                json.put("val",novaDespesa.getValor());
                 json.put("data_venc",novaDespesa.getData_venc());
                 json.put("data_lanc",novaDespesa.getData_lanc());
                 json.put("pagamento",novaDespesa.getPagamento());
@@ -53,12 +62,17 @@ public class DespesaController {
                 json.put("tipo_id",novaDespesa.getTipoDespesa_id());
                 json.put("usuario_id",novaDespesa.getUsuario_id());
                 json.put("evento_id",novaDespesa.getEvento_id());
-                conexao.Desconectar();
+                conexao.getConexao().commit();
                 return json;
             }
-
+            else{
+                json.put("erro","Erro ao cadastrar a Empresa");
+                conexao.getConexao().rollback();
+            }
             conexao.Desconectar();
         }
+        else
+            json.put("erro","Erro ao conectar com o BD");
         return json;
     }
 //    public Map<String,Object> getDespesa() {
