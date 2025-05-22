@@ -79,8 +79,12 @@
                 return response.json();
             })
             .then(data =>{
-                if(data.erro == null )
+                if(data.erro == null ) {
                     document.getElementById("mensagem").innerHTML = '<div class="alert alert-success">Tipo de receita cadastrado com sucesso!</div>';
+                    setTimeout(function () {
+                        document.getElementById("mensagem").innerHTML = '';
+                    }, 2000);
+                }
                 else
                     throw new Error(data.erro);
             })

@@ -66,8 +66,8 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Salvar Evento</button>
           </form>
+          <div id="mensagem" class="mt-3 text-center"></div>
         </div>
-        <div id="mensagem" class="mensagem"></div>
       </div>
     </div>
   </div>
@@ -97,8 +97,12 @@
               return response.json();
             })
             .then(data =>{
-              if(data.erro == null )
-                mostrarMensagem("Evento Cadastrado com sucesso!", false);
+              if(data.erro == null ) {
+                document.getElementById("mensagem").innerHTML = '<div class="alert alert-success">Evento cadastrado com sucesso!</div>';
+                setTimeout(function () {
+                  document.getElementById("mensagem").innerHTML = '';
+                }, 2000);
+              }
               else
                 throw new Error(data.erro);
             })
