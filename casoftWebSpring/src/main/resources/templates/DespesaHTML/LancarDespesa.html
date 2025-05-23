@@ -6,6 +6,9 @@
   <title>Cadastro de Despesa</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../css/estilo.css" rel="stylesheet">
+  <style>
+
+    </style>
 </head>
 <body class="bg-light">
   <!-- Header fixo -->
@@ -36,6 +39,12 @@
     <a href="../TipoDespesasHTML/tipoDespesa.html">Tipos de Despesas</a>
     <a href="#">Relatórios</a>
     <a href="#">Configurações</a>
+    <a href="../gerenciarContas.html">Contas Bancárias</a>
+    <a href="#" id="lancarDespesaToggle">Despesa ▼</a>
+    <div id="submenuDespesa">
+        <a href="LancarDespesa.html">Cadastrar</a>
+        <a href="Alterar.html">Alterar</a>
+    </div>
     <a href="../gerenciarContas.html">Contas Bancárias</a>
   </div>
 
@@ -139,5 +148,20 @@
   <script src="../js/tokenVerification.js"></script>
   <script src="../js/scriptDespesa.js"></script>
   <script src="../js/scripts.js"></script>
+  <script>
+    const toggle = document.getElementById('lancarDespesaToggle');
+    const submenu = document.getElementById('submenuDespesa');
+
+    toggle.addEventListener('click', function(event) {
+        event.preventDefault();
+        if (submenu.classList.contains('open')) {
+        submenu.classList.remove('open');
+        toggle.textContent = 'Despesa ▼';
+        } else {
+        submenu.classList.add('open');
+        toggle.textContent = 'Despesa ▲';
+        }
+    });
+</script>
 </body>
 </html>
