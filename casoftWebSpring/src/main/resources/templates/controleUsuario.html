@@ -339,10 +339,68 @@
         display: flex;
       }
     }
+    #verificacao-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .mensagem-erro {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .mensagem-erro h2 {
+      margin-top: 0;
+      color: #c62828;
+    }
+
+    .botao-voltar {
+      background: #c62828;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
+<!-- Container de Verificação -->
+<div id="verificacao-container">
+  <div class="spinner" id="spinner"></div>
+  <div class="mensagem-erro" id="mensagemErro">
+    <h2>⛔ Acesso Negado</h2>
+    <p id="mensagemTexto">Você não tem permissão para acessar esta página.</p>
+    <button class="botao-voltar" id="botaoVoltar">Voltar à Página Inicial</button>
+  </div>
+</div>
+
+<!-- Conteúdo Principal -->
 <div class="app-container">
+  <!-- Header -->
   <div class="header">
     <div class="header-container">
       <img src="img/logo.png" alt="Logo">
@@ -355,6 +413,7 @@
     </div>
   </div>
 
+  <!-- Sidebar -->
   <div class="sidebar">
     <a href="home.html">Home</a>
     <a href="cadastroEmpresa.html">Empresa</a>
@@ -363,6 +422,7 @@
     <a href="#"><i class="fas fa-cog"></i> Configurações</a>
   </div>
 
+  <!-- Conteúdo -->
   <div class="content">
     <div class="form-card">
       <div class="card-header bg-orange">
@@ -381,43 +441,7 @@
             </tr>
             </thead>
             <tbody>
-            <!-- Exemplo de dados (serão substituídos por dados reais) -->
-            <tr>
-              <td>1</td>
-              <td>João Silva</td>
-              <td>joao.silva</td>
-              <td><span class="badge-nivel badge-admin">Admin</span></td>
-              <td>
-                <div class="btn-actions">
-                  <a href="#" class="btn-alterar"><i class="fas fa-edit"></i> Alterar</a>
-                  <a href="#" class="btn-excluir"><i class="fas fa-trash"></i> Excluir</a>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Maria Oliveira</td>
-              <td>maria.oliveira</td>
-              <td><span class="badge-nivel badge-user">Usuário</span></td>
-              <td>
-                <div class="btn-actions">
-                  <a href="#" class="btn-alterar"><i class="fas fa-edit"></i> Alterar</a>
-                  <a href="#" class="btn-excluir"><i class="fas fa-trash"></i> Excluir</a>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Carlos Souza</td>
-              <td>carlos.souza</td>
-              <td><span class="badge-nivel badge-admin">Admin</span></td>
-              <td>
-                <div class="btn-actions">
-                  <a href="#" class="btn-alterar"><i class="fas fa-edit"></i> Alterar</a>
-                  <a href="#" class="btn-excluir"><i class="fas fa-trash"></i> Excluir</a>
-                </div>
-              </td>
-            </tr>
+            <!-- Dados serão carregados dinamicamente -->
             </tbody>
           </table>
         </div>
@@ -426,7 +450,7 @@
   </div>
 </div>
 
-<!-- Modal de Confirmação -->
+<!-- Modal de Confirmação (ÚNICO) -->
 <div id="modalConfirmacao" class="modal">
   <div class="modal-content">
     <p>Deseja realmente excluir este usuário?</p>
@@ -434,10 +458,61 @@
     <button id="btnCancelarExclusao">Cancelar</button>
   </div>
 </div>
-
 <script src="js/authManager.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      // Elementos DOM
+      const verificationContainer = document.getElementById('verificacao-container');
+      const spinner = document.getElementById('spinner');
+      const appContainer = document.querySelector('.app-container');
+
+      // 1. Verifica autenticação
+      const isValid = await authManager.verificarToken();
+
+      if (!isValid) {
+        mostrarErro("Sua sessão expirou. Faça login novamente.");
+        return;
+      }
+
+      // 2. Verifica se é ADMIN
+      console.log('Nível de acesso:', authManager.getNivel());
+
+      if (authManager.getNivel() === 'ADMIN') {
+        // Esconde o container de verificação
+        verificationContainer.style.display = 'none';
+        // Mostra o conteúdo principal
+        appContainer.style.display = 'grid';
+        // Inicializa a página
+        inicializarPagina();
+      } else {
+        mostrarErro("Acesso permitido apenas para administradores.");
+      }
+
+    } catch (error) {
+      console.error('Erro na verificação:', error);
+      mostrarErro("Ocorreu um erro inesperado. Tente novamente mais tarde.");
+    }
+  });
+
+  // Função para exibir mensagens de erro
+  function mostrarErro(mensagem) {
+    const spinner = document.getElementById('spinner');
+    const mensagemTexto = document.getElementById('mensagemTexto');
+    const mensagemErro = document.getElementById('mensagemErro');
+
+    if (spinner) spinner.style.display = 'none';
+    if (mensagemTexto) mensagemTexto.textContent = mensagem;
+    if (mensagemErro) mensagemErro.style.display = 'block';
+  }
+
+  // Configura o botão de voltar
+  document.getElementById('botaoVoltar').addEventListener('click', () => {
+    window.location.href = "home.html";
+  });
+
+  // Função principal de inicialização da página
+  function inicializarPagina() {
     // Elementos da página
     const tabela = document.getElementById('tabelaUsuarios').getElementsByTagName('tbody')[0];
     const modal = document.getElementById('modalConfirmacao');
@@ -445,32 +520,24 @@
     const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
     let usuarioIdParaExcluir = null;
     let usuarioNomeParaExcluir = null;
-    let nivelAcessoUsuarioLogado = null;
-
-    // Verifica o token e obtém o nível de acesso do usuário
-    authManager.verificarToken()
-            .then(isValid => {
-              if (isValid) {
-                nivelAcessoUsuarioLogado = authManager.getNivel();
-                carregarUsuarios(); // Carrega usuários apenas se o token for válido
-              } else {
-                window.location.href = "login.html"; // Redireciona para a página de login se não estiver autenticado
-              }
-            });
 
     // Carrega todos os usuários do back-end
     async function carregarUsuarios() {
       try {
-        const response = await fetch('http://localhost:8080/api/usuarios/todos');
+        const response = await fetch('http://localhost:8080/api/usuarios/todos', {
+          headers: {
+            'Authorization': `Bearer ${authManager.getToken()}`
+          }
+        });
 
         if (!response.ok) {
           throw new Error(`Erro HTTP: ${response.status}`);
         }
 
         const usuarios = await response.json();
-        tabela.innerHTML = ''; // Limpa a tabela antes de preencher
+        tabela.innerHTML = '';
 
-        // Preenche a tabela com os usuarios
+        // Preenche a tabela com os usuários
         usuarios.forEach(usuario => {
           const row = tabela.insertRow();
           const badgeClass = usuario.nivelAcesso === 'ADMIN' ? 'badge-admin' : 'badge-user';
@@ -482,7 +549,9 @@
                     <td><span class="badge-nivel ${badgeClass}">${usuario.nivelAcesso}</span></td>
                     <td>
                         <div class="btn-actions">
-                            <a href="alterarUsuario.html?id=${usuario.id}" class="btn-alterar"><i class="fas fa-edit"></i> Alterar</a>
+                            <a href="alterarUsuario.html?id=${usuario.id}" class="btn-alterar">
+                                <i class="fas fa-edit"></i> Alterar
+                            </a>
                             <button class="btn-excluir" data-id="${usuario.id}" data-nome="${usuario.nome}">
                                 <i class="fas fa-trash"></i> Excluir
                             </button>
@@ -495,12 +564,13 @@
         document.querySelectorAll('.btn-excluir').forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.preventDefault();
-            usuarioIdParaExcluir = e.target.getAttribute('data-id');
-            usuarioNomeParaExcluir = e.target.getAttribute('data-nome');
+            const button = e.target.closest('button');
+            usuarioIdParaExcluir = button.getAttribute('data-id');
+            usuarioNomeParaExcluir = button.getAttribute('data-nome');
 
-            // Atualiza a mensagem do modal com o nome do usuário
-            const modalContent = modal.querySelector('.modal-content p');
-            modalContent.textContent = `Deseja realmente excluir o usuário "${usuarioNomeParaExcluir}"?`;
+            // Atualiza a mensagem do modal
+            modal.querySelector('.modal-content p').textContent =
+                    `Deseja realmente excluir o usuário "${usuarioNomeParaExcluir}"?`;
 
             // Mostra o modal
             modal.classList.add('active');
@@ -509,48 +579,48 @@
 
       } catch (error) {
         console.error('Falha ao carregar usuários:', error);
-        alert('Erro ao carregar usuários. Verifique o console.');
+        mostrarErro("Erro ao carregar usuários. Verifique o console.");
       }
     }
 
-    // Confirmação de exclusão (modal)
+    // Confirmação de exclusão
     btnConfirmarExclusao.addEventListener('click', async () => {
-      if (usuarioIdParaExcluir) {
-        try {
-          const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioIdParaExcluir}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
+      if (!usuarioIdParaExcluir) return;
 
-          if (response.ok) {
-            alert(`Usuário "${usuarioNomeParaExcluir}" excluído com sucesso!`);
-            carregarUsuarios();
-          } else {
-            const errorData = await response.json();
-            alert(`Erro ao excluir usuário: ${errorData.message || 'Erro desconhecido'}`);
+      try {
+        const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioIdParaExcluir}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${authManager.getToken()}`,
+            'Content-Type': 'application/json'
           }
-        } catch (error) {
-          console.error('Erro na exclusão:', error);
-          alert(`Erro ao excluir usuário: ${error.message}`);
-        } finally {
-          modal.classList.remove('active');
-          usuarioIdParaExcluir = null;
-          usuarioNomeParaExcluir = null;
+        });
+
+        if (response.ok) {
+          alert(`Usuário "${usuarioNomeParaExcluir}" excluído com sucesso!`);
+          await carregarUsuarios();
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Erro desconhecido');
         }
+      } catch (error) {
+        console.error('Erro na exclusão:', error);
+        alert(`Erro ao excluir usuário: ${error.message}`);
+      } finally {
+        modal.classList.remove('active');
+        usuarioIdParaExcluir = null;
+        usuarioNomeParaExcluir = null;
       }
     });
 
-
-    // Cancelar exclusão (modal)
+    // Cancelar exclusão
     btnCancelarExclusao.addEventListener('click', () => {
       modal.classList.remove('active');
       usuarioIdParaExcluir = null;
       usuarioNomeParaExcluir = null;
     });
 
-    // Fecha o modal se clicar fora dele
+    // Fecha o modal ao clicar fora
     window.addEventListener('click', (e) => {
       if (e.target === modal) {
         modal.classList.remove('active');
@@ -558,8 +628,10 @@
         usuarioNomeParaExcluir = null;
       }
     });
-  });
 
+    // Carrega os usuários inicialmente
+    carregarUsuarios();
+  }
 </script>
 
 </body>
