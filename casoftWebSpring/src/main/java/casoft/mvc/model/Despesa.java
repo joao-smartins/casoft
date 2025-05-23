@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
+
 @Repository
 public class Despesa {
 
@@ -22,7 +24,7 @@ public class Despesa {
     private String descricao;
     private String status_conci;
     private int tipoDespesa_id;
-    private int usuario_id;
+    private Integer usuario_id;
     private int evento_id;
 
     public Despesa() {
@@ -112,15 +114,19 @@ public class Despesa {
         this.usuario_id = usuario_id;
     }
 
-    public int getEvento_id() {
+    public Integer getEvento_id() {
         return evento_id;
     }
 
-    public void setEvento_id(int evento_id) {
+    public void setEvento_id(Integer evento_id) {
         this.evento_id = evento_id;
     }
 
     public Despesa add(Despesa despesa, Singleton conexao) {
         return despesaDAO.gravar(despesa,conexao);
+    }
+
+    public List<Despesa> listar(String filtro,Singleton conexao) {
+        return despesaDAO.consultar(filtro,conexao);
     }
 }

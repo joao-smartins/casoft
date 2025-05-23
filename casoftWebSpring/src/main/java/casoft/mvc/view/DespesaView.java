@@ -35,6 +35,20 @@ public class DespesaView {
         }
         return ResponseEntity.badRequest().body(new Mensagem("Usuario nao autenticado"));
     }
-
+    @GetMapping
+    public ResponseEntity<Object> getAll(HttpServletRequest httpServletRequest){
+        String token = httpServletRequest.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer "))
+            token = token.substring(7);
+        if(JWTTokenProvider.verifyToken(token)) {
+            List<Map<String,Object>> jsonlist;
+            jsonlist=controller.getAll();
+            if (!jsonlist.isEmpty())
+                return ResponseEntity.ok(jsonlist);
+            else
+                return ResponseEntity.badRequest().body(new Mensagem("Erro ao Cadastrar"));
+        }
+        return ResponseEntity.badRequest().body(new Mensagem("Usuario nao autenticado"));
+    }
 
 }

@@ -4,6 +4,9 @@ import casoft.mvc.model.Despesa;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Repository
 public class DespesaDAO {
 
@@ -18,8 +21,8 @@ public class DespesaDAO {
                 despesa_pagamento, 
                 despesa_desc, 
                 despesa_statusconci, 
-                categoriadesp_catdesp_id, 
-                usuario_user_id
+                categoriadesp_id, 
+                user_id
             ) VALUES (
                 #2, '#3', '#4', '#5', '#6', '#7', #8, #9
             );
@@ -33,9 +36,9 @@ public class DespesaDAO {
                 despesa_pagamento, 
                 despesa_desc, 
                 despesa_statusconci, 
-                categoriadesp_catdesp_id, 
-                usuario_user_id, 
-                evento_evento_id
+                categoriadesp_id, 
+                user_id, 
+                evento_id
             ) VALUES (
                 #2, '#3', '#4', '#5', '#6', '#7', #8, #9, #A
             );
@@ -58,5 +61,40 @@ public class DespesaDAO {
             return null;
         }
     }
+    public List<Despesa> consultar(String filtro, Singleton conexao) {
+        List<Despesa> despesas = new ArrayList<>();
+        String sql = "SELECT * FROM despesa";
 
+        if (filtro != null && !filtro.isBlank()) {
+            sql += " WHERE " + filtro;
+        }
+
+        var rs = conexao.getConexao().consultar(sql);
+        try {
+            while (rs.next()) {
+                Despesa d = new Despesa();
+                d.setId(rs.getInt("despesa_id"));
+                d.setValor(rs.getDouble("despesa_val"));
+                d.setData_venc(rs.getString("despesa_dt_venc"));
+                d.setData_lanc(rs.getString("despesa_dt_lanc"));
+                d.setPagamento(rs.getDouble("despesa_pagamento"));
+                d.setDescricao(rs.getString("despesa_desc"));
+                d.setStatus_conci(rs.getString("despesa_statusconci"));
+                d.setTipoDespesa_id(rs.getInt("categoriadesp_id"));
+                d.setUsuario_id(rs.getInt("user_id"));
+                String evento_id = rs.getString("evento_id");
+                if (evento_id != null && !evento_id.isBlank()) {
+                    d.setEvento_id(rs.getInt("evento_id"));
+                }
+                else{
+                    d.setEvento_id(0);
+                }
+
+                despesas.add(d);
+            }
+        } catch(Exception er) {
+            System.out.println("Erro ao carregar despesas: " + er.getMessage());
+        }
+        return despesas;
+    }
 }

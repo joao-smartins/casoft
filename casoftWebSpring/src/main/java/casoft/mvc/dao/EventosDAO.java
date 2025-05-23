@@ -44,11 +44,11 @@ public class EventosDAO implements IDAO<Evento> {
         try {
             while (rs.next()) {
                 Evento e = new Evento();
-                e.setId(rs.getInt("id_evento"));
-                e.setNome(rs.getString("nome"));
-                e.setDescricao(rs.getString("descricao"));
-                e.setData(rs.getDate("data").toString());
-                e.setStatus(rs.getString("status").charAt(0));
+                e.setId(rs.getInt("evento_id"));
+                e.setNome(rs.getString("evento_nome"));
+                e.setDescricao(rs.getString("evento_desc"));
+                e.setData(rs.getDate("evento_data").toString());
+                e.setStatus(rs.getString("evento_status").charAt(0));
                 eventos.add(e);
             }
 

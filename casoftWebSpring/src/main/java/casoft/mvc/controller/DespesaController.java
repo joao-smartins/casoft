@@ -1,6 +1,7 @@
 package casoft.mvc.controller;
 
 import casoft.mvc.model.Despesa;
+import casoft.mvc.model.Evento;
 import casoft.mvc.model.Parametrizacao;
 import casoft.mvc.model.TipoDespesas;
 import casoft.mvc.util.Singleton;
@@ -18,6 +19,9 @@ public class DespesaController {
 
     @Autowired
     private TipoDespesas tipoDespesasModel;
+
+    @Autowired
+    private Evento eventoModel;
 
     public List<Map<String,Object>> getTipoDespesa() {
         Singleton conexao= Singleton.getInstancia();
@@ -75,32 +79,46 @@ public class DespesaController {
             json.put("erro","Erro ao conectar com o BD");
         return json;
     }
-//    public Map<String,Object> getDespesa() {
-//        Singleton conexao= Singleton.getInstancia();
-//        if(conexao.conectar()){
-//            TipoDespesas tipoDespesas=new TipoDespesas();
-//            List<TipoDespesas> tipoDespesasList=tipoDespesas.consultar("",conexao);
-//            List<Map<String,Object>> listJson=new ArrayList<>();
-//            for (TipoDespesas td : tipoDespesasList){
-//                Map<String,Object> json= new HashMap<>();
-//                json.put("despesa_id",td.getId());
-//                json.put("despesa_val",td.getvalor);
-//                json.put("despesa_dt_venc",param.getCnpj());
-//                json.put("despesa_lancamento",param.getLogradouro());
-//                json.put("despesa_pagamento",param.getNumero());
-//                json.put("despesa_desc",param.getBairro());
-//                json.put("despesa_statusconci",param.getCidade());
-//                json.put("catdesp_id",param.getEstado());
-//                json.put("user_id",param.getCep());
-//                json.put("evento_id",param.getTelefone());
-//                listJson.add(json);
-//            }
-//
-//
-//            conexao.Desconectar();
-//            return null;
-//        }
-//        return null;
-//    }
+    public List<Map<String,Object>> getAll() {
+        List<Map<String,Object>> jsonlist = new ArrayList<>();
+
+        Singleton conexao= Singleton.getInstancia();
+        if(conexao.conectar()){
+            List<Despesa> despesaList=despesaModel.listar("",conexao);
+
+            for (Despesa despesa : despesaList){
+                Evento evento=null;
+                if(despesa.getEvento_id()!=0)
+                    evento=eventoModel.consultar(despesa.getEvento_id(),conexao);
+                TipoDespesas tipoDespesas=tipoDespesasModel.consultar(despesa.getTipoDespesa_id(),conexao);
+                Map<String, Object> eventoJson = new HashMap<>();
+                if (evento != null) {
+                    eventoJson.put("id", evento.getId());
+                    eventoJson.put("nome", evento.getNome());
+                }
+                Map<String, Object> tipoDespesaJson = new HashMap<>();
+                if (tipoDespesas != null) {
+                    tipoDespesaJson.put("id", tipoDespesas.getId());
+                    tipoDespesaJson.put("nome", tipoDespesas.getNome());
+                }
+                Map<String,Object> json= new HashMap<>();
+                json.put("id",despesa.getId());
+                json.put("val",despesa.getValor());
+                json.put("data_venc",despesa.getData_venc());
+                json.put("data_lanc",despesa.getData_lanc());
+                json.put("pagamento",despesa.getPagamento());
+                json.put("descricao",despesa.getDescricao());
+                json.put("status_conci",despesa.getStatus_conci());
+                json.put("categoria",tipoDespesaJson);
+                json.put("evento",eventoJson);
+                jsonlist.add(json);
+                conexao.getConexao().commit();
+            }
+            conexao.Desconectar();
+
+        }
+        return jsonlist;
+    }
+
 
 }
