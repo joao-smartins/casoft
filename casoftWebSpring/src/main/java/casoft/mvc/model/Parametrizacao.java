@@ -23,8 +23,9 @@ public class Parametrizacao {
     private String cep;
     private String telefone;
     private String email;
+    private String complemento;
 
-    public Parametrizacao(String nomeEmpresa, String cnpj, String logradouro, int numero, String bairro, String cidade, String estado, String cep, String telefone,String email) {
+    public Parametrizacao(String nomeEmpresa, String cnpj, String logradouro, int numero, String bairro, String cidade, String estado, String cep, String telefone,String email,String complemento) {
         this.nomeEmpresa = nomeEmpresa;
         this.cnpj = cnpj;
         this.logradouro = logradouro;
@@ -35,9 +36,10 @@ public class Parametrizacao {
         this.cep = cep;
         this.telefone = telefone;
         this.email = email;
+        this.complemento=complemento;
     }
 
-    public Parametrizacao(int id, String nomeEmpresa, String cnpj, String logradouro, int numero, String bairro, String cidade, String estado, String cep, String telefone,String email) {
+    public Parametrizacao(int id, String nomeEmpresa, String cnpj, String logradouro, int numero, String bairro, String cidade, String estado, String cep, String telefone,String email,String complemento) {
         this.id = id;
         this.nomeEmpresa = nomeEmpresa;
         this.cnpj = cnpj;
@@ -49,6 +51,7 @@ public class Parametrizacao {
         this.cep = cep;
         this.telefone = telefone;
         this.email = email;
+        this.complemento=complemento;
     }
 
     public Parametrizacao() {
@@ -139,6 +142,14 @@ public class Parametrizacao {
 
     public int getId() {
         return id;
+    }
+
+    public String getComplemento() {
+        return complemento;
+    }
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
     }
 
     public List<Parametrizacao> consultar(String filtro, Singleton conexao){

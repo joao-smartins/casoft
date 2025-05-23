@@ -60,7 +60,13 @@ function limparFormulario() {
 function enviarFormulario(event) {
     event.preventDefault(); // Evita o recarregamento da página
     var fdados = document.getElementById("formEmpresa");
-
+    const cnpjValido = validarCampo('cnpj', 14, 'CNPJ deve ter 14 dígitos.');
+    const cepValido = validarCampo('cep', 8, 'CEP deve ter 8 dígitos.');
+    const telValido = validarCampo('telefone', 10, 'Telefone deve ter 10 ou 11 dígitos.');
+  
+    if (!cnpjValido || !cepValido || !telValido) {
+      return false;
+    }
     // Obtendo o token do localStorage
     const token = authManager.getToken();
 
@@ -187,7 +193,6 @@ function carregarEmpresa() {
     modoCadastro = true;
     const URL = "http://localhost:8080/apis/param/1";
     const token = authManager.getToken();
-    console.log("Token enviado:", token);
     fetch(URL, {
         method: "GET",
         headers: {
@@ -217,12 +222,9 @@ function carregarEmpresa() {
         document.getElementById('cep').value = formatarCEP(data.cep);
         document.getElementById('telefone').value = formatarTelefone(data.telefone);
         document.getElementById('email').value = data.email;
+        document.getElementById('complemento').value = data.complemento;
         atualizarTexto(true);
         modoCadastro = false;
-    })
-    .catch((error) => {
-        console.error("Erro ao carregar os dados da empresa:", error);
-        alert("Erro ao carregar os dados da empresa. Verifique a conexão.");
     });
 }
 
@@ -255,12 +257,39 @@ function atualizarTexto(alteracao) {
     });
 }
 function formatarCNPJ(cnpj) {
-        return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
-    }
+    return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+}
+function formatarTelefone(telefone) {
+  if (telefone.length === 11) {
+      return telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+  }
+  return telefone.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
+}
+function formatarCEP(cep) {
+    return cep.replace(/^(\d{5})(\d{3})$/, "$1-$2");
+}
 
-    function formatarTelefone(telefone) {
-        return telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+function validarCampo(inputId, length, message) {
+  const input = document.getElementById(inputId);
+  const feedback = document.getElementById(inputId + 'Feedback');
+  if(inputId=='telefone'){
+    if (input.value.replace(/\D/g, '').length !== length && input.value.replace(/\D/g, '').length !== length+1) {
+      input.classList.add('is-invalid');
+      feedback.textContent = message;
+      return false;
+    } else {
+      input.classList.remove('is-invalid');
+      feedback.textContent = '';
+      return true;
     }
-    function formatarCEP(cep) {
-        return cep.replace(/^(\d{5})(\d{3})$/, "$1-$2");
-    }
+  }
+  else if (input.value.replace(/\D/g, '').length !== length) {
+    input.classList.add('is-invalid');
+    feedback.textContent = message;
+    return false;
+  } else {
+    input.classList.remove('is-invalid');
+    feedback.textContent = '';
+    return true;
+  }
+}

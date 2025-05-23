@@ -32,6 +32,7 @@ public class ParametrizacaoController {
                 json.put("cep",param.getCep());
                 json.put("telefone",param.getTelefone());
                 json.put("email",param.getEmail());
+                json.put("complemento",param.getComplemento());
                 conexao.Desconectar();
                 return json;
             }
@@ -40,7 +41,7 @@ public class ParametrizacaoController {
         }
         return null;
     }
-    public Map<String,Object> addParam(String nome, String cnpj, String logradouro, String numero, String bairro, String cidade, String estado, String cep, String telefone,String email, MultipartFile file) {
+    public Map<String,Object> addParam(String nome, String cnpj, String logradouro, String numero, String bairro, String cidade, String estado, String cep, String telefone,String email,String complemento, MultipartFile file) {
         Singleton conexao= Singleton.getInstancia();
         Map<String,Object> json= new HashMap<>();
         if(conexao.conectar()){
@@ -51,11 +52,11 @@ public class ParametrizacaoController {
                     File uploadFolder = new File("casoftWebSpring/src/main/resources/templates/img/");
                     if (!uploadFolder.exists())
                         uploadFolder.mkdirs();
-                    file.transferTo(new File(uploadFolder.getAbsoluteFile()+"\\"+"logo.png"));
+                    file.transferTo(new File(uploadFolder.getAbsoluteFile()+File.separator+"logo.png"));
                     cnpj=cnpj.replaceAll("[^\\d]", "");
                     cep=cep.replaceAll("[^\\d]", "");
                     telefone=telefone.replaceAll("[^\\d]", "");
-                    Parametrizacao param=new Parametrizacao(nome,cnpj,logradouro,Integer.parseInt(numero),bairro,cidade,estado,cep,telefone,email);
+                    Parametrizacao param=new Parametrizacao(nome,cnpj,logradouro,Integer.parseInt(numero),bairro,cidade,estado,cep,telefone,email,complemento);
                     if (paramModel.gravar(param,conexao) != null){
                         json.put("id",param.getId());
                         json.put("nomeEmpresa",param.getNomeEmpresa());
@@ -68,6 +69,7 @@ public class ParametrizacaoController {
                         json.put("cep",param.getCep());
                         json.put("telefone",param.getTelefone());
                         json.put("email",param.getEmail());
+                        json.put("complemento",param.getComplemento());
                         conexao.getConexao().commit();
                     }
                     else{
@@ -87,7 +89,7 @@ public class ParametrizacaoController {
         }
         return json;
     }
-    public Map<String,Object> updtParam(String nome, String cnpj, String logradouro,String numero, String bairro, String cidade, String estado, String cep, String telefone,String email, MultipartFile file) {
+    public Map<String,Object> updtParam(String nome, String cnpj, String logradouro,String numero, String bairro, String cidade, String estado, String cep, String telefone,String email,String complemento, MultipartFile file) {
         Singleton conexao= Singleton.getInstancia();
         Map<String,Object> json= new HashMap<>();
         if(conexao.conectar()){
@@ -95,11 +97,11 @@ public class ParametrizacaoController {
                 File uploadFolder = new File("casoftWebSpring/src/main/resources/templates/img/");
                 if (!uploadFolder.exists())
                     uploadFolder.mkdir();
-                file.transferTo(new File(uploadFolder.getAbsoluteFile()+"\\"+"logo.png"));
+                file.transferTo(new File(uploadFolder.getAbsoluteFile()+File.separator+"logo.png"));
                 cnpj=cnpj.replaceAll("[^\\d]", "");
                 cep=cep.replaceAll("[^\\d]", "");
                 telefone=telefone.replaceAll("[^\\d]", "");
-                Parametrizacao param=new Parametrizacao(1,nome,cnpj,logradouro,Integer.parseInt(numero),bairro,cidade,estado,cep,telefone,email);
+                Parametrizacao param=new Parametrizacao(1,nome,cnpj,logradouro,Integer.parseInt(numero),bairro,cidade,estado,cep,telefone,email,complemento);
                 if (paramModel.alterar(param,conexao) != null){
                     json.put("id",param.getId());
                     json.put("nomeEmpresa",param.getNomeEmpresa());
@@ -112,6 +114,7 @@ public class ParametrizacaoController {
                     json.put("cep",param.getCep());
                     json.put("telefone",param.getTelefone());
                     json.put("email",param.getEmail());
+                    json.put("complemento",param.getComplemento());
                     conexao.getConexao().commit();
                 }
                 else {

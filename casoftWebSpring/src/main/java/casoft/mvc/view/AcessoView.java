@@ -1,7 +1,6 @@
 package casoft.mvc.view;
 
 import casoft.mvc.controller.AcessoController;
-import casoft.mvc.model.Usuario;
 import casoft.mvc.util.JWTTokenProvider;
 import casoft.mvc.util.Mensagem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +37,9 @@ public class AcessoView {
     @GetMapping("/verificar-token")
     public ResponseEntity<?> verificarToken(@RequestHeader("Authorization") String authHeader) {
         try {
-            // Remover o prefixo "Bearer "
             String token = authHeader.substring(7);
-
-            // Use seu serviço de validação de token aqui
-            boolean isValid = JWTTokenProvider.verifyToken(token);
-
-            if (isValid) {
+            boolean valido = JWTTokenProvider.verifyToken(token);
+            if (valido) {
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.status(401).build();

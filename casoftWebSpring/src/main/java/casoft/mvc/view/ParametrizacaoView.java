@@ -37,13 +37,13 @@ public class ParametrizacaoView {
         return ResponseEntity.badRequest().body(new Mensagem("Usuario nao autenticado"));
     }
     @PostMapping
-    public ResponseEntity<Object> addParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestPart("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Object> addParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestParam("comlemento")String complemento,@RequestPart("file") MultipartFile file, HttpServletRequest httpServletRequest) {
 
         String token = httpServletRequest.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer "))
             token = token.substring(7);
         if(JWTTokenProvider.verifyToken(token)) {
-            Map<String,Object> json =paramController.addParam(nomeEmpresa,cnpj,logradouro,numero,bairro,cidade,estado,cep,telefone,email,file);
+            Map<String,Object> json =paramController.addParam(nomeEmpresa,cnpj,logradouro,numero,bairro,cidade,estado,cep,telefone,email,complemento,file);
             if(json.get("erro")==null) {
                 System.out.println("deu certo");
                 return ResponseEntity.ok(new Mensagem(nomeEmpresa + " cadastrada com sucesso!"));
@@ -55,14 +55,14 @@ public class ParametrizacaoView {
 
     }
     @PutMapping
-    public ResponseEntity<Object> updtParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestPart("file") MultipartFile file,HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Object> updtParam(@RequestParam("nomeEmpresa") String nomeEmpresa,@RequestParam("cnpj") String cnpj,@RequestParam("logradouro")String logradouro,@RequestParam("numero") String numero,@RequestParam("bairro") String bairro,@RequestParam("cidade") String cidade,@RequestParam("estado")String estado,@RequestParam("cep")String cep,@RequestParam("telefone")String telefone,@RequestParam("email")String email,@RequestParam("complemento")String complemento,@RequestPart("file") MultipartFile file,HttpServletRequest httpServletRequest) {
         System.out.println(httpServletRequest.getHeader("Authorization"));
         Map<String,Object> json=new HashMap<>();
         String token = httpServletRequest.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer "))
             token = token.substring(7);
         if(JWTTokenProvider.verifyToken(token)) {
-             json=paramController.updtParam(nomeEmpresa,cnpj,logradouro,numero,bairro,cidade,estado,cep,telefone,email,file);
+             json=paramController.updtParam(nomeEmpresa,cnpj,logradouro,numero,bairro,cidade,estado,cep,telefone,email,complemento,file);
             if(json.get("erro")==null)
                 return ResponseEntity.ok(new Mensagem(nomeEmpresa+" alterada com sucesso!"));
         }

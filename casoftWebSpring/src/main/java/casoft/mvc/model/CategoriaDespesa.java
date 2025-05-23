@@ -1,5 +1,7 @@
 package casoft.mvc.model;
 
+import java.util.List;
+
 public class CategoriaDespesa {
     private String nome;
 
@@ -14,5 +16,6 @@ public class CategoriaDespesa {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
 
 }
