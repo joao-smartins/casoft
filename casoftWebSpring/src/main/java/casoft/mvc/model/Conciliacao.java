@@ -9,9 +9,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-@Component // Marca como um componente Spring, similar ao seu TipoDespesas
-public class Conciliacao {
-    @Autowired // Injeta o DAO aqui, como no TipoDespesas
+@Component
+public class Conciliacao
+{
+    @Autowired
     private ConciliacaoDAO dao;
 
     private int concId;
@@ -19,11 +20,11 @@ public class Conciliacao {
     private String concDescProblema;
     private LocalDate concDtSolucao;
     private String concDescSolucao;
-    private int concReceitaId; // Usaremos 0 para representar NULL no banco
-    private int concDespesaId; // Usaremos 0 para representar NULL no banco
+    private int concReceitaId;
+    private int concDespesaId;
 
     public Conciliacao() {
-        // Construtor vazio
+
     }
 
     public Conciliacao(int concId, LocalDate concDtProblema, String concDescProblema,
@@ -120,7 +121,6 @@ public class Conciliacao {
         return dao.isEmpty(conexao);
     }
 
-    // Novos métodos de negócio para a Conciliação, chamando o DAO
     public List<Map<String, Object>> consultarItensNaoConciliados(Singleton conexao) {
         return dao.getItensNaoConciliados(conexao);
     }

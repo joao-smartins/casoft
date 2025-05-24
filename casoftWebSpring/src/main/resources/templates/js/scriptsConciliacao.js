@@ -1,18 +1,90 @@
+// src/main/resources/static/js/conciliacao.js
+
 // Array para armazenar os itens não conciliados e seus estados temporários
 let itensNaoConciliados = [];
 // Array para armazenar apenas as conciliações marcadas como pendentes
 let conciliacoesPendentesParaSalvar = [];
-// Variáveis para guardar o item que está sendo editado no modal
+// Variáveis para guardar o item que está sendo editado no modal de problema
 let currentEditingItemId = null;
 let currentEditingItemType = null;
 
+// Variáveis para o modal de confirmação genérico
+let confirmActionCallback = null; // Função a ser executada se o usuário confirmar
+let confirmActionParams = null; // Parâmetros para a função de callback
+
 // Adiciona um listener para carregar os itens de conciliação quando a página estiver pronta
-document.addEventListener("DOMContentLoaded", carregarItensConciliacao);
+document.addEventListener("DOMContentLoaded", () => {
+    // A lógica para adicionar o link "Conciliação" à sidebar foi removida daqui.
+    // Certifique-se de que o link 'conciliacao.html' esteja presente diretamente
+    // no HTML da sua sidebar, se você ainda deseja que ele apareça.
+    carregarItensConciliacao(); // Carrega os dados ao carregar a página
+});
+
+
+// Função para exibir mensagens na tela (sucesso/erro)
+function showMessage(message, type) {
+    const msgDiv = document.getElementById("mensagem");
+    msgDiv.textContent = message;
+    msgDiv.style.display = 'block';
+
+    // Aplica estilos baseados no tipo de mensagem (sem operador ternário)
+    if (type === 'red') {
+        msgDiv.style.backgroundColor = '#ffebee'; // Fundo vermelho claro
+        msgDiv.style.color = '#d32f2f'; // Texto vermelho escuro
+        msgDiv.style.borderColor = '#ef9a9a'; // Borda vermelha
+    } else if (type === 'green') {
+        msgDiv.style.backgroundColor = '#e8f5e9'; // Fundo verde claro
+        msgDiv.color = '#388e3c'; // Texto verde escuro
+        msgDiv.style.borderColor = '#a5d6a7'; // Borda verde
+    } else {
+        // Estilo padrão se nenhum tipo for especificado
+        msgDiv.style.backgroundColor = '#f0f0f0';
+        msgDiv.color = '#333';
+        msgDiv.style.borderColor = '#ccc';
+    }
+
+    setTimeout(() => {
+        msgDiv.style.display = 'none';
+        msgDiv.textContent = ''; // Limpa a mensagem
+    }, 5000);
+}
+
+// Função para exibir o modal de confirmação genérico
+function showConfirmModal(message, callback, params) {
+    const modal = document.getElementById("confirmModal");
+    const modalMessage = document.getElementById("confirmModalMessage");
+    const confirmButton = document.getElementById("confirmModalYesButton");
+
+    modalMessage.textContent = message;
+    confirmActionCallback = callback;
+    confirmActionParams = params;
+
+    // Remove qualquer listener anterior para evitar múltiplas execuções
+    confirmButton.onclick = null;
+    confirmButton.addEventListener('click', executeConfirmAction);
+
+    modal.style.display = "flex"; // Usa flex para centralizar
+}
+
+// Função para fechar o modal de confirmação genérico
+function closeConfirmModal() {
+    const modal = document.getElementById("confirmModal");
+    modal.style.display = "none";
+    confirmActionCallback = null;
+    confirmActionParams = null;
+}
+
+// Função para executar a ação confirmada do modal
+function executeConfirmAction() {
+    if (confirmActionCallback) {
+        confirmActionCallback.apply(null, confirmActionParams);
+    }
+    closeConfirmModal();
+}
 
 // Função principal para carregar e exibir os itens de conciliação
 async function carregarItensConciliacao() {
     try {
-        // Faz a chamada real para o backend para buscar itens não conciliados
         const response = await fetch("http://localhost:8080/apis/conciliacao/nao-conciliados");
 
         if (!response.ok) {
@@ -29,18 +101,25 @@ async function carregarItensConciliacao() {
 
         // Se a resposta for uma lista vazia ou nula (sem "ok" ou "erro"),
         // ou se o 'ok' estiver vazio, trate como sem itens
-        if (!data || data.length === 0 || (data.ok && data.ok.length === 0)) {
+        if (!data || data.length === 0) {
             itensNaoConciliados = []; // Garante que a lista está vazia
         } else {
             // Se houver "ok", assume que o array de itens está dentro dele (como no seu TipoDespesasView)
+            // Caso contrário, assume que a própria 'data' é o array de itens
             const itensRecebidos = data.ok ? data.ok : data;
-            itensNaoConciliados = itensRecebidos.map(item => ({
-                id: item.id,
-                tipo: item.tipo,
-                valor: item.valor,
-                descricao: item.descricao,
-                statusConciliacao: item.statusConciliacao || 'AGUARDANDO' // Assume 'AGUARDANDO' se o status for nulo
-            }));
+            itensNaoConciliados = itensRecebidos.map(item => {
+                let status = item.statusConciliacao;
+                if (status === null) {
+                    status = 'AGUARDANDO';
+                }
+                return {
+                    id: item.id,
+                    tipo: item.tipo,
+                    valor: item.valor,
+                    descricao: item.descricao,
+                    statusConciliacao: status
+                };
+            });
         }
 
         renderizarTabelaConciliacao(); // Chama a função para renderizar a tabela
@@ -55,7 +134,28 @@ function renderizarTabelaConciliacao() {
     const tableBody = document.getElementById("conciliacaoTableBody");
     tableBody.innerHTML = ''; // Limpa a tabela antes de renderizar
 
-    if (itensNaoConciliados.length === 0) {
+    // Obtém o valor do campo de filtro
+    const filtroInput = document.getElementById("filtro");
+    let filtro = "";
+    if (filtroInput) {
+        filtro = filtroInput.value.toLowerCase();
+    }
+
+    const filteredItems = [];
+    if (itensNaoConciliados.length > 0) {
+        itensNaoConciliados.forEach(item => {
+            const tipoMatches = item.tipo.toLowerCase().includes(filtro);
+            const valorMatches = item.valor.toFixed(2).toLowerCase().includes(filtro); // Converte valor para string para comparação
+            const descriptionMatches = item.descricao.toLowerCase().includes(filtro);
+            const statusMatches = item.statusConciliacao.toLowerCase().includes(filtro);
+
+            if (filtro === "" || tipoMatches || valorMatches || descriptionMatches || statusMatches) {
+                filteredItems.push(item);
+            }
+        });
+    }
+
+    if (filteredItems.length === 0) {
         const row = tableBody.insertRow();
         const cell = row.insertCell();
         cell.colSpan = 6; // Cobre todas as colunas
@@ -64,7 +164,7 @@ function renderizarTabelaConciliacao() {
         return;
     }
 
-    itensNaoConciliados.forEach(item => {
+    filteredItems.forEach(item => {
         const row = tableBody.insertRow();
         row.dataset.id = item.id;
         row.dataset.type = item.tipo;
@@ -85,63 +185,59 @@ function renderizarTabelaConciliacao() {
         const conciliadoButton = document.createElement('button');
         conciliadoButton.textContent = 'Conciliado';
         conciliadoButton.className = 'btn btn-sm btn-success'; // Estilo Bootstrap
-        conciliadoButton.onclick = () => handleConciliacao(item.id, item.tipo, 'CONCILIADO');
+        conciliadoButton.onclick = function() {
+            showConfirmModal(`Deseja marcar este item (${item.tipo} ID: ${item.id}) como CONCILIADO?`, confirmConciliadoAction, [item.id, item.tipo]);
+        };
         actionsCell.appendChild(conciliadoButton);
 
         // Botão PENDENTE
         const pendingButton = document.createElement('button');
         pendingButton.textContent = 'Pendente';
         pendingButton.className = 'btn btn-sm btn-warning ms-2'; // Estilo Bootstrap com margem
-        pendingButton.onclick = () => handleConciliacao(item.id, item.tipo, 'PENDENTE');
+        pendingButton.onclick = function() {
+            handleConciliacaoPendente(item.id, item.tipo);
+        };
         actionsCell.appendChild(pendingButton);
     });
 }
 
-// Função para lidar com a ação de conciliação (CONCILIADO ou PENDENTE)
-async function handleConciliacao(id, tipo, status) {
-    // Encontra o item na lista local
+// Ação para confirmar conciliação (chamada pelo modal)
+async function confirmConciliadoAction(id, tipo) {
     const itemIndex = itensNaoConciliados.findIndex(item => item.id === id && item.tipo === tipo);
     if (itemIndex === -1) {
-        showMessage("Erro: Item não encontrado na lista para conciliação.", 'red');
+        showMessage("Erro: Item não encontrado para conciliação.", 'red');
         return;
     }
 
-    const item = itensNaoConciliados[itemIndex];
-
-    if (status === 'CONCILIADO') {
-        // Confirmação antes de conciliar
-        if (!confirm(`Deseja marcar este item (${item.tipo} ID: ${item.id}) como CONCILIADO?`)) {
-            return;
-        }
-
-        const endpoint = tipo === 'Receita'
-            ? `http://localhost:8080/apis/conciliacao/receita/${id}/status`
-            : `http://localhost:8080/apis/conciliacao/despesa/${id}/status`;
-
-        try {
-            const response = await fetch(endpoint, {
-                method: 'PUT'
-            });
-
-            const result = await response.json(); // Espera um Map de retorno (com "ok" ou "erro")
-            if (response.ok && result.ok) {
-                // Remove o item da lista de não conciliados e renderiza a tabela
-                itensNaoConciliados.splice(itemIndex, 1); // Remove 1 item a partir do index
-                renderizarTabelaConciliacao();
-                showMessage(result.ok, 'green'); // Exibe a mensagem de sucesso
-            } else {
-                throw new Error(result.erro || `Erro desconhecido ao atualizar status para ${status}.`);
-            }
-        } catch (error) {
-            console.error("Erro ao atualizar status:", error);
-            showMessage("Erro ao atualizar status: " + error.message, 'red');
-        }
-    } else if (status === 'PENDENTE') {
-        // Armazena os dados do item para uso no modal de problema
-        currentEditingItemId = id;
-        currentEditingItemType = tipo;
-        showProblemaModal();
+    let endpoint = `/apis/conciliacao/receita/${id}/status`;
+    if (tipo === 'Despesa') {
+        endpoint = `/apis/conciliacao/despesa/${id}/status`;
     }
+
+    try {
+        const response = await fetch(`http://localhost:8080${endpoint}`, {
+            method: 'PUT'
+        });
+
+        const result = await response.json(); // Espera um Map de retorno (com "ok" ou "erro")
+        if (response.ok && result.ok) {
+            itensNaoConciliados.splice(itemIndex, 1); // Remove 1 item a partir do index
+            renderizarTabelaConciliacao();
+            showMessage(result.ok, 'green'); // Exibe a mensagem de sucesso
+        } else {
+            throw new Error(result.erro || `Erro desconhecido ao atualizar status para CONCILIADO.`);
+        }
+    } catch (error) {
+        console.error("Erro ao atualizar status:", error);
+        showMessage("Erro ao atualizar status: " + error.message, 'red');
+    }
+}
+
+// Função para lidar com a ação de conciliação Pendente (abre o modal de problema)
+function handleConciliacaoPendente(id, tipo) {
+    currentEditingItemId = id;
+    currentEditingItemType = tipo;
+    showProblemaModal();
 }
 
 // Função para exibir a janela modal de problema
@@ -150,7 +246,16 @@ function showProblemaModal() {
     const dataProblemaInput = document.getElementById("dataProblema");
     // Define a data atual como valor padrão
     dataProblemaInput.value = new Date().toISOString().split('T')[0];
-    document.getElementById("descricaoProblema").value = ''; // Limpa a descrição
+    const descricaoProblemaInput = document.getElementById("descricaoProblema");
+    descricaoProblemaInput.value = ''; // Limpa a descrição
+    descricaoProblemaInput.style.border = ""; // Limpa borda de erro anterior
+
+    // Remove label de erro anterior se existir
+    const oldErrorLabel = descricaoProblemaInput.parentElement.querySelector('.error-label');
+    if (oldErrorLabel) {
+        oldErrorLabel.remove();
+    }
+
     modal.style.display = "flex"; // Usa flex para centralizar o modal
 }
 
@@ -160,15 +265,38 @@ function closeProblemaModal() {
     modal.style.display = "none";
     currentEditingItemId = null;
     currentEditingItemType = null;
+    // Limpa a borda e a mensagem de erro ao fechar o modal
+    const descricaoProblemaInput = document.getElementById("descricaoProblema");
+    descricaoProblemaInput.style.border = "";
+    const oldErrorLabel = descricaoProblemaInput.parentElement.querySelector('.error-label');
+    if (oldErrorLabel) {
+        oldErrorLabel.remove();
+    }
 }
 
 // Função para salvar os detalhes do problema (chamada pelo modal)
 async function saveProblema() {
     const dataProblema = document.getElementById("dataProblema").value;
-    const descricaoProblema = document.getElementById("descricaoProblema").value.trim();
+    const descricaoProblemaInput = document.getElementById("descricaoProblema");
+    const descricaoProblema = descricaoProblemaInput.value.trim();
 
-    if (!descricaoProblema) {
-        showMessage("A descrição do problema não pode estar vazia.", 'red');
+    // Limpa estilos de erro anteriores
+    descricaoProblemaInput.style.border = "";
+    const oldErrorLabel = descricaoProblemaInput.parentElement.querySelector('.error-label');
+    if (oldErrorLabel) {
+        oldErrorLabel.remove();
+    }
+
+    if (descricaoProblema === "") {
+        descricaoProblemaInput.style.border = "2px solid red";
+        const errorLabel = document.createElement('div');
+        errorLabel.className = 'error-label';
+        errorLabel.style.color = "red";
+        errorLabel.style.fontSize = "12px";
+        errorLabel.style.marginTop = "5px";
+        errorLabel.innerText = "A descrição do problema não pode estar vazia.";
+        descricaoProblemaInput.parentElement.appendChild(errorLabel);
+        showMessage("Por favor, preencha a descrição do problema.", 'red');
         return;
     }
 
@@ -179,21 +307,23 @@ async function saveProblema() {
     if (itemIndex !== -1) {
         const item = itensNaoConciliados[itemIndex];
 
-        // Cria um objeto Conciliacao conforme o modelo Java para envio ao backend
         const conciliacaoProblema = {
-            concDtProblema: dataProblema, // FormatoISO (yyyy-MM-DD)
+            concDtProblema: dataProblema,
             concDescProblema: descricaoProblema,
-            concDtSolucao: null, // Inicialmente nulo
-            concDescSolucao: null, // Inicialmente nulo
-            // Define o ID da receita ou despesa, e o outro como 0 (que o backend vai converter para NULL)
-            concReceitaId: item.tipo === 'Receita' ? item.id : 0,
-            concDespesaId: item.tipo === 'Despesa' ? item.id : 0
+            concDtSolucao: null,
+            concDescSolucao: null,
+            concReceitaId: 0, // Default para 0, será ajustado abaixo
+            concDespesaId: 0  // Default para 0, será ajustado abaixo
         };
 
-        // Adiciona à lista local para envio posterior (será salvo em lote)
+        if (item.tipo === 'Receita') {
+            conciliacaoProblema.concReceitaId = item.id;
+        } else {
+            conciliacaoProblema.concDespesaId = item.id;
+        }
+
         conciliacoesPendentesParaSalvar.push(conciliacaoProblema);
 
-        // Remove o item da lista de não conciliados para que não apareça mais na tabela
         itensNaoConciliados.splice(itemIndex, 1); // Remove 1 item a partir do index
         renderizarTabelaConciliacao(); // Renderiza a tabela novamente para remover o item
 
@@ -205,26 +335,19 @@ async function saveProblema() {
     }
 }
 
-// Função para exibir mensagens na tela (sucesso/erro)
-function showMessage(message, type) {
-    const msgDiv = document.getElementById("mensagem");
-    msgDiv.textContent = message;
-    msgDiv.className = `alert ${type === 'red' ? 'alert-danger' : 'alert-success'}`; // Estilo Bootstrap
-    msgDiv.style.display = 'block';
-    setTimeout(() => {
-        msgDiv.style.display = 'none';
-    }, 5000);
-}
-
-// Função para salvar todas as conciliações pendentes (enviar para o backend em lote)
-async function salvarConciliacoesPendentes() {
+// Função para exibir o modal de confirmação para salvar conciliações pendentes
+function showConfirmSalvarPendentesModal() {
     if (conciliacoesPendentesParaSalvar.length === 0) {
         showMessage("Nenhuma conciliação pendente para salvar.", 'red');
         return;
     }
+    showConfirmModal(`Deseja salvar ${conciliacoesPendentesParaSalvar.length} conciliações pendentes?`, salvarConciliacoesPendentes);
+}
 
-    // Confirmação antes de salvar em lote
-    if (!confirm(`Deseja salvar ${conciliacoesPendentesParaSalvar.length} conciliações pendentes?`)) {
+// Função para salvar todas as conciliações pendentes (enviar para o backend)
+async function salvarConciliacoesPendentes() {
+    if (conciliacoesPendentesParaSalvar.length === 0) {
+        showMessage("Nenhuma conciliação pendente para salvar.", 'red');
         return;
     }
 
@@ -239,7 +362,6 @@ async function salvarConciliacoesPendentes() {
         if (response.ok && result.ok) {
             showMessage(result.ok, 'green'); // Exibe a mensagem de sucesso
             conciliacoesPendentesParaSalvar = []; // Limpa a lista após salvar com sucesso
-            // Não é necessário recarregar carregarItensConciliacao() aqui, pois os itens já foram removidos da lista
         } else {
             throw new Error(result.erro || "Erro desconhecido ao salvar conciliações pendentes.");
         }
@@ -252,27 +374,7 @@ async function salvarConciliacoesPendentes() {
 // Simulação de authManager.logout() para o botão Deslogar
 const authManager = {
     logout: function() {
-        alert('Função Deslogar simulada. Redirecionaria para a página de login.');
+        showMessage('Função Deslogar simulada. Redirecionaria para a página de login.', 'green');
         // window.location.href = 'login.html'; // Descomente para redirecionar
     }
 };
-
-// Adiciona o link de Conciliação à sidebar (se ainda não estiver lá)
-document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar) {
-        // Verifica se o link de conciliação já existe para evitar duplicatas
-        if (!sidebar.querySelector('a[href="conciliacao.html"]')) {
-            const conciliacaoLink = document.createElement('a');
-            conciliacaoLink.href = 'conciliacao.html';
-            conciliacaoLink.textContent = 'Conciliação';
-            // Encontra o link de Tipos de Despesas para inserir o novo link depois
-            const tiposDespesasLink = sidebar.querySelector('a[href="tipoDespesa.html"]');
-            if (tiposDespesasLink) {
-                tiposDespesasLink.parentNode.insertBefore(conciliacaoLink, tiposDespesasLink.nextSibling);
-            } else {
-                sidebar.appendChild(conciliacaoLink); // Adiciona no final se não encontrar
-            }
-        }
-    }
-});

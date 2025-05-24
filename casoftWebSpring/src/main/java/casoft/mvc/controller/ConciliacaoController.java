@@ -11,16 +11,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service // Marca como um serviço/componente de negócio, como o TipoDespesasController
-public class ConciliacaoController {
+@Service
+public class ConciliacaoController
+{
 
     @Autowired
-    private Conciliacao conciliacaoModel; // Injeta o Model de Conciliacao, como no TipoDespesasController
+    private Conciliacao conciliacaoModel;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    // Método para obter itens não conciliados
-    public List<Map<String, Object>> getItensNaoConciliados() {
+    public List<Map<String, Object>> getItensNaoConciliados()
+    {
         Singleton conexao = Singleton.getInstancia();
         if (conexao.conectar()) {
             List<Map<String, Object>> resultado = null;
@@ -28,17 +29,16 @@ public class ConciliacaoController {
                 resultado = conciliacaoModel.consultarItensNaoConciliados(conexao);
             } catch (Exception e) {
                 System.err.println("Erro no Controller ao buscar itens não conciliados: " + e.getMessage());
-                // Não precisa de rollback aqui, pois é apenas uma consulta
             } finally {
                 conexao.Desconectar();
             }
             return resultado;
         }
-        return null; // Erro de conexão
+        return null;
     }
 
-    // Método para registrar problemas de conciliação (gravar em lote)
-    public Map<String, Object> addConciliacaoProblemas(List<Conciliacao> conciliacoes) {
+    public Map<String, Object> addConciliacaoProblemas(List<Conciliacao> conciliacoes)
+    {
         Singleton conexao = Singleton.getInstancia();
         Map<String, Object> json = new HashMap<>();
 
@@ -48,18 +48,18 @@ public class ConciliacaoController {
                 for (Conciliacao conc : conciliacoes) {
                     if (conciliacaoModel.gravar(conc, conexao) == null) {
                         sucessoTotal = false;
-                        break; // Se um falhar, para a iteração
+                        break;
                     }
                 }
                 if (sucessoTotal) {
-                    conexao.getConexao().commit(); // Confirma a transação
+                    conexao.getConexao().commit();
                     json.put("ok", "Conciliações pendentes salvas com sucesso!");
                 } else {
-                    conexao.getConexao().rollback(); // Reverte a transação em caso de erro
+                    conexao.getConexao().rollback();
                     json.put("erro", "Erro ao gravar uma ou mais conciliações.");
                 }
             } catch (Exception e) {
-                conexao.getConexao().rollback(); // Reverte a transação em caso de erro
+                conexao.getConexao().rollback();
                 System.err.println("Erro no Controller ao salvar conciliações pendentes: " + e.getMessage());
                 json.put("erro", "Erro ao salvar conciliações pendentes: " + e.getMessage());
             } finally {
@@ -71,7 +71,6 @@ public class ConciliacaoController {
         return json;
     }
 
-    // Método para marcar despesa como conciliada
     public Map<String, Object> marcarDespesaConciliada(int despesaId) {
         Singleton conexao = Singleton.getInstancia();
         Map<String, Object> json = new HashMap<>();
@@ -98,8 +97,8 @@ public class ConciliacaoController {
         return json;
     }
 
-    // Método para marcar receita como conciliada
-    public Map<String, Object> marcarReceitaConciliada(int receitaId) {
+    public Map<String, Object> marcarReceitaConciliada(int receitaId)
+    {
         Singleton conexao = Singleton.getInstancia();
         Map<String, Object> json = new HashMap<>();
 
@@ -125,8 +124,8 @@ public class ConciliacaoController {
         return json;
     }
 
-    // Métodos CRUD básicos para Conciliacao (se precisar gerenciar as entradas da tabela conciliacao diretamente)
-    public Map<String,Object> getConciliacaoID(int id) {
+    public Map<String,Object> getConciliacaoID(int id)
+    {
         Singleton conexao = Singleton.getInstancia();
         Map<String, Object> json = new HashMap<>();
         if(conexao.conectar()) {
@@ -149,7 +148,8 @@ public class ConciliacaoController {
         return json;
     }
 
-    public Map<String,Object> addConciliacao(Conciliacao conciliacao) {
+    public Map<String,Object> addConciliacao(Conciliacao conciliacao)
+    {
         Singleton conexao = Singleton.getInstancia();
         Map<String,Object> json = new HashMap<>();
 
@@ -196,7 +196,8 @@ public class ConciliacaoController {
         return json;
     }
 
-    public Map<String, Object> deleteConciliacao(int id) {
+    public Map<String, Object> deleteConciliacao(int id)
+    {
         Singleton conexao = Singleton.getInstancia();
         Map<String, Object> json = new HashMap<>();
 
