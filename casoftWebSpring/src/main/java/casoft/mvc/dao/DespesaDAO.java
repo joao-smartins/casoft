@@ -1,6 +1,7 @@
 package casoft.mvc.dao;
 
 import casoft.mvc.model.Despesa;
+import casoft.mvc.model.Evento;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 
@@ -21,7 +22,7 @@ public class DespesaDAO {
                 despesa_pagamento, 
                 despesa_desc, 
                 despesa_statusconci, 
-                categoriadesp_id, 
+                catdesp_id, 
                 user_id
             ) VALUES (
                 #2, '#3', '#4', '#5', '#6', '#7', #8, #9
@@ -36,7 +37,7 @@ public class DespesaDAO {
                 despesa_pagamento, 
                 despesa_desc, 
                 despesa_statusconci, 
-                categoriadesp_id, 
+                catdesp_id, 
                 user_id, 
                 evento_id
             ) VALUES (
@@ -80,21 +81,28 @@ public class DespesaDAO {
                 d.setPagamento(rs.getDouble("despesa_pagamento"));
                 d.setDescricao(rs.getString("despesa_desc"));
                 d.setStatus_conci(rs.getString("despesa_statusconci"));
-                d.setTipoDespesa_id(rs.getInt("categoriadesp_id"));
+                d.setTipoDespesa_id(rs.getInt("catdesp_id"));
                 d.setUsuario_id(rs.getInt("user_id"));
                 String evento_id = rs.getString("evento_id");
-                if (evento_id != null && !evento_id.isBlank()) {
+                if (evento_id != null) {
                     d.setEvento_id(rs.getInt("evento_id"));
                 }
                 else{
                     d.setEvento_id(0);
                 }
-
                 despesas.add(d);
             }
         } catch(Exception er) {
             System.out.println("Erro ao carregar despesas: " + er.getMessage());
         }
         return despesas;
+    }
+
+    public boolean apagar(int id, Singleton conexao) {
+        String sql = "DELETE FROM despesa WHERE despesa_id = "+id;
+        if(conexao.getConexao().manipular(sql)) {
+            return true;
+        }
+        return false;
     }
 }

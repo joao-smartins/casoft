@@ -41,6 +41,7 @@ public class DespesaController {
     }
     public Map<String,Object> addDespesa(String valor, String data_venc, String data_lanc, String pagamento, String descricao, String status_conci, String tipoDespesa_id, String usuario_id, String evento_id){
         Map<String,Object> json = new HashMap<>();
+        System.out.println("TIpo Despesa: "+usuario_id);
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){
             int evento;
@@ -88,6 +89,7 @@ public class DespesaController {
 
             for (Despesa despesa : despesaList){
                 Evento evento=null;
+
                 if(despesa.getEvento_id()!=0)
                     evento=eventoModel.consultar(despesa.getEvento_id(),conexao);
                 TipoDespesas tipoDespesas=tipoDespesasModel.consultar(despesa.getTipoDespesa_id(),conexao);
@@ -119,6 +121,16 @@ public class DespesaController {
         }
         return jsonlist;
     }
-
+    public Map<String,Object> delete(int id){
+        Map<String,Object> json=new HashMap<>();
+        Singleton conexao= Singleton.getInstancia();
+        if(conexao.conectar()){
+            if(despesaModel.remover(id,conexao)){
+                json.put("mesagem","Despesa removida com sucesso");
+                return json;
+            }
+        }
+        return json;
+    }
 
 }

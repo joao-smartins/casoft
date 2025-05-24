@@ -129,4 +129,8 @@ public class Despesa {
     public List<Despesa> listar(String filtro,Singleton conexao) {
         return despesaDAO.consultar(filtro,conexao);
     }
+
+    public boolean remover(int id, Singleton conexao){
+        return despesaDAO.apagar(id,conexao);
+    }
 }

@@ -3,16 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Listagem de Despesas</title>
+  <title>Editar Despesa</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../css/estilo.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
   <style>
-    .status-pendente { color: #d35400; font-weight: bold; }
-    .status-pago { color: #27ae60; font-weight: bold; }
-    .status-cancelado { color: #c0392b; font-weight: bold; }
-    .status-conciliado { color: #2980b9; font-weight: bold; }
-    .action-buttons .btn { padding: 0.25rem 0.5rem; font-size: 0.875rem; }
+    .required { color: red; }
+    .card-section { 
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      color: #2c3e50;
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body class="bg-light">
@@ -46,71 +53,112 @@
     <a href="#">Configurações</a>
     <a href="../gerenciarContas.html">Contas Bancárias</a>
     <a href="#" id="lancarDespesaToggle">Despesa ▼</a>
-    <div id="submenuDespesa">
-        <a href="LancarDespesa.html">Cadastrar</a>
-        <a href="listaDespesas.html">Listar/Editar</a>
-    </div>
+    <a hhref="ListarDespesa.html">Despesa</a>
   </div>
 
   <!-- Conteúdo principal -->
   <div class="content" id="content">
     <div class="container mt-5 mb-5">
       <div class="row justify-content-center">
-        <div class="col-12">
+        <div class="col-lg-9 col-md-10">
           <div class="card form-card">
-            <div class="card-body p-3">
+            <div class="card-body p-3" style="margin: 10px;">
               <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="mb-0">Listagem de Despesas</h3>
-                <a href="LancarDespesa.html" class="btn btn-primary">Nova Despesa</a>
+                <h3 class="mb-0">Editar Despesa</h3>
+                <a href="listaDespesas.html" class="btn btn-secondary">Voltar</a>
               </div>
               
-              <!-- Filtros -->
-              <div class="card mb-4">
-                <div class="card-body">
-                  <h5 class="card-title">Filtros</h5>
-                  <div class="row g-3">
-                    <div class="col-md-3">
-                      <label for="filtroStatus" class="form-label">Status</label>
-                      <select id="filtroStatus" class="form-select">
-                        <option value="">Todos</option>
+              <form method="POST" id="formEditarDespesa" enctype="multipart/form-data" onsubmit="return atualizarDespesa(event)">
+                <input type="hidden" id="despesa_id" name="id">
+                
+                <!-- Categoria e Descrição -->
+                <div class="card-section">
+                  <h5 class="section-title">Descrição</h5>
+                  <div class="row mb-3">
+                    <div class="col-md-8">
+                      <label for="categoriadespesa_catdesp_id" class="form-label">Categoria da Despesa <span class="required">*</span></label>
+                      <select id="categoriadespesa_catdesp_id" name="tipoDespesa_id" class="form-select" required>
+                        <option value="">Carregando categorias...</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="despesa_desc" class="form-label">Descrição</label>
+                    <textarea id="despesa_desc" name="descricao" class="form-control" rows="3" placeholder="Descrição detalhada da despesa..."></textarea>
+                  </div>
+                </div>
+                
+                <!-- Dados da Despesa -->
+                <div class="card-section">
+                  <h5 class="section-title">Informações da Despesa</h5>
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="despesa_val" class="form-label">Valor <span class="required">*</span></label>
+                      <input type="number" id="despesa_val" name="valor" class="form-control" step="0.01" min="0" placeholder="0,00" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="despesa_val_pago" class="form-label">Valor Pago</label>
+                      <input type="number" id="despesa_val_pago" name="pagamento" class="form-control" step="0.01" min="0" placeholder="0,00">
+                      <small class="text-muted">Se não pago, deixe vazio ou 0</small>
+                    </div>
+                  </div>
+                  
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="despesa_dt_venc" class="form-label">Data de Vencimento <span class="required">*</span></label>
+                      <input type="date" id="despesa_dt_venc" name="data_venc" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="despesa_statuspag" class="form-label">Status do Pagamento <span class="required">*</span></label>
+                      <select id="despesa_statuspag" name="status_pagamento" class="form-select" required>
                         <option value="Pendente">Pendente</option>
                         <option value="Pago">Pago</option>
                         <option value="Cancelado">Cancelado</option>
                       </select>
                     </div>
-                    <div class="col-md-3">
-                      <label for="filtroDataInicio" class="form-label">Data Início</label>
-                      <input type="date" id="filtroDataInicio" class="form-control">
+                  </div>
+                  
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="despesa_dt_pag" class="form-label">Data de Pagamento</label>
+                      <input type="date" id="despesa_dt_pag" name="data_pagamento" class="form-control">
                     </div>
-                    <div class="col-md-3">
-                      <label for="filtroDataFim" class="form-label">Data Fim</label>
-                      <input type="date" id="filtroDataFim" class="form-control">
-                    </div>
-                    <div class="col-md-3 d-flex align-items-end">
-                      <button id="btnAplicarFiltros" class="btn btn-primary w-100">Aplicar</button>
+                    <div class="col-md-6">
+                      <label for="despesa_statusconci" class="form-label">Status da Conciliação <span class="required">*</span></label>
+                      <select id="despesa_statusconci" name="status_conci" class="form-select" required>
+                        <option value="Pendente">Pendente</option>
+                        <option value="Conciliado">Conciliado</option>
+                        <option value="Cancelado">Cancelado</option>
+                      </select>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              <!-- Tabela de Despesas -->
-              <div class="table-responsive">
-                <table id="tabela-despesas" class="table table-striped table-hover" style="width:100%">
-                  <thead>
-                    <tr>
-                      <th>Descrição</th>
-                      <th>Categoria</th>
-                      <th>Valor (R$)</th>
-                      <th>Vencimento</th>
-                      <th>Status Conc.</th>
-                      <th>Evento</th>
-                      <th>Ação</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
-              </div>
+                
+                <!-- Evento (Opcional) -->
+                <div class="card-section">
+                  <h5 class="section-title">Associação a Evento (Opcional)</h5>
+                  <div class="mb-3">
+                    <div class="col-md-8">
+                      <label for="evento_evento_id" class="form-label">Evento Relacionado</label>
+                      <select id="evento_evento_id" name="evento_id" class="form-select">
+                        <option value="">Carregando eventos...</option>
+                      </select>
+                      <small class="text-muted">Selecione um evento se esta despesa estiver relacionada</small>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Botões -->
+                <div class="row mt-4">
+                  <div class="col-md-6 mb-2">
+                    <button type="button" class="btn btn-secondary w-100" onclick="limparFormularioDespesa()">Limpar</button>
+                  </div>
+                  <div class="col-md-6 mb-2">
+                    <button type="submit" class="btn btn-primary w-100">Atualizar Despesa</button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -118,154 +166,120 @@
     </div>
   </div>
 
-  <!-- Modal de Confirmação -->
-  <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Confirmar Ação</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p id="modalMessage">Deseja realmente excluir esta despesa?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="button" id="btnConfirmAction" class="btn btn-danger">Confirmar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
   <script src="../js/authManager.js"></script>
   <script src="../js/authenticatedClient.js"></script>
   <script src="../js/tokenVerification.js"></script>
-  <script src="../js/scripts.js"></script>
   
   <script>
-    document.addEventListener('DOMContentLoaded', carregarEExibirDespesas);
-
-async function carregarDespesas() {
-    try {
-        const token = authManager.getToken();
-        const response = await fetch("http://localhost:8080/apis/despesa", {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
+    // Carregar categorias de despesas
+    async function carregarCategorias() {
+      try {
+        const response = await authenticatedClient.get('/tipos-despesas');
+        const select = document.getElementById('categoriadespesa_catdesp_id');
+        
+        select.innerHTML = '<option value="">Selecione uma categoria</option>';
+        response.data.forEach(categoria => {
+          const option = document.createElement('option');
+          option.value = categoria.id;
+          option.textContent = categoria.nome;
+          select.appendChild(option);
         });
-
-        if (!response.ok) throw new Error('Erro ao carregar despesas');
-
-        const despesas = await response.json();
-        return despesas;
-
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('Não foi possível carregar as despesas');
-        return [];
+      } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+      }
     }
-}
 
-async function carregarEExibirDespesas() {
-    try {
-        const despesas = await carregarDespesas();
-        if ($.fn.DataTable.isDataTable('#tabela-despesas')) {
-            $('#tabela-despesas').DataTable().destroy();
-        }
-        $('#tabela-despesas').DataTable({
-            data: despesas,
-            columns: [
-                { 
-                    data: 'descricao', 
-                    title: 'Descrição',
-                    render: function(data, type, row) {
-                        if (type === 'display' && data && data.length > 50) {
-                            return `<span title="${data}" class="truncated-desc">${data.substring(0, 30)}...</span>`;
-                        }
-                        return data;
-                    }
-                },
-                {
-                    data: 'categoria',
-                    title: 'Categoria',
-                    render: data => data?.nome || 'Sem categoria'
-                },
-                {
-                    data: 'val',
-                    title: 'Valor (R$)',
-                    render: data => formatarMoeda(data)
-                },
-                {
-                    data: 'data_venc',
-                    title: 'Vencimento',
-                    render: data => formatarData(data)
-                },
-                {
-                    data: 'status_conci',
-                    title: 'Status Conc.',
-                    render: data => `<span class="${getStatusClass(data)}">${data}</span>`
-                },
-                {
-                    data: 'evento',
-                    title: 'Evento',
-                    render: data => data?.nome || 'Nenhum evento'
-                },
-                {
-                    data: null,
-                    title: 'Ação',
-                    render: (data, type, row) => `
-                        <button class="btn btn-sm btn-warning" onclick='editarDespesa(${JSON.stringify(row)})'>Editar</button>
-                        <button class="btn btn-sm btn-danger" onclick='confirmarExclusao(${row.id})'>Excluir</button>
-                    `,
-                    orderable: false
-                }
-            ],
-            // Alternativa usando columnDefs (escolha uma das duas abordagens)
-            /*
-            columnDefs: [
-                {
-                    targets: 0, // coluna descrição (índice 0)
-                    render: function(data, type, row) {
-                        if (type === 'display' && data && data.length > 50) {
-                            return `<div class="text-truncate" style="max-width: 200px;" title="${data}">${data}</div>`;
-                        }
-                        return data;
-                    }
-                }
-            ],
-            */
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/pt-BR.json'
-            },
-            order: [[3, 'asc']], // Ordenar por vencimento
-            // Configurações adicionais para melhor apresentação
-            responsive: true,
-            scrollX: true, // permite scroll horizontal se necessário
-            autoWidth: false // evita larguras automáticas problemáticas
+    // Carregar eventos
+    async function carregarEventos() {
+      try {
+        const response = await authenticatedClient.get('/eventos');
+        const select = document.getElementById('evento_evento_id');
+        
+        select.innerHTML = '<option value="">Nenhum evento selecionado</option>';
+        response.data.forEach(evento => {
+          const option = document.createElement('option');
+          option.value = evento.id;
+          option.textContent = evento.nome;
+          select.appendChild(option);
         });
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('Não foi possível carregar as despesas');
+      } catch (error) {
+        console.error('Erro ao carregar eventos:', error);
+      }
     }
-}
 
-// Funções auxiliares
-function formatarMoeda(valor) {
-    return 'R$ ' + (valor || 0).toFixed(2).replace('.', ',');
-}
+    // Carregar dados da despesa para edição
+    async function carregarDespesa() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const despesaId = urlParams.get('id');
+      
+      if (!despesaId) {
+        alert('Nenhuma despesa selecionada para edição');
+        window.location.href = 'listarDespesas.html';
+        return;
+      }
+      
+      try {
+        const response = await authenticatedClient.get(`/despesas/${despesaId}`);
+        const despesa = response.data;
+        
+        // Preencher formulário
+        document.getElementById('despesa_id').value = despesa.id;
+        document.getElementById('categoriadespesa_catdesp_id').value = despesa.tipoDespesa_id;
+        document.getElementById('despesa_desc').value = despesa.descricao;
+        document.getElementById('despesa_val').value = despesa.valor;
+        document.getElementById('despesa_val_pago').value = despesa.pagamento || '';
+        document.getElementById('despesa_dt_venc').value = despesa.data_venc.split('T')[0];
+        document.getElementById('despesa_statuspag').value = despesa.status_pagamento || 'Pendente';
+        document.getElementById('despesa_dt_pag').value = despesa.data_pagamento ? despesa.data_pagamento.split('T')[0] : '';
+        document.getElementById('despesa_statusconci').value = despesa.status_conci || 'Pendente';
+        document.getElementById('evento_evento_id').value = despesa.evento_id || '';
+        
+      } catch (error) {
+        console.error('Erro ao carregar despesa:', error);
+        alert('Não foi possível carregar os dados da despesa');
+        window.location.href = 'ListarDespesa.html';
+      }
+    }
 
-function formatarData(dataString) {
-    if (!dataString) return '';
-    return new Date(dataString).toLocaleDateString('pt-BR');
-}
+    // Atualizar despesa
+    async function atualizarDespesa(event) {
+      event.preventDefault();
+      
+      const despesaId = document.getElementById('despesa_id').value;
+      const formData = {
+        tipoDespesa_id: document.getElementById('categoriadespesa_catdesp_id').value,
+        descricao: document.getElementById('despesa_desc').value,
+        valor: parseFloat(document.getElementById('despesa_val').value),
+        pagamento: parseFloat(document.getElementById('despesa_val_pago').value) || 0,
+        data_venc: document.getElementById('despesa_dt_venc').value,
+        status_pagamento: document.getElementById('despesa_statuspag').value,
+        data_pagamento: document.getElementById('despesa_dt_pag').value || null,
+        status_conci: document.getElementById('despesa_statusconci').value,
+        evento_id: document.getElementById('evento_evento_id').value || null
+      };
+      
+      try {
+        await authenticatedClient.put(`/despesas/${despesaId}`, formData);
+        alert('Despesa atualizada com sucesso!');
+        window.location.href = 'listaDespesas.html';
+      } catch (error) {
+        console.error('Erro ao atualizar despesa:', error);
+        alert('Erro ao atualizar despesa');
+      }
+    }
 
-function getStatusClass(status) {
-    return `status-${(status || '').toLowerCase()}`;
-}
+    // Limpar formulário
+    function limparFormularioDespesa() {
+      document.getElementById('formEditarDespesa').reset();
+    }
+
+    // Inicializar quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+      carregarCategorias();
+      carregarEventos();
+      carregarDespesa();
+    });
   </script>
 </body>
 </html>

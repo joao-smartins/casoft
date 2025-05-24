@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listagem de Despesas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/estilo.css" rel="stylesheet">
+  <style>
+    .status-pendente { color: #d35400; font-weight: bold; }
+    .status-pago { color: #27ae60; font-weight: bold; }
+    .status-conciliado { color: #2980b9; font-weight: bold; }
+    .status-cancelado { color: #c0392b; font-weight: bold; }
+    .action-buttons .btn { padding: 0.25rem 0.5rem; font-size: 0.875rem; }
+    #formularioDespesa { transition: all 0.3s ease; }
+    .required { color: red; }
+  </style>
+</head>
+<body class="bg-light">
+  <!-- Header fixo -->
+  <header class="header">
+    <div class="container">
+      <div class="header-container d-flex align-items-center">
+        <button class="menu-toggle d-md-none" id="menu-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <img src="../img/logo.png" alt="Logo">
+        <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger ml-auto">Deslogar</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Overlay escuro -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <h4 class="p-3">Menu</h4>
+    <a href="../home.html">Home</a>
+    <a href="../ParametrizacaoHTML/cadastroEmpresa.html">Empresa</a>
+    <a href="../EventoHTML/homeEvento.html">Eventos</a>
+    <a href="../TipoReceitasHTML/homeTPReceita.html">Tipos de Receita</a>
+    <a href="../TipoDespesasHTML/tipoDespesa.html">Tipos de Despesas</a>
+    <a href="#">Relatórios</a>
+    <a href="#">Configurações</a>
+    <a href="../gerenciarContas.html">Contas Bancárias</a>
+    <a href="ListarDespesa.html">Despesas</a>
+  </div>
+
+  <!-- Conteúdo principal -->
+  <div class="content" id="content">
+    <div class="container mt-5 mb-5">
+      <div class="row justify-content-center">
+        <div class="col-12">
+          <!-- Listagem de Despesas -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">Listagem de Despesas</h3>
+                <button class="btn btn-primary" id="btnMostrarFormulario">
+                  Nova Despesa
+                </button>
+              </div>
+              
+              <!-- Filtros -->
+              <div class="row mb-3 g-3">
+                <div class="col-md-3">
+                  <label for="filtroStatus" class="form-label">Status</label>
+                  <select id="filtroStatus" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Pago">Pago</option>
+                    <option value="Conciliado">Conciliado</option>
+                    <option value="Cancelado">Cancelado</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="filtroDataInicio" class="form-label">Data Início</label>
+                  <input type="date" id="filtroDataInicio" class="form-control">
+                </div>
+                <div class="col-md-3">
+                  <label for="filtroDataFim" class="form-label">Data Fim</label>
+                  <input type="date" id="filtroDataFim" class="form-control">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                  <button id="btnAplicarFiltros" class="btn btn-primary w-100">Aplicar</button>
+                </div>
+              </div>
+              
+              <!-- Tabela de Despesas -->
+              <div class="table-responsive">
+                <table id="tabelaDespesas" class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Descrição</th>
+                      <th>Categoria</th>
+                      <th>Valor</th>
+                      <th>Vencimento</th>
+                      <th>Status Pag.</th>
+                      <th>Status Conc.</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Dados serão carregados via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulário de Cadastro (inicialmente oculto) -->
+          <div class="card form-card mb-4" id="formularioDespesa" style="display: none;">
+            <div class="card-body p-3">
+              <div class="card-section text-dark">
+                <h3 class="text-center">Cadastro de Despesa</h3>
+                <button type="button" class="btn-close float-end" onclick="toggleFormulario()"></button>
+              </div>
+              <form method="POST" id="formDespesa" enctype="multipart/form-data">
+                <!-- Categoria e Descrição -->
+                <div class="card-section">
+                  <h5 class="section-title">Descrição</h5>
+                  <div class="row mb-3">
+                    <div class="col-md-8">
+                      <label for="categoriadespesa_catdesp_id" class="form-label">Categoria da Despesa <span class="required">*</span></label>
+                      <select id="categoriadespesa_catdesp_id" name="tipoDespesa_id" class="form-select" required>
+                        <option value="">Carregando categorias...</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="despesa_desc" class="form-label">Descrição</label>
+                    <textarea id="despesa_desc" name="descricao" class="form-control" rows="3" placeholder="Descrição detalhada da despesa..."></textarea>
+                  </div>
+                </div>
+                
+                <!-- Dados da Despesa -->
+                <div class="card-section">
+                  <h5 class="section-title">Informações da Despesa</h5>
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="despesa_val" class="form-label">Valor <span class="required">*</span></label>
+                      <input type="number" id="despesa_val" name="valor" class="form-control" step="0.01" min="0" placeholder="0,00" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="despesa_val_pago" class="form-label">Valor Pago</label>
+                      <input type="number" id="despesa_val_pago" name="pagamento" class="form-control" step="0.01" min="0" placeholder="0,00">
+                      <small class="text-muted">Se não pago, deixe vazio ou 0</small>
+                    </div>
+                  </div>
+                  
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="despesa_dt_venc" class="form-label">Data de Vencimento <span class="required">*</span></label>
+                      <input type="date" id="despesa_dt_venc" name="data_venc" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="despesa_statusconci" class="form-label">Status da Conciliação <span class="required">*</span></label>
+                      <select id="despesa_statusconci" name="status_conci" class="form-select" required>
+                        <option value="">Selecione</option>
+                        <option value="Aguardando">Aguardando</option>
+                        <option value="Conciliado">Conciliado</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Evento (Opcional) -->
+                <div class="card-section">
+                  <h5 class="section-title">Associação a Evento (Opcional)</h5>
+                  <div class="mb-3">
+                    <div class="col-md-8">
+                      <label for="evento_evento_id" class="form-label">Evento Relacionado</label>
+                      <select id="evento_evento_id" name="evento_id" class="form-select">
+                        <option value="">Carregando eventos...</option>
+                      </select>
+                      <small class="text-muted">Selecione um evento se esta despesa estiver relacionada</small>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Botões -->
+                <div class="row mt-4">
+                  <div class="col-md-6 mb-2">
+                    <button type="button" class="btn btn-secondary w-100" onclick="limparFormulario()">Limpar</button>
+                  </div>
+                  <div class="col-md-6 mb-2">
+                    <button type="submit" class="btn btn-primary w-100">Cadastrar Despesa</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmar Ação</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="modalMessage">Deseja realmente excluir esta despesa?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" id="btnConfirmAction" class="btn btn-danger">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="../js/authManager.js"></script>
+  <script src="../js/authenticatedClient.js"></script>
+  <script src="../js/tokenVerification.js"></script>
+  
+  <script>
+    // Variáveis globais
+    let despesaSelecionadaId = null;
+    const modalConfirmacao = new bootstrap.Modal(document.getElementById('confirmModal'));
+
+    // Funções auxiliares
+    function formatarMoeda(valor) {
+      return 'R$ ' + parseFloat(valor || 0).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatarData(dataString) {
+      if (!dataString) return '';
+      return new Date(dataString).toLocaleDateString('pt-BR');
+    }
+
+    function getStatusClass(status) {
+      switch(status) {
+        case 'Pendente': return 'status-pendente';
+        case 'Pago': return 'status-pago';
+        case 'Conciliado': return 'status-conciliado';
+        case 'Cancelado': return 'status-cancelado';
+        default: return '';
+      }
+    }
+
+    // Controle do formulário
+    function toggleFormulario() {
+      const formulario = document.getElementById('formularioDespesa');
+      const btn = document.getElementById('btnMostrarFormulario');
+      
+      if (formulario.style.display === 'none') {
+        formulario.style.display = 'block';
+        btn.textContent = 'Cancelar';
+      } else {
+        formulario.style.display = 'none';
+        btn.textContent = 'Nova Despesa';
+        limparFormulario();
+      }
+    }
+
+    function limparFormulario() {
+      document.getElementById('formDespesa').reset();
+    }
+
+    // Carregar dados para selects
+    async function carregarCategorias() {
+      try {
+        const response = await authenticatedClient.get('/tipos-despesa');
+        const select = document.getElementById('categoriadespesa_catdesp_id');
+        
+        select.innerHTML = '<option value="">Selecione uma categoria</option>';
+        response.data.forEach(categoria => {
+          const option = document.createElement('option');
+          option.value = categoria.id;
+          option.textContent = categoria.nome;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+      }
+    }
+
+    async function carregarEventos() {
+      try {
+        const response = await authenticatedClient.get('/eventos');
+        const select = document.getElementById('evento_evento_id');
+        
+        select.innerHTML = '<option value="">Nenhum evento selecionado</option>';
+        response.data.forEach(evento => {
+          const option = document.createElement('option');
+          option.value = evento.id;
+          option.textContent = evento.nome;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Erro ao carregar eventos:', error);
+      }
+    }
+
+    // Carregar despesas
+    async function carregarDespesas(filtros = {}) {
+      try {
+        const params = new URLSearchParams(filtros);
+        const response = await authenticatedClient.get(`/despesas?${params.toString()}`);
+        const tbody = document.querySelector('#tabelaDespesas tbody');
+        
+        tbody.innerHTML = response.data.map(despesa => `
+          <tr>
+            <td>${despesa.id}</td>
+            <td>${despesa.descricao || ''}</td>
+            <td>${despesa.tipoDespesa?.nome || 'Não informado'}</td>
+            <td>${formatarMoeda(despesa.valor)}</td>
+            <td>${formatarData(despesa.data_venc)}</td>
+            <td><span class="${getStatusClass(despesa.status_pagamento)}">${despesa.status_pagamento || 'Pendente'}</span></td>
+            <td><span class="${getStatusClass(despesa.status_conci)}">${despesa.status_conci}</span></td>
+            <td>
+              <div class="action-buttons d-flex gap-2">
+                <button class="btn btn-sm btn-warning" onclick="editarDespesa(${despesa.id})">Editar</button>
+                <button class="btn btn-sm btn-danger" onclick="confirmarExclusao(${despesa.id})">Excluir</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('Erro ao carregar despesas:', error);
+        alert('Não foi possível carregar as despesas');
+      }
+    }
+
+    // Funções para ações
+    function confirmarExclusao(id) {
+      despesaSelecionadaId = id;
+      document.getElementById('modalMessage').textContent = 'Deseja realmente excluir esta despesa?';
+      document.getElementById('btnConfirmAction').className = 'btn btn-danger';
+      document.getElementById('btnConfirmAction').textContent = 'Excluir';
+      modalConfirmacao.show();
+    }
+
+    async function excluirDespesa() {
+      try {
+        await authenticatedClient.delete(`/despesas/${despesaSelecionadaId}`);
+        alert('Despesa excluída com sucesso!');
+        carregarDespesas();
+      } catch (error) {
+        console.error('Erro ao excluir despesa:', error);
+        alert('Erro ao excluir despesa');
+      } finally {
+        modalConfirmacao.hide();
+      }
+    }
+
+    function editarDespesa(id) {
+      window.location.href = `Alterar.html?id=${id}`;
+    }
+
+    // Event Listeners
+    document.getElementById('btnMostrarFormulario').addEventListener('click', toggleFormulario);
+    document.getElementById('btnConfirmAction').addEventListener('click', excluirDespesa);
+    document.getElementById('btnAplicarFiltros').addEventListener('click', () => {
+      const filtros = {
+        status: document.getElementById('filtroStatus').value,
+        dataInicio: document.getElementById('filtroDataInicio').value,
+        dataFim: document.getElementById('filtroDataFim').value
+      };
+      carregarDespesas(filtros);
+    });
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarDespesas();
+      carregarCategorias();
+      carregarEventos();
+    });
+  </script>
+</body>
+</html>

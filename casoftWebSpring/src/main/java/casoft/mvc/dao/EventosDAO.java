@@ -35,7 +35,7 @@ public class EventosDAO implements IDAO<Evento> {
     public List<Evento> get(String filtro, Singleton conexao) {
         List<Evento> eventos = new ArrayList<>();
         String sql = """
-                SELECT * FROM eventos
+                SELECT * FROM evento
                 """;
         if (filtro != null && !filtro.isBlank()) {
             sql += " WHERE "+filtro;
@@ -94,16 +94,16 @@ public class EventosDAO implements IDAO<Evento> {
 
     @Override
     public Evento get(int id, Singleton conexao) {
-        String sql = "SELECT * FROM eventos WHERE id_evento = " + id;
+        String sql = "SELECT * FROM evento WHERE evento_id = " + id;
         var rs = conexao.getConexao().consultar(sql);
         try {
             if (rs.next()) {
                 Evento e = new Evento();
-                e.setId(rs.getInt("id_evento"));
-                e.setNome(rs.getString("nome"));
-                e.setDescricao(rs.getString("descricao"));
-                e.setData(rs.getDate("data").toString());
-                e.setStatus(rs.getString("status").charAt(0));
+                e.setId(rs.getInt("evento_id"));
+                e.setNome(rs.getString("evento_nome"));
+                e.setDescricao(rs.getString("evento_desc"));
+                e.setData(rs.getDate("evento_data").toString());
+                e.setStatus(rs.getString("evento_status").charAt(0));
                 return e;
             }
         } catch (Exception e) {

@@ -66,10 +66,12 @@
         })
         .then((response) => response.json())
         .then((json) => {
-            alert(json.mensagem);
+            showToast("Despesa Cadastrada", true);
+            // Opcional: limpar o formulário após sucesso
+            //fdados.reset();
         })
         .catch((error) => {
-            alert("Erro ao cadastrar empresa. Por favor, tente novamente. " + error.message);
+            showToast("Erro ao cadastrar despesa. Por favor, tente novamente.", false);
             console.error("Erro:", error);
         });
     }
@@ -150,6 +152,27 @@
     function carregarDadosFormulario() {
       carregarCategorias();
       carregarEventos();
+    } 
+    function showToast(message, isSuccess = true) {
+      const toast = document.createElement('div');
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.right = '20px';
+      toast.style.padding = '15px 20px';
+      toast.style.backgroundColor = isSuccess ? '#4CAF50' : '#f44336';
+      toast.style.color = 'white';
+      toast.style.borderRadius = '4px';
+      toast.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+      toast.style.zIndex = '1000';
+      toast.style.transition = 'opacity 0.5s';
+      toast.textContent = message;
+      
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+          toast.style.opacity = '0';
+          setTimeout(() => toast.remove(), 500);
+      }, 3000);
     }
 
     // Chama a função ao carregar a página
