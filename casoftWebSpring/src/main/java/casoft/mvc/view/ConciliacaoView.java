@@ -1,8 +1,8 @@
-package casoft.mvc.view; // Certifique-se que o pacote 'view' é o correto para seus REST Controllers
+package casoft.mvc.view;
 
 import casoft.mvc.controller.ConciliacaoController;
 import casoft.mvc.model.Conciliacao;
-import casoft.mvc.util.Mensagem; // Certifique-se de que sua classe Mensagem está acessível
+import casoft.mvc.util.Mensagem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
