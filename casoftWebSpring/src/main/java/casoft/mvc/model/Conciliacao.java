@@ -96,7 +96,6 @@ public class Conciliacao
         this.concDespesaId = concDespesaId;
     }
 
-    // Métodos de negócio que chamam o DAO (similar a TipoDespesas)
     public Conciliacao gravar(Conciliacao conc, Singleton conexao) {
         return dao.gravar(conc, conexao);
     }
@@ -132,4 +131,5 @@ public class Conciliacao
     public boolean marcarReceitaComoConciliada(int receitaId, Singleton conexao) {
         return dao.marcarReceitaComoConciliada(receitaId, conexao);
     }
+
 }

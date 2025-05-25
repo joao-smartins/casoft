@@ -359,8 +359,8 @@ async function salvarConciliacoesPendentes() {
         });
 
         const result = await response.json(); // Espera um Map de retorno (com "ok" ou "erro")
-        if (response.ok && result.ok) {
-            showMessage(result.ok, 'green'); // Exibe a mensagem de sucesso
+        if (response.ok && result.mensagem) {
+            showMessage(result.mensagem, 'green'); // Exibe a mensagem de sucesso
             conciliacoesPendentesParaSalvar = []; // Limpa a lista após salvar com sucesso
         } else {
             throw new Error(result.erro || "Erro desconhecido ao salvar conciliações pendentes.");

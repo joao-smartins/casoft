@@ -1,10 +1,14 @@
 package casoft.mvc.controller;
 
+import casoft.mvc.dao.ConciliacaoDAO;
 import casoft.mvc.model.Conciliacao;
-import casoft.mvc.util.Singleton; // Certifique-se de que Singleton está acessível e correto
+import casoft.mvc.util.Conexao;
+import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +23,8 @@ public class ConciliacaoController
     private Conciliacao conciliacaoModel;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    @Autowired
+    private ConciliacaoDAO conciliacaoDAO;
 
     public List<Map<String, Object>> getItensNaoConciliados()
     {
@@ -220,4 +226,5 @@ public class ConciliacaoController
         }
         return json;
     }
+
 }
