@@ -22,6 +22,9 @@ public class Conciliacao
     private String concDescSolucao;
     private int concReceitaId;
     private int concDespesaId;
+    private String itemTipo;
+    private double itemValor;
+    private String itemDescricao;
 
     public Conciliacao() {
 
@@ -37,6 +40,21 @@ public class Conciliacao
         this.concDescSolucao = concDescSolucao;
         this.concReceitaId = concReceitaId;
         this.concDespesaId = concDespesaId;
+    }
+
+    public Conciliacao(int concId, LocalDate concDtProblema, String concDescProblema, LocalDate concDtSolucao,
+                       String concDescSolucao, int concReceitaId, int concDespesaId,
+                       String itemTipo, double itemValor, String itemDescricao) {
+        this.concId = concId;
+        this.concDtProblema = concDtProblema;
+        this.concDescProblema = concDescProblema;
+        this.concDtSolucao = concDtSolucao;
+        this.concDescSolucao = concDescSolucao;
+        this.concReceitaId = concReceitaId;
+        this.concDespesaId = concDespesaId;
+        this.itemTipo = itemTipo;
+        this.itemValor = itemValor;
+        this.itemDescricao = itemDescricao;
     }
 
     // Getters e Setters
@@ -94,6 +112,30 @@ public class Conciliacao
 
     public void setConcDespesaId(int concDespesaId) {
         this.concDespesaId = concDespesaId;
+    }
+
+    public String getItemTipo() {
+        return itemTipo;
+    }
+
+    public void setItemTipo(String itemTipo) {
+        this.itemTipo = itemTipo;
+    }
+
+    public double getItemValor() {
+        return itemValor;
+    }
+
+    public void setItemValor(double itemValor) {
+        this.itemValor = itemValor;
+    }
+
+    public String getItemDescricao() {
+        return itemDescricao;
+    }
+
+    public void setItemDescricao(String itemDescricao) {
+        this.itemDescricao = itemDescricao;
     }
 
     public Conciliacao gravar(Conciliacao conc, Singleton conexao) {

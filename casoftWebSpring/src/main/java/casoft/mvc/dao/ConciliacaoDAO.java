@@ -27,7 +27,7 @@ public class ConciliacaoDAO
                 """;
 
         sql = sql.replace("#1", entidade.getConcDtProblema().format(SQL_DATE_FORMATTER));
-        sql = sql.replace("#2", entidade.getConcDescProblema());
+        sql = sql.replace("#2", entidade.getConcDescProblema().replaceAll("'", "''"));
 
         if (entidade.getConcDtSolucao() != null) {
             sql = sql.replace("#3", "'" + entidade.getConcDtSolucao().format(SQL_DATE_FORMATTER) + "'");
@@ -36,7 +36,7 @@ public class ConciliacaoDAO
         }
 
         if (entidade.getConcDescSolucao() != null && !entidade.getConcDescSolucao().isEmpty()) {
-            sql = sql.replace("#4", "'" + entidade.getConcDescSolucao() + "'");
+            sql = sql.replace("#4", "'" + entidade.getConcDescSolucao().replaceAll("'", "''") + "'"); // Adicionado .replaceAll("'", "''")
         } else {
             sql = sql.replace("#4", "NULL");
         }
@@ -74,7 +74,7 @@ public class ConciliacaoDAO
                 """;
 
         sql = sql.replace("#1", "'" + entidade.getConcDtProblema().format(SQL_DATE_FORMATTER) + "'");
-        sql = sql.replace("#2", "'" + entidade.getConcDescProblema() + "'");
+        sql = sql.replace("#2", "'" + entidade.getConcDescProblema().replaceAll("'", "''") + "'");
 
         if (entidade.getConcDtSolucao() != null) {
             sql = sql.replace("#3", "'" + entidade.getConcDtSolucao().format(SQL_DATE_FORMATTER) + "'");
@@ -83,7 +83,7 @@ public class ConciliacaoDAO
         }
 
         if (entidade.getConcDescSolucao() != null && !entidade.getConcDescSolucao().isEmpty()) {
-            sql = sql.replace("#4", "'" + entidade.getConcDescSolucao() + "'");
+            sql = sql.replace("#4", "'" + entidade.getConcDescSolucao().replaceAll("'", "''") + "'");
         } else {
             sql = sql.replace("#4", "NULL");
         }
@@ -256,4 +256,107 @@ public class ConciliacaoDAO
     }
 
 
+    public List<Conciliacao> getProblemas(String filtro, Singleton conexao) {
+        List<Conciliacao> listaProblemas = new ArrayList<>();
+        ResultSet rs = null;
+
+        String sql = "SELECT c.conc_id, c.conc_dt_problema, c.conc_desc_problema, " +
+                "c.conc_dt_solucao, c.conc_desc_solucao, c.conc_receita_id, c.conc_despesa_id, " +
+                "CASE " +
+                "    WHEN c.conc_receita_id IS NOT NULL AND c.conc_receita_id != 0 THEN 'Receita' " +
+                "    WHEN c.conc_despesa_id IS NOT NULL AND c.conc_despesa_id != 0 THEN 'Despesa' " +
+                "    ELSE 'Desconhecido' " +
+                "END AS item_tipo, " +
+                "COALESCE(r.receita_val, d.despesa_val) AS item_valor, " +
+                "COALESCE(r.receita_desc, d.despesa_desc) AS item_descricao " +
+                "FROM conciliacao c " +
+                "LEFT JOIN receita r ON c.conc_receita_id = r.receita_id " +
+                "LEFT JOIN despesa d ON c.conc_despesa_id = d.despesa_id " +
+                "WHERE c.conc_dt_solucao IS NULL ";
+
+        if (filtro != null && !filtro.trim().isEmpty()) {
+            String sanitizedFiltro = filtro.replaceAll("'", "''");
+            sql += "AND (LOWER(c.conc_desc_problema) LIKE '%" + sanitizedFiltro.toLowerCase() + "%' OR " +
+                    "LOWER(CAST(c.conc_id AS TEXT)) LIKE '%" + sanitizedFiltro.toLowerCase() + "%' OR " +
+                    "LOWER(CAST(c.conc_receita_id AS TEXT)) LIKE '%" + sanitizedFiltro.toLowerCase() + "%' OR " +
+                    "LOWER(CAST(c.conc_despesa_id AS TEXT)) LIKE '%" + sanitizedFiltro.toLowerCase() + "%' OR " +
+                    "LOWER(COALESCE(r.receita_desc, d.despesa_desc)) LIKE '%" + sanitizedFiltro.toLowerCase() + "%') "; // **CORRIGIDO: de r.rec_descricao para r.receita_desc**
+        }
+
+        sql += "ORDER BY c.conc_id DESC";
+
+        try {
+            rs = conexao.getConexao().consultar(sql);
+
+            while (rs.next()) {
+                int concId = rs.getInt("conc_id");
+                LocalDate concDtProblema = null;
+                String concDtProblemaStr = rs.getString("conc_dt_problema");
+                if (concDtProblemaStr != null && !concDtProblemaStr.isEmpty()) {
+                    try {
+                        concDtProblema = LocalDate.parse(concDtProblemaStr);
+                    } catch (java.time.format.DateTimeParseException e) {
+                        System.err.println("Aviso: conc_dt_problema (ID: " + concId + ") contém formato de data inválido: " + concDtProblemaStr);
+                    }
+                }
+
+                String concDescProblema = rs.getString("conc_desc_problema");
+
+                LocalDate concDtSolucao = null;
+                String dtSolucaoStr = rs.getString("conc_dt_solucao");
+                if (dtSolucaoStr != null && !dtSolucaoStr.isEmpty()) {
+                    try {
+                        concDtSolucao = LocalDate.parse(dtSolucaoStr);
+                    } catch (java.time.format.DateTimeParseException e) {
+                        System.err.println("Aviso: conc_dt_solucao (ID: " + concId + ") contém formato de data inválido: " + dtSolucaoStr);
+                    }
+                }
+
+                String concDescSolucao = rs.getString("conc_desc_solucao");
+
+                int concReceitaId = rs.getInt("conc_receita_id");
+                int concDespesaId = rs.getInt("conc_despesa_id");
+                String itemTipo = rs.getString("item_tipo");
+                double itemValor = rs.getDouble("item_valor");
+                String itemDescricao = rs.getString("item_descricao");
+
+                listaProblemas.add(new Conciliacao(concId, concDtProblema, concDescProblema,
+                        concDtSolucao, concDescSolucao, concReceitaId, concDespesaId,
+                        itemTipo, itemValor, itemDescricao));
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao obter problemas de conciliação: " + e.getMessage());
+            throw new RuntimeException("Erro no DAO ao obter problemas de conciliação.", e);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    System.err.println("Erro ao fechar ResultSet em getProblemas: " + e.getMessage());
+                }
+            }
+        }
+        return listaProblemas;
+    }
+
+    public boolean atualizarSolucao(int concId, LocalDate concDtSolucao, String concDescSolucao, Singleton conexao) {
+        String sql = "UPDATE conciliacao SET ";
+
+        if (concDtSolucao != null) {
+            sql += "conc_dt_solucao = '" + concDtSolucao.format(SQL_DATE_FORMATTER) + "'";
+        } else {
+            sql += "conc_dt_solucao = NULL";
+        }
+
+        String sanitizedDescSolucao = (concDescSolucao != null ? concDescSolucao.replaceAll("'", "''") : "");
+        sql += ", conc_desc_solucao = '" + sanitizedDescSolucao + "' ";
+        sql += "WHERE conc_id = " + concId;
+
+        try {
+            return conexao.getConexao().manipular(sql);
+        } catch (RuntimeException e) {
+            System.err.println("Erro ao atualizar solução da conciliação ID " + concId + ": " + e.getMessage());
+            throw new RuntimeException("Erro no DAO ao atualizar solução da conciliação.", e);
+        }
+    }
 }

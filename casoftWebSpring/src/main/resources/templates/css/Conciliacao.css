@@ -284,3 +284,186 @@ h2 {
     background-color: #2980b9;
 }
 
+/* Estilos gerais e configurações */
+:root {
+    --cor: #ffffff;
+    --primary-color: #F96333;
+    --secondary-color: #005f73;
+    --text-color: #333;
+    --light-gray: #f7f7f7;
+    --border-color: #e0e0e0;
+    --sidebar-width: 250px;
+    --header-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    --card-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--text-color);
+}
+
+/* Estilos do cabeçalho */
+.header {
+    background-color: #fff;
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: var(--header-shadow);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-container img {
+    max-width: 60px;
+    height: auto;
+}
+
+/* Botão do menu */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: #333;
+    margin: 5px 0;
+}
+
+/* Menu lateral (sidebar) */
+.sidebar {
+    min-width: var(--sidebar-width);
+    background-color: #343a40;
+    color: #fff;
+    transition: transform 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 900;
+    padding-top: 80px; /* Espaço para o header */
+}
+
+.sidebar a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+}
+
+.sidebar a:hover {
+    background-color: #495057;
+}
+
+/* Área de conteúdo principal */
+.content {
+    flex: 1;
+    padding: 20px;
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s ease;
+}
+
+/* Estilos do cartão de formulário */
+.form-card {
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+}
+
+.form-card .card-header {
+    border-radius: 10px 10px 0 0;
+    border-bottom: 1px solid #eee;
+}
+
+.card-section {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #505050;
+    margin-bottom: 15px;
+}
+
+.bg-orange {
+    background-color: #ffffff !important;
+}
+
+/* Estilos de campos de formulário */
+.custom-input {
+    background-color: var(--light-gray);
+    border-color: var(--border-color);
+}
+
+.required {
+    color: red;
+}
+
+/* Estilos para o preview do logo */
+.logo-preview {
+    max-width: 200px;
+    max-height: 200px;
+    display: none;
+    margin: 0 auto;
+}
+.is-invalid {
+    border-color: red;
+}
+
+.invalid-feedback {
+    color: red;
+    font-size: 0.9em;
+}
+
+/* Media queries para responsividade */
+@media (max-width: 767.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+        padding-top: 60px; /* Menor padding para mobile */
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .content {
+        margin-left: 0;
+    }
+
+    .row > * {
+        margin-bottom: 10px;
+    }
+}
+
+
+
+
+
+

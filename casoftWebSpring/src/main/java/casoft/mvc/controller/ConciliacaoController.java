@@ -2,15 +2,12 @@ package casoft.mvc.controller;
 
 import casoft.mvc.dao.ConciliacaoDAO;
 import casoft.mvc.model.Conciliacao;
-import casoft.mvc.util.Conexao;
 import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -225,6 +222,58 @@ public class ConciliacaoController
             json.put("erro", "Erro ao conectar com o BD.");
         }
         return json;
+    }
+
+    public Map<String, Object> getProblemas(String filtro) {
+        Map<String, Object> response = new HashMap<>();
+        Singleton conexao = Singleton.getInstancia();
+
+        if (conexao.conectar()) {
+            try {
+                List<Conciliacao> problemas = conciliacaoDAO.getProblemas(filtro, conexao);
+                conexao.getConexao().commit();
+
+                response.put("ok", problemas);
+            } catch (Exception e) {
+                conexao.getConexao().rollback();
+                System.err.println("Erro ao buscar problemas de conciliação: " + e.getMessage());
+                response.put("erro", "Falha ao buscar problemas de conciliação: " + e.getMessage());
+            } finally {
+                conexao.Desconectar();
+            }
+        } else {
+            response.put("erro", "Erro ao conectar com o banco de dados para buscar problemas.");
+            System.err.println("Erro ao conectar com o banco de dados em getProblemas.");
+        }
+        return response;
+    }
+
+    public Map<String, Object> atualizarSolucaoConciliacao(int concId, LocalDate concDtSolucao, String concDescSolucao) {
+        Map<String, Object> response = new HashMap<>();
+        Singleton conexao = Singleton.getInstancia();
+
+        if (conexao.conectar()) {
+            try {
+                boolean updated = conciliacaoDAO.atualizarSolucao(concId, concDtSolucao, concDescSolucao, conexao);
+                if (updated) {
+                    conexao.getConexao().commit();
+                    response.put("ok", "Solução da conciliação atualizada com sucesso.");
+                } else {
+                    conexao.getConexao().rollback();
+                    response.put("erro", "Nenhuma conciliação encontrada com o ID " + concId + " ou não houve alteração.");
+                }
+            } catch (Exception e) {
+                conexao.getConexao().rollback();
+                System.err.println("Erro ao atualizar solução da conciliação: " + e.getMessage());
+                response.put("erro", "Falha ao atualizar solução da conciliação: " + e.getMessage());
+            } finally {
+                conexao.Desconectar();
+            }
+        } else {
+            response.put("erro", "Erro ao conectar com o banco de dados para atualizar solução.");
+            System.err.println("Erro ao conectar com o banco de dados em atualizarSolucaoConciliacao.");
+        }
+        return response;
     }
 
 }
