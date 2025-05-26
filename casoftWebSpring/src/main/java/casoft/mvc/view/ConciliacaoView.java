@@ -149,4 +149,15 @@ public class ConciliacaoView
             return ResponseEntity.badRequest().body(new Mensagem(response.get("erro").toString()));
         }
     }
+
+    @DeleteMapping("/solucao/{id}")
+    public ResponseEntity<Object> deleteConciliacaoSolucao(@PathVariable("id") int concId)
+    {
+        Map<String, Object> json = conciliacaoController.apagarConciliacaoPorId(concId);
+        if (json.get("erro") == null) {
+            return ResponseEntity.ok(new Mensagem(json.get("ok").toString()));
+        } else {
+            return ResponseEntity.badRequest().body(new Mensagem(json.get("erro").toString()));
+        }
+    }
 }

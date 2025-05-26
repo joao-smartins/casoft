@@ -279,36 +279,28 @@ async function resolverProblemaFinal(concId, itemId, itemTipo, dataSolucao, desc
     }
 
     try {
-        // Passo 1: Marcar o item (Receita/Despesa) como "Conciliado"
-        // Este endpoint retorna { "message": "..." } ou { "error": "..." }
         const responseMarcar = await fetch(`http://localhost:8080${endpointMarcarConciliado}`, {
             method: 'PUT'
         });
-        const resultMarcar = await responseMarar.json(); // <-- CORRIGIDO: typo aqui. Era 'responseMarar'
+        const resultMarcar = await responseMarcar.json();
 
         if (!responseMarcar.ok) {
             throw new Error(resultMarcar.message || `Falha ao marcar ${itemTipo} ID ${itemId} como conciliado. Status: ${responseMarcar.status}`);
         }
 
-        // Passo 2: Atualizar o registro do problema na tabela 'conciliacao'
-        // Este endpoint retorna { "message": "..." } ou { "error": "..." }
-        const responseAtualizarConc = await fetch(`${API_BASE_URL}/solucao/${concId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                concDtSolucao: dataSolucao,
-                concDescSolucao: descricaoSolucao
-            })
+        const responseExcluirConc = await fetch(`${API_BASE_URL}/solucao/${concId}`, { // Agora chama o DELETE /solucao/{id}
+            method: 'DELETE', // MUDANÇA PARA DELETE
+            headers: { 'Content-Type': 'application/json' }
         });
-        const resultAtualizarConc = await responseAtualizarConc.json();
+        const resultExcluirConc = await responseExcluirConc.json();
 
-        if (!responseAtualizarConc.ok) {
-            throw new Error(resultAtualizarConc.message || `Falha ao atualizar o registro de conciliação ${concId} com a solução. Status: ${responseAtualizarConc.status}`);
+        if (!responseExcluirConc.ok) {
+            throw new Error(resultExcluirConc.message || `Falha ao excluir o registro de conciliação ${concId}. Status: ${responseExcluirConc.status}`);
         }
 
         // Se ambos os passos forem bem-sucedidos
-        showMessage(`Problema ID ${concId} resolvido e ${itemTipo} ID ${itemId} conciliado com sucesso!`, 'green');
-        carregarConciliacoesComProblema(); // Recarrega a lista para refletir as alterações
+        showMessage(`Problema ID ${concId} resolvido, ${itemTipo} ID ${itemId} conciliado, e registro de conciliação excluído!`, 'green');
+        carregarConciliacoesComProblema();
 
     } catch (error) {
         console.error("Erro ao resolver problema de conciliação:", error);

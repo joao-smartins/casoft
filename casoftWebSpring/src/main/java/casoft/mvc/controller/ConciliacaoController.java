@@ -276,4 +276,32 @@ public class ConciliacaoController
         return response;
     }
 
+    public Map<String, Object> apagarConciliacaoPorId(int concId) {
+        Map<String, Object> response = new HashMap<>();
+        Singleton conexao = Singleton.getInstancia();
+
+        if (conexao.conectar()) {
+            try {
+                boolean deleted = conciliacaoDAO.apagarPorId(concId, conexao); // Chama o novo método do DAO
+                if (deleted) {
+                    conexao.getConexao().commit();
+                    response.put("ok", "Conciliação ID " + concId + " excluída com sucesso.");
+                } else {
+                    conexao.getConexao().rollback();
+                    response.put("erro", "Nenhuma conciliação encontrada com o ID " + concId + " para exclusão.");
+                }
+            } catch (Exception e) {
+                conexao.getConexao().rollback();
+                System.err.println("Erro ao apagar conciliação no Controller: " + e.getMessage());
+                response.put("erro", "Falha ao apagar conciliação: " + e.getMessage());
+            } finally {
+                conexao.Desconectar();
+            }
+        } else {
+            response.put("erro", "Erro ao conectar com o banco de dados para apagar conciliação.");
+            System.err.println("Erro ao conectar com o banco de dados em apagarConciliacaoPorId.");
+        }
+        return response;
+    }
+
 }

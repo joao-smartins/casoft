@@ -340,23 +340,52 @@ public class ConciliacaoDAO
     }
 
     public boolean atualizarSolucao(int concId, LocalDate concDtSolucao, String concDescSolucao, Singleton conexao) {
-        String sql = "UPDATE conciliacao SET ";
+        StringBuilder sqlBuilder = new StringBuilder("UPDATE conciliacao SET ");
+
+        boolean firstField = true;
 
         if (concDtSolucao != null) {
-            sql += "conc_dt_solucao = '" + concDtSolucao.format(SQL_DATE_FORMATTER) + "'";
+            sqlBuilder.append("conc_dt_solucao = '").append(concDtSolucao.format(SQL_DATE_FORMATTER)).append("'");
+            firstField = false;
         } else {
-            sql += "conc_dt_solucao = NULL";
+            sqlBuilder.append("conc_dt_solucao = NULL");
+            firstField = false;
         }
 
-        String sanitizedDescSolucao = (concDescSolucao != null ? concDescSolucao.replaceAll("'", "''") : "");
-        sql += ", conc_desc_solucao = '" + sanitizedDescSolucao + "' ";
-        sql += "WHERE conc_id = " + concId;
+        if (concDescSolucao != null && !concDescSolucao.trim().isEmpty()) {
+            if (!firstField) {
+                sqlBuilder.append(", ");
+            }
+            sqlBuilder.append("conc_desc_solucao = '").append(concDescSolucao.replaceAll("'", "''")).append("'");
+            firstField = false;
+        } else {
+            if (!firstField) {
+                sqlBuilder.append(", ");
+            }
+            sqlBuilder.append("conc_desc_solucao = NULL");
+            firstField = false;
+        }
+
+        sqlBuilder.append(" WHERE conc_id = ").append(concId);
+
+        String sql = sqlBuilder.toString();
 
         try {
+            System.out.println("SQL de atualização de solução: " + sql);
             return conexao.getConexao().manipular(sql);
         } catch (RuntimeException e) {
             System.err.println("Erro ao atualizar solução da conciliação ID " + concId + ": " + e.getMessage());
             throw new RuntimeException("Erro no DAO ao atualizar solução da conciliação.", e);
+        }
+    }
+
+    public boolean apagarPorId(int concId, Singleton conexao) {
+        String sql = "DELETE FROM public.conciliacao WHERE conc_id = " + concId;
+        try {
+            return conexao.getConexao().manipular(sql);
+        } catch (RuntimeException e) {
+            System.err.println("Erro ao apagar conciliação ID " + concId + ": " + e.getMessage());
+            throw new RuntimeException("Erro no DAO ao apagar conciliação por ID.", e);
         }
     }
 }
