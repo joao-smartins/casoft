@@ -1,7 +1,6 @@
 package casoft.mvc.dao;
 
-import casoft.mvc.model.Despesa;
-import casoft.mvc.model.Evento;
+import casoft.mvc.model.Despesas;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 
@@ -9,13 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class DespesaDAO {
+public class DespesasDAO {
 
-    public Despesa gravar(Despesa entidade, Singleton conexao) {
+    public Despesas gravar(Despesas entidade, Singleton conexao) {
         String sql;
         if(entidade.getEvento_id()==0)
             sql = """
-            INSERT INTO despesa (
+            INSERT INTO despesas (
                 despesa_val, 
                 despesa_dt_venc, 
                 despesa_dt_lanc, 
@@ -30,7 +29,7 @@ public class DespesaDAO {
             """;
         else
             sql = """
-            INSERT INTO despesa (
+            INSERT INTO despesas (
                 despesa_val, 
                 despesa_dt_venc, 
                 despesa_dt_lanc, 
@@ -62,9 +61,9 @@ public class DespesaDAO {
             return null;
         }
     }
-    public List<Despesa> consultar(String filtro, Singleton conexao) {
-        List<Despesa> despesas = new ArrayList<>();
-        String sql = "SELECT * FROM despesa";
+    public List<Despesas> consultar(String filtro, Singleton conexao) {
+        List<Despesas> despesas = new ArrayList<>();
+        String sql = "SELECT * FROM despesas";
 
         if (filtro != null && !filtro.isBlank()) {
             sql += " WHERE " + filtro;
@@ -73,7 +72,7 @@ public class DespesaDAO {
         var rs = conexao.getConexao().consultar(sql);
         try {
             while (rs.next()) {
-                Despesa d = new Despesa();
+                Despesas d = new Despesas();
                 d.setId(rs.getInt("despesa_id"));
                 d.setValor(rs.getDouble("despesa_val"));
                 d.setData_venc(rs.getString("despesa_dt_venc"));
@@ -99,7 +98,7 @@ public class DespesaDAO {
     }
 
     public boolean apagar(int id, Singleton conexao) {
-        String sql = "DELETE FROM despesa WHERE despesa_id = "+id;
+        String sql = "DELETE FROM despesas WHERE despesa_id = "+id;
         if(conexao.getConexao().manipular(sql)) {
             return true;
         }

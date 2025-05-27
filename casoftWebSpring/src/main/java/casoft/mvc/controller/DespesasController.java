@@ -1,21 +1,18 @@
 package casoft.mvc.controller;
 
-import casoft.mvc.model.Despesa;
+import casoft.mvc.model.Despesas;
 import casoft.mvc.model.Evento;
-import casoft.mvc.model.Parametrizacao;
 import casoft.mvc.model.TipoDespesas;
 import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.sql.SQLOutput;
 import java.util.*;
 
 @Service
-public class DespesaController {
+public class DespesasController {
     @Autowired
-    private Despesa despesaModel;
+    private Despesas despesasModel;
 
     @Autowired
     private TipoDespesas tipoDespesasModel;
@@ -54,19 +51,19 @@ public class DespesaController {
                 pag=Double.parseDouble(pagamento);
             else
                 pag=0.0;
-            Despesa novaDespesa=new Despesa(Double.parseDouble(valor),data_venc,data_lanc,pag,descricao,status_conci,Integer.parseInt(tipoDespesa_id),Integer.parseInt(usuario_id),evento);
-            novaDespesa=despesaModel.add(novaDespesa,conexao);
-            if(novaDespesa!=null){
-                json.put("id",novaDespesa.getId());
-                json.put("val",novaDespesa.getValor());
-                json.put("data_venc",novaDespesa.getData_venc());
-                json.put("data_lanc",novaDespesa.getData_lanc());
-                json.put("pagamento",novaDespesa.getPagamento());
-                json.put("descricao",novaDespesa.getDescricao());
-                json.put("status",novaDespesa.getStatus_conci());
-                json.put("tipo_id",novaDespesa.getTipoDespesa_id());
-                json.put("usuario_id",novaDespesa.getUsuario_id());
-                json.put("evento_id",novaDespesa.getEvento_id());
+            Despesas novaDespesas =new Despesas(Double.parseDouble(valor),data_venc,data_lanc,pag,descricao,status_conci,Integer.parseInt(tipoDespesa_id),Integer.parseInt(usuario_id),evento);
+            novaDespesas = despesasModel.add(novaDespesas,conexao);
+            if(novaDespesas !=null){
+                json.put("id", novaDespesas.getId());
+                json.put("val", novaDespesas.getValor());
+                json.put("data_venc", novaDespesas.getData_venc());
+                json.put("data_lanc", novaDespesas.getData_lanc());
+                json.put("pagamento", novaDespesas.getPagamento());
+                json.put("descricao", novaDespesas.getDescricao());
+                json.put("status", novaDespesas.getStatus_conci());
+                json.put("tipo_id", novaDespesas.getTipoDespesa_id());
+                json.put("usuario_id", novaDespesas.getUsuario_id());
+                json.put("evento_id", novaDespesas.getEvento_id());
                 conexao.getConexao().commit();
                 return json;
             }
@@ -85,14 +82,14 @@ public class DespesaController {
 
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){
-            List<Despesa> despesaList=despesaModel.listar("",conexao);
+            List<Despesas> despesasList = despesasModel.listar("",conexao);
 
-            for (Despesa despesa : despesaList){
+            for (Despesas despesas : despesasList){
                 Evento evento=null;
 
-                if(despesa.getEvento_id()!=0)
-                    evento=eventoModel.consultar(despesa.getEvento_id(),conexao);
-                TipoDespesas tipoDespesas=tipoDespesasModel.consultar(despesa.getTipoDespesa_id(),conexao);
+                if(despesas.getEvento_id()!=0)
+                    evento=eventoModel.consultar(despesas.getEvento_id(),conexao);
+                TipoDespesas tipoDespesas=tipoDespesasModel.consultar(despesas.getTipoDespesa_id(),conexao);
                 Map<String, Object> eventoJson = new HashMap<>();
                 if (evento != null) {
                     eventoJson.put("id", evento.getId());
@@ -104,13 +101,13 @@ public class DespesaController {
                     tipoDespesaJson.put("nome", tipoDespesas.getNome());
                 }
                 Map<String,Object> json= new HashMap<>();
-                json.put("id",despesa.getId());
-                json.put("val",despesa.getValor());
-                json.put("data_venc",despesa.getData_venc());
-                json.put("data_lanc",despesa.getData_lanc());
-                json.put("pagamento",despesa.getPagamento());
-                json.put("descricao",despesa.getDescricao());
-                json.put("status_conci",despesa.getStatus_conci());
+                json.put("id", despesas.getId());
+                json.put("val", despesas.getValor());
+                json.put("data_venc", despesas.getData_venc());
+                json.put("data_lanc", despesas.getData_lanc());
+                json.put("pagamento", despesas.getPagamento());
+                json.put("descricao", despesas.getDescricao());
+                json.put("status_conci", despesas.getStatus_conci());
                 json.put("categoria",tipoDespesaJson);
                 json.put("evento",eventoJson);
                 jsonlist.add(json);
@@ -125,7 +122,7 @@ public class DespesaController {
         Map<String,Object> json=new HashMap<>();
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){
-            if(despesaModel.remover(id,conexao)){
+            if(despesasModel.remover(id,conexao)){
                 json.put("mesagem","Despesa removida com sucesso");
                 return json;
             }

@@ -1,10 +1,8 @@
 package casoft.mvc.view;
 
-import casoft.mvc.controller.DespesaController;
-import casoft.mvc.model.Despesa;
+import casoft.mvc.controller.DespesasController;
 import casoft.mvc.util.JWTTokenProvider;
 import casoft.mvc.util.Mensagem;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +14,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("apis/despesa")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-public class DespesaView {
+public class DespesasView {
     @Autowired
-    private DespesaController controller;
+    private DespesasController controller;
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestParam String valor, @RequestParam String data_venc, @RequestParam String data_lanc, @RequestParam String pagamento, @RequestParam String descricao, @RequestParam String status_conci, @RequestParam String tipoDespesa_id, @RequestParam String usuario_id, @RequestParam String evento_id,HttpServletRequest httpServletRequest){

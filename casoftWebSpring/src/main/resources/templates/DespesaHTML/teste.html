@@ -276,7 +276,7 @@
     // Carregar dados para selects
     async function carregarCategorias() {
       try {
-        const response = await authenticatedClient.get('/tipos-despesa');
+        const response = await authenticatedClient.get('/tipos-despesas');
         const select = document.getElementById('categoriadespesa_catdesp_id');
         
         select.innerHTML = '<option value="">Selecione uma categoria</option>';
@@ -317,17 +317,17 @@
         
         tbody.innerHTML = response.data.map(despesa => `
           <tr>
-            <td>${despesa.id}</td>
-            <td>${despesa.descricao || ''}</td>
-            <td>${despesa.tipoDespesa?.nome || 'Não informado'}</td>
-            <td>${formatarMoeda(despesa.valor)}</td>
-            <td>${formatarData(despesa.data_venc)}</td>
-            <td><span class="${getStatusClass(despesa.status_pagamento)}">${despesa.status_pagamento || 'Pendente'}</span></td>
-            <td><span class="${getStatusClass(despesa.status_conci)}">${despesa.status_conci}</span></td>
+            <td>${despesas.id}</td>
+            <td>${despesas.descricao || ''}</td>
+            <td>${despesas.tipoDespesa?.nome || 'Não informado'}</td>
+            <td>${formatarMoeda(despesas.valor)}</td>
+            <td>${formatarData(despesas.data_venc)}</td>
+            <td><span class="${getStatusClass(despesas.status_pagamento)}">${despesas.status_pagamento || 'Pendente'}</span></td>
+            <td><span class="${getStatusClass(despesas.status_conci)}">${despesas.status_conci}</span></td>
             <td>
               <div class="action-buttons d-flex gap-2">
-                <button class="btn btn-sm btn-warning" onclick="editarDespesa(${despesa.id})">Editar</button>
-                <button class="btn btn-sm btn-danger" onclick="confirmarExclusao(${despesa.id})">Excluir</button>
+                <button class="btn btn-sm btn-warning" onclick="editarDespesa(${despesas.id})">Editar</button>
+                <button class="btn btn-sm btn-danger" onclick="confirmarExclusao(${despesas.id})">Excluir</button>
               </div>
             </td>
           </tr>
@@ -341,7 +341,7 @@
     // Funções para ações
     function confirmarExclusao(id) {
       despesaSelecionadaId = id;
-      document.getElementById('modalMessage').textContent = 'Deseja realmente excluir esta despesa?';
+      document.getElementById('modalMessage').textContent = 'Deseja realmente excluir esta despesas?';
       document.getElementById('btnConfirmAction').className = 'btn btn-danger';
       document.getElementById('btnConfirmAction').textContent = 'Excluir';
       modalConfirmacao.show();
@@ -353,8 +353,8 @@
         alert('Despesa excluída com sucesso!');
         carregarDespesas();
       } catch (error) {
-        console.error('Erro ao excluir despesa:', error);
-        alert('Erro ao excluir despesa');
+        console.error('Erro ao excluir despesas:', error);
+        alert('Erro ao excluir despesas');
       } finally {
         modalConfirmacao.hide();
       }

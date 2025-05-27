@@ -214,7 +214,7 @@
       const despesaId = urlParams.get('id');
       
       if (!despesaId) {
-        alert('Nenhuma despesa selecionada para edição');
+        alert('Nenhuma despesas selecionada para edição');
         window.location.href = 'listarDespesas.html';
         return;
       }
@@ -224,20 +224,20 @@
         const despesa = response.data;
         
         // Preencher formulário
-        document.getElementById('despesa_id').value = despesa.id;
-        document.getElementById('categoriadespesa_catdesp_id').value = despesa.tipoDespesa_id;
-        document.getElementById('despesa_desc').value = despesa.descricao;
-        document.getElementById('despesa_val').value = despesa.valor;
-        document.getElementById('despesa_val_pago').value = despesa.pagamento || '';
-        document.getElementById('despesa_dt_venc').value = despesa.data_venc.split('T')[0];
-        document.getElementById('despesa_statuspag').value = despesa.status_pagamento || 'Pendente';
-        document.getElementById('despesa_dt_pag').value = despesa.data_pagamento ? despesa.data_pagamento.split('T')[0] : '';
-        document.getElementById('despesa_statusconci').value = despesa.status_conci || 'Pendente';
-        document.getElementById('evento_evento_id').value = despesa.evento_id || '';
+        document.getElementById('despesa_id').value = despesas.id;
+        document.getElementById('categoriadespesa_catdesp_id').value = despesas.tipoDespesa_id;
+        document.getElementById('despesa_desc').value = despesas.descricao;
+        document.getElementById('despesa_val').value = despesas.valor;
+        document.getElementById('despesa_val_pago').value = despesas.pagamento || '';
+        document.getElementById('despesa_dt_venc').value = despesas.data_venc.split('T')[0];
+        document.getElementById('despesa_statuspag').value = despesas.status_pagamento || 'Pendente';
+        document.getElementById('despesa_dt_pag').value = despesas.data_pagamento ? despesas.data_pagamento.split('T')[0] : '';
+        document.getElementById('despesa_statusconci').value = despesas.status_conci || 'Pendente';
+        document.getElementById('evento_evento_id').value = despesas.evento_id || '';
         
       } catch (error) {
-        console.error('Erro ao carregar despesa:', error);
-        alert('Não foi possível carregar os dados da despesa');
+        console.error('Erro ao carregar despesas:', error);
+        alert('Não foi possível carregar os dados da despesas');
         window.location.href = 'ListarDespesa.html';
       }
     }
@@ -264,8 +264,8 @@
         alert('Despesa atualizada com sucesso!');
         window.location.href = 'listaDespesas.html';
       } catch (error) {
-        console.error('Erro ao atualizar despesa:', error);
-        alert('Erro ao atualizar despesa');
+        console.error('Erro ao atualizar despesas:', error);
+        alert('Erro ao atualizar despesas');
       }
     }
 

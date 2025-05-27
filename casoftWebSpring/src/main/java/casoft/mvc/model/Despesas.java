@@ -1,20 +1,17 @@
 package casoft.mvc.model;
 
-import casoft.mvc.dao.DespesaDAO;
+import casoft.mvc.dao.DespesasDAO;
 import casoft.mvc.util.Singleton;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public class Despesa {
+public class Despesas {
 
     @Autowired
-    private DespesaDAO despesaDAO;
+    private DespesasDAO despesaDAO;
 
     private int id;
     private double valor;
@@ -27,10 +24,10 @@ public class Despesa {
     private Integer usuario_id;
     private int evento_id;
 
-    public Despesa() {
+    public Despesas() {
     }
 
-    public Despesa(double valor, String data_venc, String data_lanc, double pagamento, String descricao, String status_conci, int tipoDespesa_id, int usuario_id, int evento_id) {
+    public Despesas(double valor, String data_venc, String data_lanc, double pagamento, String descricao, String status_conci, int tipoDespesa_id, int usuario_id, int evento_id) {
         this.valor = valor;
         this.data_venc = data_venc;
         this.data_lanc = data_lanc;
@@ -122,11 +119,11 @@ public class Despesa {
         this.evento_id = evento_id;
     }
 
-    public Despesa add(Despesa despesa, Singleton conexao) {
-        return despesaDAO.gravar(despesa,conexao);
+    public Despesas add(Despesas despesas, Singleton conexao) {
+        return despesaDAO.gravar(despesas,conexao);
     }
 
-    public List<Despesa> listar(String filtro,Singleton conexao) {
+    public List<Despesas> listar(String filtro, Singleton conexao) {
         return despesaDAO.consultar(filtro,conexao);
     }
 
