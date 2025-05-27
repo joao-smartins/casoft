@@ -8,19 +8,16 @@
   <link href="css/estilo.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-  <!-- Overlay escuro -->
-  <div class="overlay" id="overlay"></div>
-
   <!-- Header fixo -->
   <header class="header">
     <div class="container">
       <div class="header-container d-flex align-items-center">
-        <button class="menu-toggle d-md-none" id="menu-toggle">
+        <img src="img/logo.png" alt="Logo">
+        <button class="menu-toggle d-md-none" id="menu-toggle" onclick="toggleSidebar()">
           <span></span>
           <span></span>
           <span></span>
         </button>
-        <img src="img/logo.png" alt="Logo">
         <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger ml-auto">Deslogar</button>
       </div>
     </div>
@@ -30,14 +27,13 @@
   <div class="sidebar" id="sidebar">
     <h4 class="p-3">Menu</h4>
     <a href="home.html">Home</a>
-    <a href="ParametrizacaoHTML/cadastroEmpresa.html">Empresa</a>
+    <a href="cadastroEmpresa.html">Empresa</a>
     <a href="EventoHTML/homeEvento.html">Eventos</a>
     <a href="TipoReceitasHTML/homeTPReceita.html">Tipos de Receita</a>
     <a href="TipoDespesasHTML/tipoDespesa.html">Tipos de Despesas</a>
     <a href="#">Relatórios</a>
     <a href="#">Configurações</a>
     <a href="gerenciarContas.html">Contas Bancárias</a>
-    <a href="/DespesaHTML/ListarDespesa.html">Despesa</a>
   </div>
 
   <!-- Conteúdo principal -->
