@@ -36,8 +36,8 @@ public class AcessoController {
             Usuario NovoUsuario= usuario.getUsuario(login,conexao);
             Map<String,Object> json= new HashMap<>();
             json.put("token",token);
-            json.put("nivel",usuario.getNivelAcesso());
-            json.put("id",usuario.getId());
+            json.put("nivel",NovoUsuario.getNivelAcesso());
+            json.put("id",NovoUsuario.getId());
             return json;
         }
         return null;

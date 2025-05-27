@@ -121,10 +121,10 @@ async function carregarEExibirDespesas() {
             render: (data, type, row) => `
             <div class="action-buttons">
                 <button class="btn btn-sm btn-warning" onclick="editarDespesa(${row.id})" title="Editar">
-                <i class="fa-solid fa-pen-to-square"></i>
+                	<i class="bi bi-pencil-square"></i>
                 </button>
                 <button class="btn btn-sm btn-danger" onclick="confirmarExclusao(${row.id})" title="Excluir">
-                <i class="fa-solid fa-trash"></i>
+                	<i class="bi bi-trash"></i>
                 </button>
             </div>
             `,

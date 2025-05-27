@@ -14,7 +14,7 @@ public class DespesasDAO {
         String sql;
         if(entidade.getEvento_id()==0)
             sql = """
-            INSERT INTO despesas (
+            INSERT INTO despesa (
                 despesa_val, 
                 despesa_dt_venc, 
                 despesa_dt_lanc, 
@@ -29,7 +29,7 @@ public class DespesasDAO {
             """;
         else
             sql = """
-            INSERT INTO despesas (
+            INSERT INTO despesa (
                 despesa_val, 
                 despesa_dt_venc, 
                 despesa_dt_lanc, 
@@ -63,7 +63,7 @@ public class DespesasDAO {
     }
     public List<Despesas> consultar(String filtro, Singleton conexao) {
         List<Despesas> despesas = new ArrayList<>();
-        String sql = "SELECT * FROM despesas";
+        String sql = "SELECT * FROM despesa";
 
         if (filtro != null && !filtro.isBlank()) {
             sql += " WHERE " + filtro;
@@ -98,7 +98,7 @@ public class DespesasDAO {
     }
 
     public boolean apagar(int id, Singleton conexao) {
-        String sql = "DELETE FROM despesas WHERE despesa_id = "+id;
+        String sql = "DELETE FROM despesa WHERE despesa_id = "+id;
         if(conexao.getConexao().manipular(sql)) {
             return true;
         }
