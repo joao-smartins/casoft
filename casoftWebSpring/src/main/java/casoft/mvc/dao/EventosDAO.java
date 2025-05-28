@@ -1,6 +1,6 @@
 package casoft.mvc.dao;
 
-import casoft.mvc.model.Evento;
+import casoft.mvc.model.Eventos;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 
@@ -9,10 +9,10 @@ import java.util.List;
 
 
 @Repository
-public class EventosDAO implements IDAO<Evento> {
+public class EventosDAO implements IDAO<Eventos> {
 
     @Override
-    public Evento gravar(Evento entidade, Singleton conexao)
+    public Eventos gravar(Eventos entidade, Singleton conexao)
     {
         String sql = """
                 INSERT INTO eventos (nome, descricao, data, status) 
@@ -32,10 +32,10 @@ public class EventosDAO implements IDAO<Evento> {
     }
 
     @Override
-    public List<Evento> get(String filtro, Singleton conexao) {
-        List<Evento> eventos = new ArrayList<>();
+    public List<Eventos> get(String filtro, Singleton conexao) {
+        List<Eventos> eventos = new ArrayList<>();
         String sql = """
-                SELECT * FROM evento
+                SELECT * FROM eventos
                 """;
         if (filtro != null && !filtro.isBlank()) {
             sql += " WHERE "+filtro;
@@ -43,12 +43,12 @@ public class EventosDAO implements IDAO<Evento> {
         var rs = conexao.getConexao().consultar(sql);
         try {
             while (rs.next()) {
-                Evento e = new Evento();
-                e.setId(rs.getInt("evento_id"));
-                e.setNome(rs.getString("evento_nome"));
-                e.setDescricao(rs.getString("evento_desc"));
-                e.setData(rs.getDate("evento_data").toString());
-                e.setStatus(rs.getString("evento_status").charAt(0));
+                Eventos e = new Eventos();
+                e.setId(rs.getInt("id_evento"));
+                e.setNome(rs.getString("nome"));
+                e.setDescricao(rs.getString("descricao"));
+                e.setData(rs.getDate("data").toString());
+                e.setStatus(rs.getString("status").charAt(0));
                 eventos.add(e);
             }
 
@@ -59,7 +59,7 @@ public class EventosDAO implements IDAO<Evento> {
     }
 
     @Override
-    public Evento alterar(Evento entidade, Singleton conexao) {
+    public Eventos alterar(Eventos entidade, Singleton conexao) {
         String sql = """
         UPDATE eventos SET 
             nome = '#1',
@@ -83,7 +83,7 @@ public class EventosDAO implements IDAO<Evento> {
     }
 
     @Override
-    public boolean apagar(Evento entidade, Singleton conexao) {
+    public boolean apagar(Eventos entidade, Singleton conexao) {
         String sql = "DELETE FROM eventos WHERE id_evento = ";
         sql += entidade.getId();
         if(conexao.getConexao().manipular(sql)) {
@@ -93,21 +93,21 @@ public class EventosDAO implements IDAO<Evento> {
     }
 
     @Override
-    public Evento get(int id, Singleton conexao) {
-        String sql = "SELECT * FROM evento WHERE evento_id = " + id;
+    public Eventos get(int id, Singleton conexao) {
+        String sql = "SELECT * FROM eventos WHERE evento_id = " + id;
         var rs = conexao.getConexao().consultar(sql);
         try {
             if (rs.next()) {
-                Evento e = new Evento();
-                e.setId(rs.getInt("evento_id"));
-                e.setNome(rs.getString("evento_nome"));
-                e.setDescricao(rs.getString("evento_desc"));
-                e.setData(rs.getDate("evento_data").toString());
-                e.setStatus(rs.getString("evento_status").charAt(0));
+                Eventos e = new Eventos();
+                e.setId(rs.getInt("id_evento"));
+                e.setNome(rs.getString("nome"));
+                e.setDescricao(rs.getString("descricao"));
+                e.setData(rs.getDate("data").toString());
+                e.setStatus(rs.getString("status").charAt(0));
                 return e;
             }
         } catch (Exception e) {
-            System.out.println("Erro ao buscar evento: " + e.getMessage());
+            System.out.println("Erro ao buscar eventos: " + e.getMessage());
         }
         return null;
     }

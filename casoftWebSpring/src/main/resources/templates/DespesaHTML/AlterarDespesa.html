@@ -199,8 +199,8 @@
         select.innerHTML = '<option value="">Nenhum evento selecionado</option>';
         response.data.forEach(evento => {
           const option = document.createElement('option');
-          option.value = evento.id;
-          option.textContent = evento.nome;
+          option.value = eventos.id;
+          option.textContent = eventos.nome;
           select.appendChild(option);
         });
       } catch (error) {

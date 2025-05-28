@@ -93,9 +93,9 @@
                 // Limpar o <select> antes de adicionar novas opções
                 select.innerHTML = '<option value="">Selecione o evento</option>'; // Garantir que tenha a opção "Selecione"
                 data.forEach(evento => {
-                  console.log(evento);
+                  console.log(eventos);
                   // Criar uma nova opção para cada evento
-                  const option = new Option(evento.nome, evento.id);
+                  const option = new Option(eventos.nome, eventos.id);
                   select.appendChild(option);
                 });
               } else {
@@ -116,11 +116,11 @@ function alterarcampos(){
     fetch(URL)
             .then(response => response.json())
             .then(evento => {
-              document.getElementById("eventoId").value = evento.id;
-              document.getElementById("status").value = evento.status;
-              document.getElementById("nome").value = evento.nome;
-              document.getElementById("descricao").value = evento.descricao;
-              document.getElementById("data").value = evento.data;
+              document.getElementById("eventoId").value = eventos.id;
+              document.getElementById("status").value = eventos.status;
+              document.getElementById("nome").value = eventos.nome;
+              document.getElementById("descricao").value = eventos.descricao;
+              document.getElementById("data").value = eventos.data;
 
             })
             .catch(error => {
@@ -146,7 +146,7 @@ document.getElementById("formEvento").addEventListener("submit", function (e) {
         "Content-Type": "application/json"
       },
       method: "PUT",
-      body: JSON.stringify(evento)
+      body: JSON.stringify(eventos)
     })
             .then(response => {
               if (!response.ok) {

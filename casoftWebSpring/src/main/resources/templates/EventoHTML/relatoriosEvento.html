@@ -94,7 +94,7 @@
                 if (Array.isArray(data)) {
                     select.innerHTML = '<option value="">Selecione o evento</option>';
                     data.forEach(evento => {
-                        const option = new Option(evento.nome, evento.id);
+                        const option = new Option(eventos.nome, eventos.id);
                         select.appendChild(option);
                     });
                 } else {
@@ -123,9 +123,9 @@
             .then(response => response.json())
             .then(evento => {
                 // Exibir as informações do evento
-                const dataInvertida = evento.data.split("-").reverse().join("/");
-                document.getElementById("nomeEvento").textContent = evento.nome;
-                document.getElementById("descricaoEvento").textContent = evento.descricao;
+                const dataInvertida = eventos.data.split("-").reverse().join("/");
+                document.getElementById("nomeEvento").textContent = eventos.nome;
+                document.getElementById("descricaoEvento").textContent = eventos.descricao;
                 document.getElementById("dataEvento").textContent = dataInvertida;
 
                 // Mostrar as informações na página
@@ -133,7 +133,7 @@
                 document.getElementById("todosEventos").classList.add("hidden"); // Ocultar lista de todos eventos
             })
             .catch(error => {
-                console.error("Erro ao carregar evento:", error);
+                console.error("Erro ao carregar eventos:", error);
                 mostrarMensagem(`Erro ao carregar evento: ${error.message}`, true);
             });
     }
@@ -152,13 +152,13 @@
                     // Adicionar todos os eventos à lista
                     data.forEach(evento => {
                         const divEvento = document.createElement("div");
-                        const dataInvertida = evento.data.split("-").reverse().join("/");
-                        divEvento.classList.add("evento-item");
+                        const dataInvertida = eventos.data.split("-").reverse().join("/");
+                        divEvento.classList.add("eventos-item");
                         divEvento.innerHTML = `
-              <p><strong>Nome:</strong> ${evento.nome}</p>
-              <p><strong>Descrição:</strong> ${evento.descricao}</p>
+              <p><strong>Nome:</strong> ${eventos.nome}</p>
+              <p><strong>Descrição:</strong> ${eventos.descricao}</p>
               <p><strong>Data:</strong> ${dataInvertida}</p>
-              <p><strong>Status:</strong> ${evento.status}</p>
+              <p><strong>Status:</strong> ${eventos.status}</p>
             `;
                         listaEventos.appendChild(divEvento);
                     });
@@ -167,7 +167,7 @@
                     document.getElementById("todosEventos").classList.remove("hidden");
                     document.getElementById("informacoesEvento").classList.add("hidden"); // Ocultar informações do evento selecionado
                 } else {
-                    mostrarMensagem("Nenhum evento encontrado.", true);
+                    mostrarMensagem("Nenhum eventos encontrado.", true);
                 }
             })
             .catch(error => {

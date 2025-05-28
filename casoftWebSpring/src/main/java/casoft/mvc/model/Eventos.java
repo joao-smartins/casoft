@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 @Repository
-public class Evento {
+public class Eventos {
     private int Id;
     private String nome;
     private String descricao;
@@ -17,7 +17,7 @@ public class Evento {
     @Autowired
     private EventosDAO dao;
 
-    public Evento(String nome, int id, String data, String descricao, char status) {
+    public Eventos(String nome, int id, String data, String descricao, char status) {
         this.nome = nome;
         Id = id;
         this.data = data;
@@ -25,7 +25,7 @@ public class Evento {
         this.status = status;
     }
 
-    public Evento() {
+    public Eventos() {
     }
 
     public int getId() {
@@ -68,24 +68,24 @@ public class Evento {
         this.status = status;
     }
 
-    public List<Evento> consultar(String filtro, Singleton conexao){
+    public List<Eventos> consultar(String filtro, Singleton conexao){
         return dao.get(filtro, conexao);
     }
 
-    public Evento consultar(int Id, Singleton conexao){
+    public Eventos consultar(int Id, Singleton conexao){
         return dao.get(Id, conexao);
     }
 
-    public Evento update(Evento evento, Singleton conexao){
-        return dao.alterar(evento,conexao);
+    public Eventos update(Eventos eventos, Singleton conexao){
+        return dao.alterar(eventos,conexao);
     }
 
-    public boolean delete(Evento evento, Singleton conexao){
-        return dao.apagar(evento, conexao);
+    public boolean delete(Eventos eventos, Singleton conexao){
+        return dao.apagar(eventos, conexao);
     }
 
-    public Evento create(Evento evento, Singleton conexao){
-        return dao.gravar(evento, conexao);
+    public Eventos create(Eventos eventos, Singleton conexao){
+        return dao.gravar(eventos, conexao);
     }
 
 
