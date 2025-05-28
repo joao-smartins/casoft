@@ -83,7 +83,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     console.log("Página carregada, executando o fetch...");
     const select = document.getElementById("selectEven");
-    const URL = "http://localhost:8080/apis/evento"; // Sua URL da API
+    const URL = "http://localhost:8080/apis/eventos"; // Sua URL da API
 
     fetch(URL)
             .then(response => response.json())
@@ -132,7 +132,7 @@ function alterarcampos(){
 
 document.getElementById("formEvento").addEventListener("submit", function (e) {
     e.preventDefault();
-    const URL = "http://localhost:8080/apis/evento";
+    const URL = "http://localhost:8080/apis/eventos";
     const evento = {
       id: document.getElementById("eventoId").value,
       nome: document.getElementById("nome").value,

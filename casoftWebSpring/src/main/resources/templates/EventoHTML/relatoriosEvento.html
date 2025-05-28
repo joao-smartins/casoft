@@ -86,7 +86,7 @@
     // Função para carregar os eventos
     document.addEventListener("DOMContentLoaded", function () {
         const select = document.getElementById("selectEvento");
-        const URL = "http://localhost:8080/apis/evento"; // URL da API
+        const URL = "http://localhost:8080/apis/eventos"; // URL da API
 
         fetch(URL)
             .then(response => response.json())
@@ -102,7 +102,7 @@
                 }
             })
             .catch(error => {
-                console.error("Erro ao carregar evento:", error);
+                console.error("Erro ao carregar eventos:", error);
                 mostrarMensagem(`Erro ao carregar eventos: ${error.message}`, true);
             });
     });
@@ -140,7 +140,7 @@
 
     // Função para mostrar todos os eventos
     function mostrarTodosEventos() {
-        const URL = "http://localhost:8080/apis/evento";
+        const URL = "http://localhost:8080/apis/eventos";
 
         fetch(URL)
             .then(response => response.json())

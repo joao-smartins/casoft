@@ -94,7 +94,7 @@ public class EventosDAO implements IDAO<Evento> {
 
     @Override
     public Evento get(int id, Singleton conexao) {
-        String sql = "SELECT * FROM eventos WHERE evento_id = " + id;
+        String sql = "SELECT * FROM eventos WHERE id_evento = " + id;
         var rs = conexao.getConexao().consultar(sql);
         try {
             if (rs.next()) {
