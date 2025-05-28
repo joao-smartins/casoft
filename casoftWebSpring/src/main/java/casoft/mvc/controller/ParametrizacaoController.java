@@ -15,6 +15,7 @@ import java.util.Map;
 public class ParametrizacaoController {
     @Autowired
     private Parametrizacao paramModel;
+
     public Map<String,Object> getParam(int id) {
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){

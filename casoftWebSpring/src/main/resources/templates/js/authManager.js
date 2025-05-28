@@ -3,14 +3,16 @@
 class AuthManager {
   constructor() {
     this.tokenKey = "authToken";
+    this.idKey = "userID";
     this.nivelKey = "userNivel";
     this.apiBaseUrl = "http://localhost:8080";       
   }
 
   // Salva dados de autenticação
-  setAuthData(token, nivel) {
+  setAuthData(token, nivel,id) {
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.nivelKey, nivel);
+    localStorage.setItem(this.idKey,id);
   }
 
   // Obtém o token atual
@@ -22,7 +24,9 @@ class AuthManager {
   getNivel() {
     return localStorage.getItem(this.nivelKey);
   }
-
+  getId(){
+    return localStorage.getItem(this.idKey);
+  }
   // Verifica se o usuário está autenticado
   isAuthenticated() {
     return !!this.getToken();
@@ -32,7 +36,8 @@ class AuthManager {
   logout() {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.nivelKey);
-    window.location.href = "ControleAcesso.html";
+    localStorage.removeItem(this.idKey);
+    window.location.href = "../ControleAcesso.html";
   }
 
   // Verifica se o token é válido no backend
@@ -77,21 +82,21 @@ class AuthManager {
       }
 
       const data = await response.json();
-      const { token, nivel } = data;
+      const { token, nivel , id} = data;
       
       // Salva os dados de autenticação
-      this.setAuthData(token, nivel);
+      this.setAuthData(token, nivel,id);
       const empresaCadastrada = await this.verificaEmpresaCadastrada();
       // Redireciona com base no nível
       if (nivel === "ADMIN") {
         alert("Login bem-sucedido! Bem-vindo, Administrador!");
         if(empresaCadastrada)
-          window.location.href = "home.html";
+          window.location.href = "../home.html";
         else
-          window.location.href = "cadastroEmpresa.html";
+          window.location.href = "../ParametrizacaoHTML/cadastroEmpresa.html";
       } else {
         alert("Login bem-sucedido! Bem-vindo!");
-        window.location.href = "home.html";
+        window.location.href = "../home.html";
       }
       
       return true;

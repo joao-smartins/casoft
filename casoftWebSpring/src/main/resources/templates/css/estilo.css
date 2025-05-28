@@ -1,4 +1,4 @@
-/* Estilos gerais e configurações */
+/* ================== VARIÁVEIS ================== */
 :root {
   --cor: #ffffff;
   --primary-color: #F96333;
@@ -11,6 +11,7 @@
   --card-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
+/* ================== RESET ================== */
 * {
   margin: 0;
   padding: 0;
@@ -25,7 +26,7 @@ body {
   color: var(--text-color);
 }
 
-/* Estilos do cabeçalho */
+/* ================== HEADER ================== */
 .header {
   background-color: #fff;
   padding: 10px 0;
@@ -48,101 +49,158 @@ body {
   height: auto;
 }
 
-/* Botão do menu */
+/* ================== MENU HAMBURGUER ================== */
 .menu-toggle {
-  display: none;
   background: none;
   border: none;
+  width: 40px;
+  height: 40px;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
-  padding: 5px;
 }
 
 .menu-toggle span {
   display: block;
-  width: 25px;
-  height: 3px;
+  width: 18px;
+  height: 2px;
   background-color: #333;
-  margin: 5px 0;
+  transition: 0.3s;
 }
 
-/* Menu lateral (sidebar) */
+.menu-toggle:hover {
+  background-color: rgba(136, 136, 136, 0.1);
+  border-radius: 4px;
+}
+
+/* ================== SIDEBAR ================== */
 .sidebar {
-  min-width: var(--sidebar-width);
-  background-color: #343a40;
+  width: var(--sidebar-width);
+  background-color: #2c3e50;
   color: #fff;
-  transition: transform 0.3s ease;
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   z-index: 900;
-  padding-top: 80px; /* Espaço para o header */
+  padding-top: 80px;
+  transition: transform 0.3s ease;
 }
 
 .sidebar a {
-  color: #fff;
+  color: #ecf0f1;
   text-decoration: none;
   padding: 10px 20px;
   display: block;
+  transition: background-color 0.3s;
 }
 
 .sidebar a:hover {
-  background-color: #495057;
+  background-color: #34495e;
 }
 
-/* Área de conteúdo principal */
-.content {
+.sidebar h4 {
+  color: white;
+  margin-left: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Sidebar ativa no mobile */
+.sidebar.active {
+  transform: translateX(0);
+}
+/* Overlay que escurece o fundo */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: opacity 0.3s ease;
+  z-index: 800;
+  display: block;
+}
+.overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+#submenuDespesa {
+    max-height: 0; /* começa fechado */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin-left: 15px;
+}
+#submenuDespesa.open {
+    max-height: 200px; /* valor maior que a altura real do submenu */
+}
+/* ================== ÁREA DE CONTEÚDO ================== */
+.content, .main {
   flex: 1;
   padding: 20px;
   margin-left: var(--sidebar-width);
-  transition: margin-left 0.3s ease;
+  margin-bottom: 3rem;
+  box-sizing: border-box;
 }
 
-/* Estilos do cartão de formulário */
+/* ================== FORMULÁRIOS ================== */
 .form-card {
-  border-radius: 10px;
+  background-color: #fff;
+  border-radius: 8px;
   box-shadow: var(--card-shadow);
+  padding: 20px;
+
 }
 
-.form-card .card-header {
+.card-header {
   border-radius: 10px 10px 0 0;
-  border-bottom: 1px solid #eee;
 }
 
 .card-section {
-  border-bottom: 1px solid #eee;
   margin-bottom: 20px;
-  padding-bottom: 10px;
 }
 
 .section-title {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #505050;
   margin-bottom: 15px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
 }
 
-.bg-orange { 
-  background-color: #ffffff !important; 
+input[type="text"], input[type="number"], input[type="email"],input[type="file"]{
+  width: 100%;
+  border: 1px solid #cccccc;
+  background-color: #f7f7f7;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
-
-/* Estilos de campos de formulário */
-.custom-input {
-  background-color: var(--light-gray);
-  border-color: var(--border-color);
+select {
+  border: 1px solid #cccccc !important;
+  background-color: #f7f7f7 !important;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+textarea{
+    border: 1px solid #cccccc !important;
+  background-color: #f7f7f7 !important;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .required {
   color: red;
 }
 
-/* Estilos para o preview do logo */
-.logo-preview {
-  max-width: 200px;
-  max-height: 200px;
-  display: none;
-  margin: 0 auto;
-}
 .is-invalid {
   border-color: red;
 }
@@ -152,103 +210,28 @@ body {
   font-size: 0.9em;
 }
 
-/* Media queries para responsividade */
-@media (max-width: 767.98px) {
-  .sidebar {
-    transform: translateX(-100%);
-    padding-top: 60px; /* Menor padding para mobile */
-  }
-  
-  .sidebar.active {
-    transform: translateX(0);
-  }
-  
-  .menu-toggle {
-    display: block;
-  }
-  
-  .content {
-    margin-left: 0;
-  }
-  
-  .row > * {
-    margin-bottom: 10px;
-  }
-}
-
-
-
-
-/* Tipos Despesas */
-
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f2f2f2;
-}
-
-h2 {
-  color: #4CAF50;
-  text-align: center;
-  margin-top: 20px;
-}
-
-.flex-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  align-items: center;
-  margin: 20px;
-}
-
-.form-container {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  width: 100%;
-  max-width: 800px;
-}
-
-input[type="text"], input[type="number"], input[type="email"], select {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0 15px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 100%;
-  font-size: 16px;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
 #mensagem {
   color: red;
   margin-top: 10px;
   text-align: center;
 }
 
+/* ================== LOGO PREVIEW ================== */
+.logo-preview {
+  max-width: 200px;
+  max-height: 200px;
+  display: none;
+  margin: 0 auto;
+}
+
+/* ================== TABELAS ================== */
 table {
   width: 100%;
   border-collapse: collapse;
   background-color: #fff;
   margin-top: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
 }
 
 th, td {
@@ -269,254 +252,42 @@ tbody tr:hover {
   background-color: #ecf0f1;
 }
 
-.sidebar {
-  height: 100%;
-  width: 250px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: #2c3e50;
-  overflow-x: hidden;
-  padding-top: 20px;
-  color: white;
-}
-
-.sidebar a {
-  padding: 10px 15px;
-  text-decoration: none;
-  font-size: 18px;
-  color: #ecf0f1;
-  display: block;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.sidebar a:hover {
-  background-color: #34495e;
-  color: white;
-}
-
-.sidebar h4 {
-  color: white;
-  margin-left: 15px;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.main {
-  margin-left: 250px;
-  padding: 80px 20px; /* Adiciona padding para evitar sobreposição */
-  box-sizing: border-box; /* Garante que o padding não aumente a largura total */
-}
-
-.top-menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: #333;
-  color: white;
-  padding: 10px;
-  text-align: right;
-  z-index: 1000;
+/* ================== FLEX CONTAINER ================== */
+.flex-container {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: space-around;
   align-items: center;
+  margin: 20px;
 }
 
-.top-menu img {
-  max-height: 50px;
-  margin-right: auto;
+/* ================== CORES AUXILIARES ================== */
+.bg-orange {
+  background-color: var(--cor) !important;
 }
 
-.top-menu button {
-  margin-left: auto;
+/* ================== MEDIA QUERIES ================== */
+@media (max-width: 767.98px) {
+  .sidebar {
+    transform: translateX(-100%);
+    padding-top: 60px;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .content, .main {
+    margin-left: 0;
+  }
+
+  .row > * {
+    margin-bottom: 10px;
+  }
 }
 
-.card-section {
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
-
-.section-title {
-  color: #3498db;
-  margin-bottom: 15px;
-  font-size: 1.4em;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 5px;
-}
-
-.required {
-  color: red;
-  font-weight: bold;
-}
-
-.logo-preview {
-  max-width: 200px;
-  max-height: 200px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 5px;
-  margin-top: 10px;
-}
-
-/* Estilos adicionais para o cabeçalho e botão */
-.top-menu {
-  background-color: #2c3e50; /* Cor de fundo do cabeçalho */
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between; /* Espaçamento entre elementos */
-  align-items: center; /* Alinhamento vertical */
-}
-
-.top-menu img {
-  height: 50px; /* Altura do logo */
-}
-
-.top-menu button {
-  background-color: #e74c3c; /* Cor de fundo do botão */
-  color: white; /* Cor do texto do botão */
-  border: none; /* Remove a borda padrão */
-  padding: 10px 20px; /* Preenchimento do botão */
-  border-radius: 5px; /* Borda arredondada */
-  cursor: pointer; /* Cursor de mão ao passar por cima */
-  font-size: 16px; /* Tamanho da fonte */
-}
-
-.top-menu button:hover {
-  background-color: #c0392b; /* Cor de fundo do botão ao passar o mouse */
-}
-
-
-.sidebar {
-  width: 250px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background-color: #2c3e50;
-  padding-top: 70px; /* Ajuste para evitar sobreposição com o menu superior fixo */
-  overflow-x: hidden;
-  transition: 0.5s;
-}
-
-.sidebar a {
-  padding: 15px 25px;
-  text-decoration: none;
-  font-size: 18px;
-  color: white;
-  display: block;
-  transition: 0.3s;
-}
-
-.sidebar a:hover {
-  background-color: #34495e;
-}
-
-.sidebar h4 {
-  color: white;
-  font-size: 20px;
-  margin: 20px 25px;
-}
-
-.main {
-  margin-left: 250px;
-  padding: 20px;
-}
-
-/* Estilos para formulários e botões */
-.form-container {
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.form-container h5 {
-  color: #3498db;
-  margin-bottom: 15px;
-  font-size: 1.2em;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 5px;
-}
-
-.form-container input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0 15px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.form-container button {
-  background-color: #2ecc71;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-  width: 100%;
-}
-
-.form-container button:hover {
-  background-color: #27ae60;
-}
-
-/* Estilos para tabelas */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #ffffff;
-  margin-top: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: left;
-}
-
-th {
-  background-color: #f0f0f0;
-}
-
-tbody tr:nth-child(odd) {
-  background-color: #f9f9f9;
-}
-
-tbody tr:hover {
-  background-color: #ecf0f1;
-}
-
-/* Estilos para botões de ação na tabela */
-td button {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  margin: 5px;
-  transition: background-color 0.3s ease;
-}
-
-td button:hover {
-  background-color: #2980b9;
-}
-
-td button.excluir {
-  background-color: #e74c3c;
-}
-
-td button.excluir:hover {
-  background-color: #c0392b;
+@media (min-width: 768px) {
+  .menu-toggle {
+    display: none;
+  }
 }

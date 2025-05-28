@@ -5,7 +5,6 @@ import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,13 +22,13 @@ public class EventoController {
         if(conexao.conectar()){
             List<Evento> lista =  eventoModel.consultar(filtro, conexao);
             if(!lista.isEmpty()){
-                for(Evento evento:lista){
+                for(Evento evento :lista){
                     Map<String,Object> json = new HashMap<>();
-                    json.put("id",evento.getId());
-                    json.put("nome",evento.getNome());
-                    json.put("descricao",evento.getDescricao());
-                    json.put("data",evento.getData());
-                    json.put("status",evento.isStatus());
+                    json.put("id", evento.getId());
+                    json.put("nome", evento.getNome());
+                    json.put("descricao", evento.getDescricao());
+                    json.put("data", evento.getData());
+                    json.put("status", evento.isStatus());
                     eventosList.add(json);
                 }
                 conexao.Desconectar();
