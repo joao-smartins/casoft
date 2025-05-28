@@ -75,7 +75,7 @@
 <script>
   document.getElementById("formEvento").addEventListener("submit", function (e) {
     e.preventDefault();
-    const URL = "http://localhost:8080/apis/eventos";
+    const URL = "http://localhost:8080/apis/evento";
     const evento = {
       nome: document.getElementById("nome").value,
       descricao: document.getElementById("descricao").value,
@@ -88,7 +88,7 @@
         "Content-Type": "application/json"
       },
       method: "POST",
-      body: JSON.stringify(eventos)
+      body: JSON.stringify(evento)
     })
             .then(response => {
               if (!response.ok) {

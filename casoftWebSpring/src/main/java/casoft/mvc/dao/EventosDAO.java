@@ -1,6 +1,6 @@
 package casoft.mvc.dao;
 
-import casoft.mvc.model.Eventos;
+import casoft.mvc.model.Evento;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 
@@ -9,13 +9,13 @@ import java.util.List;
 
 
 @Repository
-public class EventosDAO implements IDAO<Eventos> {
+public class EventosDAO implements IDAO<Evento> {
 
     @Override
-    public Eventos gravar(Eventos entidade, Singleton conexao)
+    public Evento gravar(Evento entidade, Singleton conexao)
     {
         String sql = """
-                INSERT INTO eventos (nome, descricao, data, status) 
+                INSERT INTO evento (nome, descricao, data, status) 
                 VALUES ('#1', '#2', '#3', '#4')
                 """;
         sql = sql.replace("#1", entidade.getNome());
@@ -32,10 +32,10 @@ public class EventosDAO implements IDAO<Eventos> {
     }
 
     @Override
-    public List<Eventos> get(String filtro, Singleton conexao) {
-        List<Eventos> eventos = new ArrayList<>();
+    public List<Evento> get(String filtro, Singleton conexao) {
+        List<Evento> eventos = new ArrayList<>();
         String sql = """
-                SELECT * FROM eventos
+                SELECT * FROM evento
                 """;
         if (filtro != null && !filtro.isBlank()) {
             sql += " WHERE "+filtro;
@@ -43,7 +43,7 @@ public class EventosDAO implements IDAO<Eventos> {
         var rs = conexao.getConexao().consultar(sql);
         try {
             while (rs.next()) {
-                Eventos e = new Eventos();
+                Evento e = new Evento();
                 e.setId(rs.getInt("id_evento"));
                 e.setNome(rs.getString("nome"));
                 e.setDescricao(rs.getString("descricao"));
@@ -59,9 +59,9 @@ public class EventosDAO implements IDAO<Eventos> {
     }
 
     @Override
-    public Eventos alterar(Eventos entidade, Singleton conexao) {
+    public Evento alterar(Evento entidade, Singleton conexao) {
         String sql = """
-        UPDATE eventos SET 
+        UPDATE evento SET 
             nome = '#1',
             descricao = '#2',
             data = '#3',
@@ -83,8 +83,8 @@ public class EventosDAO implements IDAO<Eventos> {
     }
 
     @Override
-    public boolean apagar(Eventos entidade, Singleton conexao) {
-        String sql = "DELETE FROM eventos WHERE id_evento = ";
+    public boolean apagar(Evento entidade, Singleton conexao) {
+        String sql = "DELETE FROM evento WHERE id_evento = ";
         sql += entidade.getId();
         if(conexao.getConexao().manipular(sql)) {
             return true;
@@ -93,12 +93,12 @@ public class EventosDAO implements IDAO<Eventos> {
     }
 
     @Override
-    public Eventos get(int id, Singleton conexao) {
-        String sql = "SELECT * FROM eventos WHERE evento_id = " + id;
+    public Evento get(int id, Singleton conexao) {
+        String sql = "SELECT * FROM evento WHERE evento_id = " + id;
         var rs = conexao.getConexao().consultar(sql);
         try {
             if (rs.next()) {
-                Eventos e = new Eventos();
+                Evento e = new Evento();
                 e.setId(rs.getInt("id_evento"));
                 e.setNome(rs.getString("nome"));
                 e.setDescricao(rs.getString("descricao"));
@@ -107,7 +107,7 @@ public class EventosDAO implements IDAO<Eventos> {
                 return e;
             }
         } catch (Exception e) {
-            System.out.println("Erro ao buscar eventos: " + e.getMessage());
+            System.out.println("Erro ao buscar evento: " + e.getMessage());
         }
         return null;
     }

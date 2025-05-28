@@ -293,18 +293,18 @@
 
     async function carregarEventos() {
       try {
-        const response = await authenticatedClient.get('/eventos');
+        const response = await authenticatedClient.get('/evento');
         const select = document.getElementById('evento_evento_id');
         
         select.innerHTML = '<option value="">Nenhum evento selecionado</option>';
         response.data.forEach(evento => {
           const option = document.createElement('option');
-          option.value = eventos.id;
-          option.textContent = eventos.nome;
+          option.value = evento.id;
+          option.textContent = evento.nome;
           select.appendChild(option);
         });
       } catch (error) {
-        console.error('Erro ao carregar eventos:', error);
+        console.error('Erro ao carregar evento:', error);
       }
     }
 

@@ -1,7 +1,7 @@
 package casoft.mvc.controller;
 
 import casoft.mvc.model.Despesas;
-import casoft.mvc.model.Eventos;
+import casoft.mvc.model.Evento;
 import casoft.mvc.model.TipoDespesas;
 import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class DespesasController {
     private TipoDespesas tipoDespesasModel;
 
     @Autowired
-    private Eventos eventosModel;
+    private Evento eventoModel;
 
     public List<Map<String,Object>> getTipoDespesa() {
         Singleton conexao= Singleton.getInstancia();
@@ -85,15 +85,15 @@ public class DespesasController {
             List<Despesas> despesasList = despesasModel.listar("",conexao);
 
             for (Despesas despesas : despesasList){
-                Eventos eventos =null;
+                Evento evento =null;
 
                 if(despesas.getEvento_id()!=0)
-                    eventos = eventosModel.consultar(despesas.getEvento_id(),conexao);
+                    evento = eventoModel.consultar(despesas.getEvento_id(),conexao);
                 TipoDespesas tipoDespesas=tipoDespesasModel.consultar(despesas.getTipoDespesa_id(),conexao);
                 Map<String, Object> eventoJson = new HashMap<>();
-                if (eventos != null) {
-                    eventoJson.put("id", eventos.getId());
-                    eventoJson.put("nome", eventos.getNome());
+                if (evento != null) {
+                    eventoJson.put("id", evento.getId());
+                    eventoJson.put("nome", evento.getNome());
                 }
                 Map<String, Object> tipoDespesaJson = new HashMap<>();
                 if (tipoDespesas != null) {

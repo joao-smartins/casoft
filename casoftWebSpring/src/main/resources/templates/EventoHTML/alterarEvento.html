@@ -83,7 +83,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     console.log("Página carregada, executando o fetch...");
     const select = document.getElementById("selectEven");
-    const URL = "http://localhost:8080/apis/eventos"; // Sua URL da API
+    const URL = "http://localhost:8080/apis/evento"; // Sua URL da API
 
     fetch(URL)
             .then(response => response.json())
@@ -93,9 +93,9 @@
                 // Limpar o <select> antes de adicionar novas opções
                 select.innerHTML = '<option value="">Selecione o evento</option>'; // Garantir que tenha a opção "Selecione"
                 data.forEach(evento => {
-                  console.log(eventos);
+                  console.log(evento);
                   // Criar uma nova opção para cada evento
-                  const option = new Option(eventos.nome, eventos.id);
+                  const option = new Option(evento.nome, evento.id);
                   select.appendChild(option);
                 });
               } else {
@@ -116,11 +116,11 @@ function alterarcampos(){
     fetch(URL)
             .then(response => response.json())
             .then(evento => {
-              document.getElementById("eventoId").value = eventos.id;
-              document.getElementById("status").value = eventos.status;
-              document.getElementById("nome").value = eventos.nome;
-              document.getElementById("descricao").value = eventos.descricao;
-              document.getElementById("data").value = eventos.data;
+              document.getElementById("eventoId").value = evento.id;
+              document.getElementById("status").value = evento.status;
+              document.getElementById("nome").value = evento.nome;
+              document.getElementById("descricao").value = evento.descricao;
+              document.getElementById("data").value = evento.data;
 
             })
             .catch(error => {
@@ -132,7 +132,7 @@ function alterarcampos(){
 
 document.getElementById("formEvento").addEventListener("submit", function (e) {
     e.preventDefault();
-    const URL = "http://localhost:8080/apis/eventos";
+    const URL = "http://localhost:8080/apis/evento";
     const evento = {
       id: document.getElementById("eventoId").value,
       nome: document.getElementById("nome").value,
@@ -146,7 +146,7 @@ document.getElementById("formEvento").addEventListener("submit", function (e) {
         "Content-Type": "application/json"
       },
       method: "PUT",
-      body: JSON.stringify(eventos)
+      body: JSON.stringify(evento)
     })
             .then(response => {
               if (!response.ok) {

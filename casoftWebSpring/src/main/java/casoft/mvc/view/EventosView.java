@@ -1,7 +1,7 @@
 package casoft.mvc.view;
 
 import casoft.mvc.controller.EventoController;
-import casoft.mvc.model.Eventos;
+import casoft.mvc.model.Evento;
 import casoft.mvc.util.Mensagem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +38,8 @@ public class EventosView {
     }
 
     @PutMapping
-    public ResponseEntity<Object> update(@RequestBody Eventos eventos){
-        Map<String, Object> json = eventoController.update(eventos);
+    public ResponseEntity<Object> update(@RequestBody Evento evento){
+        Map<String, Object> json = eventoController.update(evento);
         if(json.get("erro")==null){
             return ResponseEntity.ok().body(json);
         }
@@ -47,8 +47,8 @@ public class EventosView {
     }
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody Eventos eventos){
-        Map<String,Object> json = eventoController.create(eventos);
+    public ResponseEntity<Object> create(@RequestBody Evento evento){
+        Map<String,Object> json = eventoController.create(evento);
         if(json.get("erro")==null){
             return ResponseEntity.ok().body(json);
         }
@@ -56,9 +56,9 @@ public class EventosView {
     }
 
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Eventos eventos){
+    public ResponseEntity<Object> delete(@RequestBody Evento evento){
         Map<String,Object> json = new HashMap<>();
-         if(eventoController.delete(eventos.getId())){
+         if(eventoController.delete(evento.getId())){
              return ResponseEntity.noContent().build();
         }
         return ResponseEntity.badRequest().body(json.put("erro","Tipo de Receita não deletado"));

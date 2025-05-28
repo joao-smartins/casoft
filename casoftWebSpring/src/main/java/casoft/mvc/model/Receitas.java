@@ -6,15 +6,15 @@ public class Receitas {
     private double valor;
     private boolean futura;
     private String descricao;
-    private Eventos eventos;
+    private Evento evento;
     private CategoriaReceita categoria;
     private LocalDate data;
 
-    public Receitas(double valor, boolean futura, String descricao, Eventos eventos, CategoriaReceita categoria, LocalDate data) {
+    public Receitas(double valor, boolean futura, String descricao, Evento evento, CategoriaReceita categoria, LocalDate data) {
         this.valor = valor;
         this.futura = futura;
         this.descricao = descricao;
-        this.eventos = eventos;
+        this.evento = evento;
         this.categoria = categoria;
         this.data = data;
     }
@@ -51,12 +51,12 @@ public class Receitas {
         this.descricao = descricao;
     }
 
-    public Eventos getEvento() {
-        return eventos;
+    public Evento getEvento() {
+        return evento;
     }
 
-    public void setEvento(Eventos eventos) {
-        this.eventos = eventos;
+    public void setEvento(Evento evento) {
+        this.evento = evento;
     }
 
     public CategoriaReceita getCategoria() {

@@ -1,6 +1,6 @@
 package casoft.mvc.controller;
 
-import casoft.mvc.model.Eventos;
+import casoft.mvc.model.Evento;
 import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,22 +13,22 @@ import java.util.Map;
 @Service
 public class EventoController {
     @Autowired
-    private Eventos eventosModel;
+    private Evento eventoModel;
 
     public List<Map<String,Object>> getAll(String filtro){
         Singleton conexao = Singleton.getInstancia();
         Map<String,Object> jsonE = new HashMap<>();
         List<Map<String,Object>> eventosList = new ArrayList<>();
         if(conexao.conectar()){
-            List<Eventos> lista =  eventosModel.consultar(filtro, conexao);
+            List<Evento> lista =  eventoModel.consultar(filtro, conexao);
             if(!lista.isEmpty()){
-                for(Eventos eventos :lista){
+                for(Evento evento :lista){
                     Map<String,Object> json = new HashMap<>();
-                    json.put("id", eventos.getId());
-                    json.put("nome", eventos.getNome());
-                    json.put("descricao", eventos.getDescricao());
-                    json.put("data", eventos.getData());
-                    json.put("status", eventos.isStatus());
+                    json.put("id", evento.getId());
+                    json.put("nome", evento.getNome());
+                    json.put("descricao", evento.getDescricao());
+                    json.put("data", evento.getData());
+                    json.put("status", evento.isStatus());
                     eventosList.add(json);
                 }
                 conexao.Desconectar();
@@ -48,7 +48,7 @@ public class EventoController {
         Singleton conexao = Singleton.getInstancia();
         Map<String,Object> json = new HashMap<>();
         if(conexao.conectar()){
-            Eventos e = eventosModel.consultar(id,conexao);
+            Evento e = eventoModel.consultar(id,conexao);
             if(e!=null){
                 json.put("id",e.getId());
                 json.put("nome",e.getNome());
@@ -70,19 +70,19 @@ public class EventoController {
     public boolean delete(int id){
         Singleton conexao = Singleton.getInstancia();
         if(conexao.conectar()){
-            Eventos e = eventosModel.consultar(id,conexao);
+            Evento e = eventoModel.consultar(id,conexao);
             if(e!=null){
-                return eventosModel.delete(e,conexao);
+                return eventoModel.delete(e,conexao);
             }
         }
         return false;
     }
 
-    public Map<String, Object> update(Eventos eventos){
+    public Map<String, Object> update(Evento evento){
         Singleton conexao = Singleton.getInstancia();
         Map<String, Object> json = new HashMap<>();
         if(conexao.conectar()){
-            Eventos e = eventosModel.update(eventos, conexao);
+            Evento e = eventoModel.update(evento, conexao);
             if(e!=null){
                 json.put("id",e.getId());
                 json.put("nome",e.getNome());
@@ -101,11 +101,11 @@ public class EventoController {
         return json;
     }
 
-    public Map<String, Object> create(Eventos eventos){
+    public Map<String, Object> create(Evento evento){
         Singleton conexao = Singleton.getInstancia();
         Map<String, Object> json = new HashMap<>();
         if(conexao.conectar()){
-            Eventos e = eventosModel.create(eventos, conexao);
+            Evento e = eventoModel.create(evento, conexao);
             if(e!=null){
 
                 json.put("id",e.getId());
