@@ -15,7 +15,7 @@ public class EventosDAO implements IDAO<Evento> {
     public Evento gravar(Evento entidade, Singleton conexao)
     {
         String sql = """
-                INSERT INTO evento (nome, descricao, data, status) 
+                INSERT INTO eventos (nome, descricao, data, status) 
                 VALUES ('#1', '#2', '#3', '#4')
                 """;
         sql = sql.replace("#1", entidade.getNome());
@@ -35,7 +35,7 @@ public class EventosDAO implements IDAO<Evento> {
     public List<Evento> get(String filtro, Singleton conexao) {
         List<Evento> eventos = new ArrayList<>();
         String sql = """
-                SELECT * FROM evento
+                SELECT * FROM eventos
                 """;
         if (filtro != null && !filtro.isBlank()) {
             sql += " WHERE "+filtro;
@@ -61,7 +61,7 @@ public class EventosDAO implements IDAO<Evento> {
     @Override
     public Evento alterar(Evento entidade, Singleton conexao) {
         String sql = """
-        UPDATE evento SET 
+        UPDATE eventos SET 
             nome = '#1',
             descricao = '#2',
             data = '#3',
@@ -84,7 +84,7 @@ public class EventosDAO implements IDAO<Evento> {
 
     @Override
     public boolean apagar(Evento entidade, Singleton conexao) {
-        String sql = "DELETE FROM evento WHERE id_evento = ";
+        String sql = "DELETE FROM eventos WHERE id_evento = ";
         sql += entidade.getId();
         if(conexao.getConexao().manipular(sql)) {
             return true;
@@ -94,7 +94,7 @@ public class EventosDAO implements IDAO<Evento> {
 
     @Override
     public Evento get(int id, Singleton conexao) {
-        String sql = "SELECT * FROM evento WHERE evento_id = " + id;
+        String sql = "SELECT * FROM eventos WHERE evento_id = " + id;
         var rs = conexao.getConexao().consultar(sql);
         try {
             if (rs.next()) {
