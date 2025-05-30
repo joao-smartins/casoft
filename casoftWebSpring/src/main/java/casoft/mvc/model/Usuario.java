@@ -102,5 +102,50 @@ public class Usuario {
         }
         return null;
     }
+    public Usuario gravar(Usuario usuario, Singleton conexao) {
+        return usuarioDAO.gravar(usuario, conexao);
+    }
 
+    public Usuario alterar(Usuario usuario, Singleton conexao) {
+        return usuarioDAO.alterar(usuario, conexao);
+    }
+
+    public boolean apagar(Usuario usuario, Singleton conexao) {
+        return usuarioDAO.apagar(usuario, conexao);
+    }
+
+    public Usuario get(int id, Singleton conexao) {
+        return usuarioDAO.get(id, conexao);
+    }
+
+    public int contarAdminsAtivos(Singleton conexao) {
+        return usuarioDAO.contarAdminsAtivos(conexao);
+    }
+
+    public boolean existeLogin(String login, Singleton conexao) {
+        return usuarioDAO.existeLogin(login, conexao);
+    }
+
+    public boolean isUltimoAdminAtivo(int idUsuario, Singleton conexao) {
+        return usuarioDAO.isUltimoAdminAtivo(idUsuario, conexao);
+    }
+
+    public int contarUsuarios(Singleton conexao) {
+        return usuarioDAO.contarUsuarios(conexao);
+    }
+
+    public boolean existeOutroUsuarioComLogin(String login,int id,Singleton conexao) {
+        return usuarioDAO.existeOutroUsuarioComLogin(login,id,conexao);
+    }
+
+    public List<Usuario> get(String filtro,Singleton conexao) {
+        return usuarioDAO.get(filtro,conexao);
+    }
+    public Usuario getUsuario(String login,Singleton conexao){
+        List<Usuario> usuarios=usuarioDAO.get("login = "+"'"+login+"'",conexao);
+        if(!usuarios.isEmpty()){
+            return usuarios.getFirst();
+        }
+        return null;
+    }
 }

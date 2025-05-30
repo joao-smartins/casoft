@@ -19,8 +19,7 @@ public class AcessoController {
     public String autenticar(String login, String senha){
         Singleton conexao=Singleton.getInstancia();
         if(conexao.conectar()){
-            String token=usuario.autenticar(login, senha,conexao);
-            return token;
+            return usuario.autenticar(login, senha,conexao);
         }
         return null;
     }
@@ -28,6 +27,18 @@ public class AcessoController {
         Singleton conexao=Singleton.getInstancia();
         if(conexao.conectar()){
             return usuario.getNivel(login,conexao);
+        }
+        return null;
+    }
+    public Map<String,Object> getUsuario(String login,String token){
+        Singleton conexao=Singleton.getInstancia();
+        if(conexao.conectar()){
+            Usuario NovoUsuario= usuario.getUsuario(login,conexao);
+            Map<String,Object> json= new HashMap<>();
+            json.put("token",token);
+            json.put("nivel",NovoUsuario.getNivelAcesso());
+            json.put("id",NovoUsuario.getId());
+            return json;
         }
         return null;
     }
