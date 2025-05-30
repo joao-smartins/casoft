@@ -55,6 +55,7 @@
     <a href="#">Configurações</a>
     <a href="../gerenciarContas.html">Contas Bancárias</a>
     <a href="ListarDespesa.html" class="active">Despesa</a>
+    <a href="QuitarDespesa.html">Quitar Despesas</a>
   </div>
 
   <!-- Conteúdo principal -->
@@ -179,14 +180,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-4">
-                      <label for="pagamento" class="form-label">Valor Pago</label>
-                      <div class="input-group">
-                        <span class="input-group-text">R$</span>
-                        <input type="number" id="pagamento" name="pagamento" class="form-control" step="0.01" min="0" placeholder="0,00">
-                      </div>
-                      <small class="text-muted">Deixe vazio se não foi pago</small>
-                    </div>
+                  
                     <div class="col-md-4">
                       <label for="data_venc" class="form-label">Data de Vencimento <span class="required">*</span></label>
                       <input type="date" id="data_venc" name="data_venc" class="form-control" required>
@@ -200,19 +194,7 @@
                     </div>
                   </div>
                   
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <label for="status_conci" class="form-label">Status da Conciliação <span class="required">*</span></label>
-                      <select id="status_conci" name="status_conci" class="form-select" required>
-                        <option value="">Selecione o status</option>
-                        <option value="Aguardando">Aguardando</option>
-                        <option value="Conciliado">Conciliado</option>
-                      </select>
-                      <div class="invalid-feedback">
-                        Informe o Status.
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
                 
                 <!-- Botões de Ação -->
@@ -272,7 +254,7 @@
                       <select id="status_conci_editar" name="status_conci_editar" class="form-select" required>
                         <option value="">Selecione o status</option>
                         <option value="Aguardando">Aguardando</option>
-                        <option value="Conciliado">Conciliado</option>
+                        <option value="Pendente">Pendente</option>
                       </select>
                     </div>
 

@@ -48,6 +48,22 @@ public class DespesasView {
         }
         return ResponseEntity.badRequest().body(new Mensagem("Usuario nao autenticado"));
     }
+
+    @GetMapping("/aguardando")
+    public ResponseEntity<Object> getAguardando(HttpServletRequest httpServletRequest){
+        String token = httpServletRequest.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer "))
+            token = token.substring(7);
+        if(JWTTokenProvider.verifyToken(token)) {
+            List<Map<String,Object>> jsonlist;
+            jsonlist=controller.getAguardando();
+            if (!jsonlist.isEmpty())
+                return ResponseEntity.ok(jsonlist);
+            else
+                return ResponseEntity.badRequest().body(new Mensagem("Erro ao Cadastrar"));
+        }
+        return ResponseEntity.badRequest().body(new Mensagem("Usuario nao autenticado"));
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable int id,  HttpServletRequest httpServletRequest){
         String token = httpServletRequest.getHeader("Authorization");
@@ -56,6 +72,21 @@ public class DespesasView {
         if(JWTTokenProvider.verifyToken(token)) {
             Map<String,Object> json;
             json=controller.delete(id);
+            if (json!=null)
+                return ResponseEntity.ok(json);
+            else
+                return ResponseEntity.badRequest().body(new Mensagem("Erro ao Cadastrar"));
+        }
+        return ResponseEntity.badRequest().body(new Mensagem("Usuario nao autenticado"));
+    }
+    @PutMapping
+    public ResponseEntity<Object> uptde(@RequestParam int id,@RequestParam String valor, @RequestParam String data_venc, @RequestParam String data_lanc, @RequestParam String pagamento, @RequestParam String descricao, @RequestParam String status_conci, @RequestParam String tipoDespesa_id, @RequestParam String usuario_id, @RequestParam String evento_id,HttpServletRequest httpServletRequest){
+        String token = httpServletRequest.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer "))
+            token = token.substring(7);
+        if(JWTTokenProvider.verifyToken(token)) {
+            Map<String,Object> json;
+            json=controller.uptDespesa(id,valor,data_venc,data_lanc,pagamento,descricao,status_conci,tipoDespesa_id,usuario_id,evento_id);
             if (json!=null)
                 return ResponseEntity.ok(json);
             else

@@ -274,9 +274,10 @@ async function handleSubmitForm(event) {
                 dados.append(key, value);
             }
         }
-
+        dados.append('pagamento', 0);
         dados.append('data_lanc', dataLanc);
         dados.append('usuario_id', authManager.getId());
+        dados.append('status_conci', "Aguardando");
 
         const token = authManager.getToken();
         const response = await fetch(`${API_BASE_URL}/despesa`, {
@@ -331,12 +332,6 @@ function validarFormulario() {
     isValid = false;
     }
 
-    // Validar status
-    const status = document.getElementById('status_conci');
-    if (!status.value) {
-    mostrarErroValidacao('status_conci', 'Selecione o status da conciliação');
-    isValid = false;
-    }
 
     return isValid;
 }
