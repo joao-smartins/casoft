@@ -469,66 +469,69 @@ try {
 }
 
 function aplicarFiltros() {
-try {
-const categoriaSelecionada = $('#filtroCategoria').val();
-const eventoSelecionado = $('#filtroEvento').val();
-const vencimentoSelecionado = $('#filtroVencimento').val();
-
-let despesasFiltradas = [...despesasPendentes];
-
-// Filtrar por categoria (tratando tanto objeto quanto string)
-if (categoriaSelecionada) {
-    despesasFiltradas = despesasFiltradas.filter(d => {
-    const categoriaDespesa = typeof d.categoria === 'object' ? d.categoria.nome : d.categoria;
-    return categoriaDespesa === categoriaSelecionada;
-    });
-}
-
-// Filtrar por evento (tratando tanto objeto quanto string)
-if (eventoSelecionado) {
-    despesasFiltradas = despesasFiltradas.filter(d => {
-    const eventoDespesa = typeof d.evento === 'object' ? d.evento.nome : d.evento;
-    return eventoDespesa === eventoSelecionado;
-    });
-}
-
-// Filtrar por vencimento (com tratamento de data seguro)
-if (vencimentoSelecionado) {
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    
-    despesasFiltradas = despesasFiltradas.filter(d => {
     try {
-        const dataVenc = d.data_vencimento ? new Date(d.data_vencimento) : new Date();
-        dataVenc.setHours(0, 0, 0, 0);
-        
-        switch (vencimentoSelecionado) {
-        case 'vencidas':
-            return dataVenc < hoje;
-        case 'hoje':
-            return dataVenc.getTime() === hoje.getTime();
-        case 'proximos7dias':
-            const proximos7 = new Date(hoje);
-            proximos7.setDate(proximos7.getDate() + 7);
-            return dataVenc >= hoje && dataVenc <= proximos7;
-        default:
-            return true;
+        const categoriaSelecionada = $('#filtroCategoria').val();
+        const eventoSelecionado = $('#filtroEvento').val();
+        const vencimentoSelecionado = $('#filtroVencimento').val();
+
+        let despesasFiltradas = [...despesasPendentes];
+
+        // Filtrar por categoria
+        if (categoriaSelecionada) {
+            despesasFiltradas = despesasFiltradas.filter(d => {
+                const categoriaDespesa = typeof d.categoria === 'object' ? d.categoria.nome : d.categoria;
+                return categoriaDespesa === categoriaSelecionada;
+            });
         }
-    } catch (e) {
-        console.error('Erro ao filtrar por data:', e);
-        return true; // Mantém no filtro se houver erro na data
+
+        // Filtrar por evento
+        if (eventoSelecionado) {
+            despesasFiltradas = despesasFiltradas.filter(d => {
+                const eventoDespesa = typeof d.evento === 'object' ? d.evento.nome : d.evento;
+                return eventoDespesa === eventoSelecionado;
+            });
+        }
+
+        // Filtrar por vencimento (versão corrigida)
+        if (vencimentoSelecionado) {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0); // Normaliza para início do dia
+            
+            despesasFiltradas = despesasFiltradas.filter(d => {
+                if (!d.data_vencimento) return false;
+                
+                try {
+                    const dataVenc = new Date(d.data_vencimento);
+                    dataVenc.setHours(0, 0, 0, 0); // Normaliza a data de vencimento
+                    
+                    const diffTime = dataVenc - hoje;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    
+                    switch (vencimentoSelecionado) {
+                        case 'vencidas':
+                            return diffDays < 0; // Dias negativos = vencidas
+                        case 'hoje':
+                            return diffDays === 0;
+                        case 'proximos7dias':
+                            return diffDays >= 0 && diffDays <= 7;
+                        default:
+                            return true;
+                    }
+                } catch (e) {
+                    console.error('Erro ao processar data:', d.data_vencimento, e);
+                    return false; // Remove itens com datas inválidas
+                }
+            });
+        }
+
+        renderizarDespesas(despesasFiltradas);
+        atualizarContador(despesasFiltradas.length);
+
+    } catch (error) {
+        console.error('Erro ao aplicar filtros:', error);
+        mostrarToast('Erro', 'Falha ao aplicar filtros', 'error');
+        renderizarDespesas(despesasPendentes);
     }
-    });
-}
-
-renderizarDespesas(despesasFiltradas);
-atualizarContador(despesasFiltradas.length);
-
-} catch (error) {
-console.error('Erro ao aplicar filtros:', error);
-mostrarToast('Erro', 'Não foi possível aplicar os filtros', 'error');
-renderizarDespesas(despesasPendentes); // Mostra lista original em caso de erro
-}
 }
 
 function limparFiltros() {
