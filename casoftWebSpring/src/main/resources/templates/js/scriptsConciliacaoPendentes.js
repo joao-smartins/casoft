@@ -1,3 +1,5 @@
+// src/main/resources/static/js/scriptsConciliacaoPendentes.js
+
 const API_BASE_URL = 'http://localhost:8080/apis/conciliacao';
 let conciliacoesComProblema = []; // Array para armazenar as conciliações com problema
 let confirmActionCallback = null; // Função a ser executada se o usuário confirmar
@@ -37,9 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filtroInput) {
         // Usa 'input' para filtrar em tempo real conforme o usuário digita
         filtroInput.addEventListener('input', () => {
-            // Recarrega os dados do backend com o novo filtro (melhor prática para filtros mais complexos)
-            // Se o filtro for APENAS no frontend, chame apenas renderizarTabelaProblemas();
-            carregarConciliacoesComProblema();
+            // No caso de Conciliações Pendentes, a lista já é carregada uma vez.
+            // O filtro será aplicado localmente.
+            renderizarTabelaProblemas();
         });
     }
 
@@ -155,29 +157,21 @@ function closeSolucaoProblemaModal() {
 // Função para carregar as conciliações que foram registradas como problemas
 async function carregarConciliacoesComProblema() {
     try {
-        const filtroInput = document.getElementById("filtro");
-        const filtro = filtroInput ? filtroInput.value : "";
-
-        // A URL é a mesma, o backend agora retorna a lista direta
-        const response = await fetch(`${API_BASE_URL}/problemas?filtro=${encodeURIComponent(filtro)}`);
+        // Remove o filtro da requisição, pois a filtragem será feita no front-end
+        const response = await fetch(`${API_BASE_URL}/problemas`);
 
         if (!response.ok) {
-            // Se o status NÃO for 200 OK, assumimos que é um erro do backend
-            // Seu ConciliacaoView para /problemas retorna um objeto Mensagem com { message: "..." }
             const errorBody = await response.json();
             throw new Error(errorBody.message || `Erro HTTP! Status: ${response.status}`);
         }
 
-        // A resposta AGORA é diretamente a lista de Conciliacao (array JSON)
         const data = await response.json();
 
-        // Verificação adicional para garantir que 'data' é uma array
         if (Array.isArray(data)) {
             conciliacoesComProblema = data;
         } else {
-            // Isso pode acontecer se o backend retornar algo inesperado, como um objeto vazio
             console.warn("A resposta da API /problemas não é uma array:", data);
-            conciliacoesComProblema = []; // Limpa a lista para evitar erros
+            conciliacoesComProblema = [];
             showMessage("Formato de dados inesperado da API. Tente novamente.", 'red');
         }
 
@@ -185,8 +179,8 @@ async function carregarConciliacoesComProblema() {
     } catch (error) {
         console.error("Erro ao carregar conciliações com problema:", error);
         showMessage("Erro ao carregar conciliações com problema: " + error.message, 'red');
-        conciliacoesComProblema = []; // Garante que a lista está vazia em caso de erro
-        renderizarTabelaProblemas(); // Renderiza para exibir "nenhum item"
+        conciliacoesComProblema = [];
+        renderizarTabelaProblemas();
     }
 }
 
@@ -200,29 +194,38 @@ function renderizarTabelaProblemas() {
     tableBody.innerHTML = ''; // Limpa a tabela
 
     const filtroInput = document.getElementById("filtro");
-    const filtroTexto = filtroInput ? filtroInput.value.toLowerCase() : "";
+    const filtroTexto = filtroInput ? filtroInput.value.toLowerCase().trim() : ""; // Trim para remover espaços
 
-    // Filtra o array localmente (conciliacoesComProblema já contem os dados brutos do backend)
     const filteredProblemas = conciliacoesComProblema.filter(conc => {
-        // Garante que os campos existem antes de tentar acessá-los e convertê-los
+        // Converte todos os campos para string e minúsculas para comparação
         const concIdStr = String(conc.concId || '').toLowerCase();
         const itemTipoStr = (conc.itemTipo || '').toLowerCase();
-        // Garante que itemId é um número ou string vazia para evitar 'null'
         const itemId = (conc.concReceitaId || conc.concDespesaId || 'N/A').toString().toLowerCase();
-        const itemValorStr = (typeof conc.itemValor === 'number' ? conc.itemValor.toFixed(2) : String(conc.itemValor || '0.00')).toLowerCase();
         const itemDescricaoStr = (conc.itemDescricao || '').toLowerCase();
-        const concDtProblemaStr = conc.concDtProblema ? new Date(conc.concDtProblema).toLocaleDateString('pt-BR') : '';
         const concDescProblemaStr = (conc.concDescProblema || '').toLowerCase();
 
+        // --- Tratamento aprimorado para Valor Item ---
+        // Remove "R$", espaços e substitui vírgula por ponto para padronizar
+        const rawItemValor = typeof conc.itemValor === 'number' ? conc.itemValor : parseFloat(String(conc.itemValor || '0').replace(',', '.'));
+        const itemValorFormatted = rawItemValor.toFixed(2); // Formata para duas casas decimais
+        const itemValorSearchable = itemValorFormatted.toLowerCase().replace('r$', '').replace(/\s/g, ''); // Remove "R$" e espaços
+
+        // --- Tratamento aprimorado para Data Problema ---
+        const concDtProblemaFormatted = conc.concDtProblema ? new Date(conc.concDtProblema).toLocaleDateString('pt-BR') : '';
+        const concDtProblemaSearchable = concDtProblemaFormatted.toLowerCase(); // Ex: "29/05/2025"
+
+        // Lógica de filtragem
         return (
-            filtroTexto === "" ||
+            filtroTexto === "" || // Se o filtro estiver vazio, mostra tudo
             concIdStr.includes(filtroTexto) ||
             itemTipoStr.includes(filtroTexto) ||
             itemId.includes(filtroTexto) ||
-            itemValorStr.includes(filtroTexto) ||
             itemDescricaoStr.includes(filtroTexto) ||
-            concDtProblemaStr.includes(filtroTexto) ||
-            concDescProblemaStr.includes(filtroTexto)
+            concDescProblemaStr.includes(filtroTexto) ||
+            // Compara o valor formatado e limpo
+            itemValorSearchable.includes(filtroTexto.replace('r$', '').replace(/\s/g, '')) ||
+            // Compara a data formatada
+            concDtProblemaSearchable.includes(filtroTexto)
         );
     });
 
