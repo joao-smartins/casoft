@@ -5,19 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Exibir Evento</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="../css/estilo.css" rel="stylesheet">
     <script src="js/Auth.js" defer></script>
     <style>
-        /* Classe para ocultar os campos */
+        #listaEventos {
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        #listaEventos::-webkit-scrollbar {
+            width: 8px;
+        }
+        #listaEventos::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        #listaEventos::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        #listaEventos::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
         .hidden {
             display: none;
+        }
+        .evento-card {
+            background-color: rgba(252, 185, 127, 0.13);
+            border: 1px solid #F96333;
+            height: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .evento-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .card.shadow.p-4{
+            width: 1250px;
+            height: 700px;
+            overflow: hidden;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-subtitle {
+            font-size: 1rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #6c757d;
         }
     </style>
 </head>
 
-<body class="bg-light">
+<body class="bg-light" style="overflow: hidden;">
 
-<!-- Header -->
 <header class="header">
     <div class="container">
         <div class="header-container d-flex align-items-center">
@@ -31,156 +84,231 @@
         </div>
     </div>
 </header>
-
-<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <h4 class="p-3">Menu Eventos</h4>
     <a href="criarEvento.html">Cadastro</a>
-    <a href="alterarEvento.html">Alterar</a>
-    <a href="exibirEvento.html">Exibir</a> <!-- Alterei o nome do menu para Exibir -->
     <a href="#">Configurações</a>
     <a href="../home.html">Voltar</a>
 </div>
 
-<!-- Conteúdo principal -->
-<div class="content">
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow p-4">
-                    <h2 class="mb-4 text-center">Exibir Evento</h2>
-                    <form id="formEvento">
-                        <div class="mb-3">
-                            <label for="selectEvento" class="form-label">Selecione o Evento <span class="required">*</span></label>
-                            <select class="form-select" id="selectEvento" name="selectEvento" onclick="mostrarEvento()" required>
-                                <option value="">Selecione o evento</option>
-                            </select>
-                        </div>
-                        <!-- Botão para mostrar todos os eventos -->
-                        <div class="mb-3 text-center">
-                            <button type="button" class="btn btn-secondary" onclick="mostrarTodosEventos()">Mostrar Todos os Eventos</button>
-                        </div>
-                    </form>
+<div class="content py-5">
+    <div class="container" style="height: 100vh; display: flex; align-items: center; justify-content: center; ">
+        <div class="card shadow p-4">
+            <h2 class="mb-4 text-center">Exibir Evento</h2>
 
-                    <!-- Área onde as informações do evento selecionado serão mostradas -->
-                    <div id="informacoesEvento" class="mt-4 hidden">
-                        <h4>Informações do Evento</h4>
-                        <p><strong>Nome:</strong> <span id="nomeEvento"></span></p>
-                        <p><strong>Descrição:</strong> <span id="descricaoEvento"></span></p>
-                        <p><strong>Data:</strong> <span id="dataEvento"></span></p>
+            <div class="mb-4">
+                <h5 class="mb-3">Filtrar Eventos</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" id="filtroNome" class="form-control" placeholder="Filtrar por nome">
                     </div>
-
-                    <!-- Área para mostrar todos os eventos -->
-                    <div id="todosEventos" class="mt-4 hidden">
-                        <h4>Todos os Eventos</h4>
-                        <div id="listaEventos"></div>
+                    <div class="col-md-4">
+                        <select id="filtroStatus" class="form-select">
+                            <option value="">Todos os Status</option>
+                            <option value="A">Ativo</option>
+                            <option value="I">Inativo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex gap-2">
+                            <input type="date" id="filtroDataInicio" class="form-control" placeholder="Data início">
+                            <input type="date" id="filtroDataFim" class="form-control" placeholder="Data fim">
+                        </div>
                     </div>
                 </div>
-                <div id="mensagem" class="mensagem"></div>
+            </div>
+
+            <div id="todosEventos" class="mt-4">
+                <h4 class="text-center mb-4">Todos os Eventos</h4>
+                <div id="mensagem" class="mensagem mt-3" style="justify-content: center; align-items: center"></div>
+                <div id="listaEventos" class="row g-4"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body">
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-labelledby="modalConfirmacaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir este evento?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmarExclusao" class="btn btn-danger">Excluir</button>
             </div>
         </div>
     </div>
 </div>
-
 <script>
-    // Função para carregar os eventos
     document.addEventListener("DOMContentLoaded", function () {
-        const select = document.getElementById("selectEvento");
-        const URL = "http://localhost:8080/apis/eventos"; // URL da API
+        const listaEventos = document.getElementById("listaEventos");
+        const URL = "http://localhost:8080/apis/eventos";
+        let eventosOriginais = [];
 
-        fetch(URL)
-            .then(response => response.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    select.innerHTML = '<option value="">Selecione o evento</option>';
-                    data.forEach(evento => {
-                        const option = new Option(evento.nome, evento.id);
-                        select.appendChild(option);
-                    });
-                } else {
-                    console.error("Eventos não encontrados.");
-                }
-            })
-            .catch(error => {
-                console.error("Erro ao carregar eventos:", error);
-                mostrarMensagem(`Erro ao carregar eventos: ${error.message}`, true);
+        const filtroDataInicio = document.getElementById("filtroDataInicio");
+        const filtroDataFim = document.getElementById("filtroDataFim");
+        const modal = new bootstrap.Modal(document.getElementById("modalConfirmacao"));
+        const btnConfirmarExclusao = document.getElementById("btnConfirmarExclusao");
+        let idParaExcluir = null;
+
+        function aplicarFiltros() {
+            var nome = filtroNome.value.toLowerCase();
+            var status = filtroStatus.value;
+            var dataInicio = filtroDataInicio.value;
+            var dataFim = filtroDataFim.value;
+            const hoje = new Date().toISOString().split("T")[0];
+
+            var eventosFiltrados = eventosOriginais.filter(evento => {
+                const nomeCond = evento.nome.toLowerCase().includes(nome);
+                const statusCond = status === "" || evento.status === status;
+                const dataCond =
+                    (!dataInicio || evento.data >= dataInicio) &&
+                    (!dataFim || evento.data <= dataFim);
+
+                return nomeCond && statusCond && dataCond;
             });
-    });
 
-    // Função para mostrar informações do evento selecionado
-    function mostrarEvento() {
-        const idEvento = document.getElementById("selectEvento").value;
-        const URL = `http://localhost:8080/apis/eventos/${idEvento}`;
+            var eventosFuturos = eventosFiltrados
+                .filter(e => e.data >= hoje)
+                .sort((a, b) => new Date(a.data) - new Date(b.data));
 
-        // Se não for selecionado nenhum evento, oculta as informações
-        if (idEvento === "") {
-            document.getElementById("informacoesEvento").classList.add("hidden");
-            return;
+            var eventosPassados = eventosFiltrados
+                .filter(e => e.data < hoje)
+                .sort((a, b) => new Date(b.data) - new Date(a.data));
+            eventosFiltrados = eventosFuturos.concat(eventosPassados);
+            renderizarEventos(eventosFiltrados);
         }
 
-        // Carregar as informações do evento selecionado
-        fetch(URL)
-            .then(response => response.json())
-            .then(evento => {
-                // Exibir as informações do evento
+
+        function renderizarEventos(eventos) {
+            listaEventos.innerHTML = "";
+            if (eventos.length === 0) {
+                listaEventos.innerHTML = '<p class="text-center text-muted">Nenhum evento encontrado com os filtros atuais.</p>';
+                return;
+            }
+
+            eventos.forEach(evento => {
+                const divCol = document.createElement("div");
+                divCol.classList.add("col-md-6", "col-lg-4");
+
                 const dataInvertida = evento.data.split("-").reverse().join("/");
-                document.getElementById("nomeEvento").textContent = evento.nome;
-                document.getElementById("descricaoEvento").textContent = evento.descricao;
-                document.getElementById("dataEvento").textContent = dataInvertida;
+                divCol.innerHTML = `
+          <div class="card evento-card h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">${evento.nome}</h5>
+              <h6 class="card-subtitle mb-2">${evento.descricao}</h6>
+              <p class="mb-1"><strong>Data de Realização:</strong> ${dataInvertida}</p>
+              <p class="mb-3">
+                 <strong>Status:</strong>
+                 <span class="${evento.status === 'A' ? 'text-success' : 'text-danger'}" style = "font-weight: bold; text-shadow: 0.2px 0.2px 0.2px black; ">
+                ${evento.status === 'A' ? 'Ativo' : 'Inativo' }
+                </span>
+                </p>
+                <div class="mt-auto d-flex justify-content-end gap-2">
+                  <button class= "${evento.status === 'A' ? 'btn btn-primary btn-sm btn-editar' : 'btn-editar hidden'}" title="Editar">
+                    <i class="bi bi-pencil-fill"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm btn-excluir" title="Excluir">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                  <button class="btn btn-success btn-sm" title="Voluntários">
+                    <i class="bi bi-person-gear"></i>
+                  </button>
+</div>
 
-                // Mostrar as informações na página
-                document.getElementById("informacoesEvento").classList.remove("hidden");
-                document.getElementById("todosEventos").classList.add("hidden"); // Ocultar lista de todos eventos
-            })
-            .catch(error => {
-                console.error("Erro ao carregar evento:", error);
-                mostrarMensagem(`Erro ao carregar evento: ${error.message}`, true);
+
+            </div>
+          </div>
+        `;
+                listaEventos.appendChild(divCol);
+                divCol.querySelector(".btn-editar").addEventListener("click", () => {
+                    localStorage.setItem("eventoSelecionado", JSON.stringify(evento));
+                    window.location.href = "alterarEvento.html?id=" + evento.id;
+                });
+
+                divCol.querySelector(".btn-excluir").addEventListener("click", () => {
+                    idParaExcluir = evento.id;
+                    modal.show();
+                });
+
             });
-    }
-
-    // Função para mostrar todos os eventos
-    function mostrarTodosEventos() {
-        const URL = "http://localhost:8080/apis/eventos";
+        }
 
         fetch(URL)
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
-                    const listaEventos = document.getElementById("listaEventos");
-                    listaEventos.innerHTML = ""; // Limpar a lista antes de adicionar os eventos
-
-                    // Adicionar todos os eventos à lista
-                    data.forEach(evento => {
-                        const divEvento = document.createElement("div");
-                        const dataInvertida = evento.data.split("-").reverse().join("/");
-                        divEvento.classList.add("evento-item");
-                        divEvento.innerHTML = `
-              <p><strong>Nome:</strong> ${evento.nome}</p>
-              <p><strong>Descrição:</strong> ${evento.descricao}</p>
-              <p><strong>Data:</strong> ${dataInvertida}</p>
-              <p><strong>Status:</strong> ${evento.status}</p>
-            `;
-                        listaEventos.appendChild(divEvento);
-                    });
-
-                    // Exibir a lista de todos os eventos
-                    document.getElementById("todosEventos").classList.remove("hidden");
-                    document.getElementById("informacoesEvento").classList.add("hidden"); // Ocultar informações do evento selecionado
+                    eventosOriginais = data;
+                    aplicarFiltros();
                 } else {
-                    mostrarMensagem("Nenhum evento encontrado.", true);
+                    listaEventos.innerHTML = '<p class="text-center text-muted">Nenhum evento encontrado.</p>';
                 }
             })
             .catch(error => {
                 console.error("Erro ao carregar eventos:", error);
-                mostrarMensagem(`Erro ao carregar eventos: ${error.message}`, true);
+                listaEventos.innerHTML = '<p class="text-danger text-center">Erro ao carregar eventos.</p>';
+
+            });
+        btnConfirmarExclusao.addEventListener("click", () => {
+            excluirEvento(idParaExcluir);
+            modal.hide();
+        });
+        filtroNome.addEventListener("input", aplicarFiltros);
+        filtroStatus.addEventListener("change", aplicarFiltros);
+        filtroDataInicio.addEventListener("change", aplicarFiltros);
+        filtroDataFim.addEventListener("change", aplicarFiltros);
+    });
+
+    function excluirEvento(id) {
+        const URL = `http://localhost:8080/apis/eventos/${id}`;
+        fetch(URL, {
+            method: "DELETE"
+        })
+            .then(response => {
+                if (response.ok) {
+                    const toastLiveExample = document.getElementById('liveToast');
+                    const toastMessage = document.getElementById('toastMessage');
+                    toastMessage.textContent = 'Evento deletado com sucesso!';
+                    toastMessage.className = 'text-success';
+
+                    const toast = new bootstrap.Toast(toastLiveExample);
+                    toast.show();
+
+                    // Recarregar os eventos após deletar
+                    document.dispatchEvent(new Event('DOMContentLoaded'));
+                } else {
+                    throw new Error("Erro ao excluir evento.");
+                }
+            })
+            .catch(error => {
+                const toastLiveExample = document.getElementById('liveToast');
+                const toastMessage = document.getElementById('toastMessage');
+                toastMessage.textContent = 'Erro ao excluir evento.';
+                toastMessage.className = 'text-danger';
+
+                const toast = new bootstrap.Toast(toastLiveExample);
+                toast.show();
             });
     }
-
 </script>
 
 <script src="../js/funcoes.js"></script>
+<script src="../js/authManager.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../js/scripts.js"></script>
 
 </body>
 </html>

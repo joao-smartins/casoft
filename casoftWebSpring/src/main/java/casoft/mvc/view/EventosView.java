@@ -55,10 +55,10 @@ public class EventosView {
         return ResponseEntity.badRequest().body(json);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Evento evento){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> delete(@PathVariable int id){
         Map<String,Object> json = new HashMap<>();
-         if(eventoController.delete(evento.getId())){
+         if(eventoController.delete(id)){
              return ResponseEntity.noContent().build();
         }
         return ResponseEntity.badRequest().body(json.put("erro","Tipo de Receita não deletado"));
