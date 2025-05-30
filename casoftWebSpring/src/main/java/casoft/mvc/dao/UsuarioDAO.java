@@ -3,8 +3,6 @@ package casoft.mvc.dao;
 import casoft.mvc.model.Usuario;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
-
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 @Repository
@@ -52,8 +50,6 @@ public class UsuarioDAO implements IDAO<Usuario> {
                 return null;
             }
         }
-
-
         String sql = "UPDATE usuario SET nome='#1', login='#2', senha='#3', ativo=#4, " +
                 "nivel_acesso='#5', cpf='#6', telefone='#7' WHERE id=#8";
 
@@ -76,19 +72,19 @@ public class UsuarioDAO implements IDAO<Usuario> {
     }
 
     @Override
-    public boolean apagar(Usuario usuario,Singleton conexao) {
-        if ("ADMIN".equals(usuario.getNivelAcesso())) {
-            System.out.println("Erro: Não é possível excluir um usuário ADMIN!");
-            return false;
-        }
+    public boolean apagar(Usuario usuario, Singleton conexao) {
         return conexao.getConexao().manipular("DELETE FROM usuario WHERE id=" + usuario.getId());
     }
 
     @Override
-    public Usuario get(int id,Singleton conexao) {
+    public Usuario get(int id, Singleton conexao) {
         String sql = "SELECT * FROM usuario WHERE id=" + id;
-        ResultSet rs = conexao.getConexao().consultar(sql);
         try {
+            var rs = conexao.getConexao().consultar(sql);
+            if (rs == null) {
+                System.err.println("Consulta retornou ResultSet null para ID: " + id);
+                return null;
+            }
             if (rs.next()) {
                 return new Usuario(
                         rs.getInt("id"),
@@ -102,7 +98,8 @@ public class UsuarioDAO implements IDAO<Usuario> {
                 );
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Erro ao buscar usuarios: "+e.getMessage());
+            System.err.println("Erro ao buscar usuário com ID: " + id);
         }
         return null;
     }
@@ -114,7 +111,7 @@ public class UsuarioDAO implements IDAO<Usuario> {
         if (filtro != null && !filtro.isEmpty()) {
             sql += " WHERE " + filtro;
         }
-        ResultSet rs = conexao.getConexao().consultar(sql);
+        var rs = conexao.getConexao().consultar(sql);
         try {
             while (rs.next()) {
                 usuarios.add(new Usuario(
@@ -145,35 +142,40 @@ public class UsuarioDAO implements IDAO<Usuario> {
         }
         return 0;
     }
-    private boolean existeUsuarioComLogin(String login,Singleton conexao) {
+    public boolean existeUsuarioComLogin(String login,Singleton conexao) {
         String sql = "SELECT COUNT(*) FROM usuario WHERE login = '" + login + "'";
-        ResultSet rs = conexao.getConexao().consultar(sql);
+        var rs = conexao.getConexao().consultar(sql);
         try {
             return rs.next() && rs.getInt(1) > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Erro existe usuario com login: "+e.getMessage());
             return false;
         }
     }
 
-    private boolean existeOutroUsuarioComLogin(String login, int idUsuario,Singleton conexao) {
+    public boolean existeOutroUsuarioComLogin(String login, int idUsuario, Singleton conexao) {
         String sql = "SELECT COUNT(*) FROM usuario WHERE login = '" + login + "' AND id != " + idUsuario;
-        ResultSet rs = conexao.getConexao().consultar(sql);
+        var rs = conexao.getConexao().consultar(sql);
         try {
             return rs.next() && rs.getInt(1) > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Existe outro usuario com login: "+e.getMessage());
             return false;
         }
     }
 
-    private boolean isUltimoAdminAtivo(int idUsuario,Singleton conexao) {
-        String sql = "SELECT COUNT(*) FROM usuario WHERE nivel_acesso = 'ADMIN' AND ativo = true AND id != " + idUsuario;
-        ResultSet rs = conexao.getConexao().consultar(sql);
+    public boolean isUltimoAdminAtivo(int idUsuario, Singleton conexao) {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE nivel_acesso = 'ADMIN' AND ativo = true";
+        var rs = conexao.getConexao().consultar(sql);
         try {
-            return rs.next() && rs.getInt(1) == 0;
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                System.out.println("Quantidade de admins ativos (excluindo o atual): " + count);
+                return count == 0;
+            }
+            return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Erro ao buscar admin: " + e.getMessage());
             return false;
         }
     }

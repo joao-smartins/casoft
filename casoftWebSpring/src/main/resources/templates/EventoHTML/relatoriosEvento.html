@@ -261,6 +261,7 @@
             .catch(error => {
                 console.error("Erro ao carregar eventos:", error);
                 listaEventos.innerHTML = '<p class="text-danger text-center">Erro ao carregar eventos.</p>';
+
             });
         btnConfirmarExclusao.addEventListener("click", () => {
             excluirEvento(idParaExcluir);

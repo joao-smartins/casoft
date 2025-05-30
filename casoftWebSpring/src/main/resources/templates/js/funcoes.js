@@ -147,3 +147,6 @@ document.getElementById("desativarForm").addEventListener("submit", async (e) =>
     mostrarMensagem(err.message || "Erro ao desativar usuário", true);
   }
 });
+
+
+
