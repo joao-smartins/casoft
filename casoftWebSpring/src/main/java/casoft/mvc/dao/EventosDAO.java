@@ -2,8 +2,10 @@ package casoft.mvc.dao;
 
 import casoft.mvc.model.Evento;
 import casoft.mvc.util.Singleton;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,4 +113,9 @@ public class EventosDAO implements IDAO<Evento> {
         }
         return null;
     }
+
+    public void inativarEventos(LocalDate hoje, Singleton conexao){
+        String sql = "UPDATE evento SET evento_status = 'I' where evento_data < '#1' and evento_status = 'A'";
+        sql=sql.replace("#1", hoje.toString());
+        conexao.getConexao().manipular(sql);}
 }

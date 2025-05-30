@@ -3,9 +3,11 @@ package casoft.mvc.controller;
 import casoft.mvc.model.Evento;
 import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLOutput;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,5 +128,15 @@ public class EventoController {
         else
             json.put("erro","Erro ao conectar ao banco de dados");
         return json;
+    }
+
+    @Scheduled(initialDelay = 10000, fixedRate = 60000)
+    public void inativarEventos(){
+        LocalDate hoje = LocalDate.now();
+        Singleton conexao = Singleton.getInstancia();
+        if(conexao.conectar()) {
+            eventoModel.inativarEventos(hoje, conexao);
+            conexao.Desconectar();
+        }
     }
 }

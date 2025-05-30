@@ -22,7 +22,13 @@
                         <label for="nome" class="form-label">Nome do Tipo de Receita</label>
                         <input type="text" class="form-control" id="nome" name="nome" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Salvar Alterações</button>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary" style="width: 70%">Salvar Alterações</button>
+                        <button type="button" class="btn btn-danger" style="width: 28%" onclick="window.location.href = 'relatorioTipoReceita.html'">Cancelar</button>
+                    </div>
+
+
                 </form>
 
                 <div id="mensagem" class="mt-3 text-center"></div>
@@ -68,5 +74,6 @@
     });
 </script>
 
+<script src="../js/authManager.js"></script>
 </body>
 </html>

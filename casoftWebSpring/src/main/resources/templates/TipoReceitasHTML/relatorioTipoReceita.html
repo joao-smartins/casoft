@@ -1,194 +1,271 @@
-  <!DOCTYPE html>
-  <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Relatório de Tipos de Receita</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../css/estilo.css" rel="stylesheet">
-    <script src="js/Auth.js" defer></script>
-    <style>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Relatório de Tipos de Receita</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/estilo.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <script src="js/Auth.js" defer></script>
+  <style>
+    #listaTiposReceitas {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
 
-      #listaTiposReceitas {
-        max-height: 400px;
-        overflow-y: auto; /* habilita o scroll vertical quando necessário */
-        padding-right: 10px; /* para evitar que o conteúdo fique colado na barra de scroll */
-      }
+    #listaTiposReceitas::-webkit-scrollbar {
+      width: 8px;
+    }
 
-      /* Opcional: estilizar a barra de scroll */
-      #listaTiposReceitas::-webkit-scrollbar {
-        width: 8px;
-      }
+    #listaTiposReceitas::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
 
-      #listaTiposReceitas::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-      }
+    #listaTiposReceitas::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+    }
 
-      #listaTiposReceitas::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 10px;
-      }
+    #listaTiposReceitas::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
 
-      #listaTiposReceitas::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-      /* Classe para ocultar os campos */
-      .hidden {
-        display: none;
-      }
-      /* Adicionando estilo para a lista de tipo de receitas */
-      .tipo-receita-item {
-        border: 1px solid #ddd;
-        margin-bottom: 10px;
-        padding: 10px;
-        border-radius: 5px;
-      }
-    </style>
-  </head>
+    .hidden {
+      display: none;
+    }
 
-  <body class="bg-light">
+    .tipo-receita-item {
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: rgba(252, 185, 127, 0.13);
+      border-left: 4px solid #F96333;
+      transition: background-color 0.2s ease;
+    }
 
-  <!-- Header -->
-  <header class="header">
-    <div class="container">
-      <div class="header-container d-flex align-items-center">
-        <img src="../img/logo.png" alt="Logo">
-        <button class="menu-toggle d-md-none" id="menu-toggle" onclick="toggleSidebar()">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-        <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger ms-auto">Deslogar</button>
+    .tipo-receita-item:hover {
+      background-color: rgba(252, 185, 127, 0.2);
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+
+<header class="header">
+  <div class="container">
+    <div class="header-container d-flex align-items-center">
+      <img src="../img/logo.png" alt="Logo">
+      <button class="menu-toggle d-md-none" id="menu-toggle" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger ms-auto">Deslogar</button>
+    </div>
+  </div>
+</header>
+
+<div class="sidebar" id="sidebar">
+  <h4 class="p-3">Menu Tipo de Receita</h4>
+  <a href="criarTipoReceita.html">Cadastro</a>
+  <a href="relatorioTipoReceita.html">Relatórios</a>
+  <a href="#">Configurações</a>
+  <a href="../home.html">Voltar</a>
+</div>
+
+<div class="content" style="height: 100vh; display: flex; align-items: center; justify-content: center;">
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow p-4">
+          <h2 class="mb-4 text-center">Relatório de Tipos de Receita</h2>
+
+          <!-- Filtros -->
+          <div class="mb-3 d-flex justify-content-center align-items-end gap-3 flex-wrap">
+            <div>
+              <label for="filtroTipo" class="form-label">Ordem:</label>
+              <select id="filtroTipo" class="form-select" style="border: 2px solid #F96333; background-color: rgba(252, 185, 127, 0.13);">
+                <option value="a-z">A - Z</option>
+                <option value="z-a">Z - A</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="filtroNome" class="form-label">Filtro:</label>
+              <input type="text" class="form-control" id="filtroNome" placeholder="Digite a letra ou palavra 🔍" style="border: 2px solid #F96333; background-color: rgba(252, 185, 127, 0.13);">
+            </div>
+          </div>
+
+          <!-- Lista -->
+          <div id="todosTiposReceitas" class="mt-4">
+            <div id="listaTiposReceitas"></div>
+          </div>
+          <div id="mensagem" class="mensagem text-center text-muted mt-2"></div>
+        </div>
       </div>
     </div>
-  </header>
 
-
-  <!-- Conteúdo principal -->
-  <div class="content" style="height: 100vh; display: flex; align-items: center; justify-content: center;">
-    <div class="sidebar" id="sidebar">
-      <h4 class="p-3">Menu Tipo de Receita</h4>
-      <a href="criarTipoReceita.html">Cadastro</a>
-      <a href="relatorioTipoReceita.html">Relatórios</a>
-      <a href="#">Configurações</a>
-      <a href="../home.html">Voltar</a>
-    </div>
-    <div class="container mt-5">
-
-      <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-          <div class="card shadow p-4">
-            <h2 class="mb-4 text-center">Relatório de Tipos de Receita</h2>
-
-            <!-- Área para mostrar todos os tipos de receitas -->
-            <div class="mb-3 d-flex justify-content-center align-items-end gap-3 flex-wrap">
-              <div>
-                <label for="filtroTipo" class="form-label">Tipo de filtro:</label>
-                <select id="filtroTipo" class="form-select">
-                  <option value="começando">Começando com a letra</option>
-                  <option value="contém">Contém a palavra</option>
-                </select>
-              </div>
-
-              <div>
-                <label for="filtroNome" class="form-label">Filtro:</label>
-                <input type="text" class="form-control" id="filtroNome" placeholder="Digite a letra ou palavra">
-              </div>
-            </div>
-
-            <div id="todosTiposReceitas" class="mt-4">
-              <div id="listaTiposReceitas"></div>
-            </div>
-            <div id="mensagem" class="mensagem"></div>
-          </div>
+  </div>
+  <div class="modal fade" id="modalConfirmacao" tabindex="-1" aria-labelledby="modalConfirmacaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmar Exclusão</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja excluir este tipo de receita?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" id="btnConfirmarExclusao" class="btn btn-danger">Excluir</button>
         </div>
       </div>
     </div>
   </div>
-
-  <script>
-    // Função para carregar e exibir todos os tipos de receitas
-    document.addEventListener("DOMContentLoaded", function () {
-      const listaTiposReceitas = document.getElementById("listaTiposReceitas");
-      const URL = "http://localhost:8080/apis/tiporeceita"; // URL da API para tipos de receitas
-
-      fetch(URL)
-              .then(response => response.json())
-              .then(data => {
-                if (Array.isArray(data) && data.length > 0) {
-                  listaTiposReceitas.innerHTML = ""; // Limpar a lista antes de adicionar os tipos de receitas
-
-                  // Adicionar todos os tipos de receitas à lista
-                  data.forEach(tipoReceita => {
-                    const divTipoReceita = document.createElement("div");
-                    divTipoReceita.classList.add("tipo-receita-item");
-                    divTipoReceita.setAttribute("id", `tipoReceita-${tipoReceita.id}`);
-                    divTipoReceita.innerHTML = `
-                      <div class="d-flex justify-content-between align-items-center">
-                      <span><strong>Nome:</strong> ${tipoReceita.nome}</span>
-                      <div class="d-flex gap-2">
-                      <button class="btn btn-primary btn-sm" onclick="editarTipoReceita(${tipoReceita.id}, '${tipoReceita.nome}')">Editar</button>
-                      <button class="btn btn-danger btn-sm" onclick="deletarTipoReceita(${tipoReceita.id},'${tipoReceita.nome}')">Excluir</button>
-                      </div>
-                      </div>
-                      `;
-                  listaTiposReceitas.appendChild(divTipoReceita);
-                  });
-                } else {
-                  listaTiposReceitas.innerHTML = "<p>Nenhum tipo de receita encontrado.</p>";
-                }
-              })
-              .catch(error => {
-                console.error("Erro ao carregar tipos de receita:", error);
-                listaTiposReceitas.innerHTML = `<p>Erro ao carregar tipos de receita: ${error.message}</p>`;
-              });
-    });
-
-    function deletarTipoReceita(id,nome) {
-      const URL = `http://localhost:8080/apis/tiporeceita/${id}`; // URL da API para deletar o tipo de receita
-
-      let resposta = confirm(`Tem certeza que deseja deletar o tipo de receita ${nome}?`);
+</div>
 
 
-      if(resposta){
-        fetch(URL, {
-          method: "DELETE",
-        })
-                .then(response => {
-                  if (!response.ok) {
-                    throw new Error(`Erro HTTP: ${response.status}`);
-                  } else {
-                    const item = document.getElementById(`tipoReceita-${id}`);
-                    if (item) item.remove();
-                  }
-                })
-                .then(data => {
-                  document.getElementById("mensagem").innerHTML = '<div class="alert alert-success">Tipo de receita deletado com sucesso!</div>';
-                  setTimeout(function () {
-                    document.getElementById("mensagem").innerHTML = '';
-                  }, 2000);
-                })
-                .catch(error => {
-                  console.log("Erro capturado:", error.message);
-                  document.getElementById("mensagem").innerHTML = '<div class="alert alert-danger">Erro: ' + error.message + '</div>';
-                });
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const listaTiposReceitas = document.getElementById("listaTiposReceitas");
+    const filtroNome = document.getElementById("filtroNome");
+    const filtroTipo = document.getElementById("filtroTipo");
+    const mensagem = document.getElementById("mensagem");
+    let idParaExcluir = null;
+    const modal = new bootstrap.Modal(document.getElementById('modalConfirmacao'));
+
+    const URL = "http://localhost:8080/apis/tiporeceita";
+    let receitasOriginais = [];
+
+    function aplicarFiltros() {
+      const nomeFiltro = filtroNome.value.toLowerCase();
+      const ordem = filtroTipo.value;
+
+      let receitasFiltradas = receitasOriginais.filter(receita =>
+              receita.nome.toLowerCase().includes(nomeFiltro)
+      );
+
+      receitasFiltradas.sort((a, b) => {
+        const nomeA = a.nome.toLowerCase();
+        const nomeB = b.nome.toLowerCase();
+
+        if (ordem === "a-z") {
+          return nomeA.localeCompare(nomeB);
+        } else {
+          return nomeB.localeCompare(nomeA);
+        }
+      });
+
+      renderizarReceitas(receitasFiltradas);
+    }
+
+    function renderizarReceitas(receitas) {
+      listaTiposReceitas.innerHTML = "";
+      mensagem.textContent = "";
+
+      if (receitas.length === 0) {
+        mensagem.textContent = "Nenhum tipo de receita encontrado com os filtros atuais.";
+        return;
       }
+
+      receitas.forEach(tp_receita => {
+        const div = document.createElement("div");
+        div.classList.add("tipo-receita-item");
+        div.innerHTML = `
+  <div class="d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><strong>Nome:</strong> ${tp_receita.nome}</h5>
+    <div>
+      <button class="btn btn-primary btn-sm btn-editar" title="Editar">
+        <i class="bi bi-pencil-fill"></i>
+      </button>
+      <button class="btn btn-danger btn-sm btn-excluir" title="Excluir">
+        <i class="bi bi-trash-fill"></i>
+      </button>
+    </div>
+  </div>
+`;
+        listaTiposReceitas.appendChild(div);
+        div.querySelector(".btn-editar").addEventListener("click", () => {
+          localStorage.setItem("tp_receitaSelecionada", JSON.stringify(tp_receita));
+          window.location.href = "alterarTipoReceita.html?id=" + tp_receita.id;
+        });
+
+        div.querySelector(".btn-excluir").addEventListener("click", () => {
+          idParaExcluir = tp_receita.id;
+          modal.show();
+        });
+      });
     }
 
-  </script>
+    fetch(URL)
+            .then(response => response.json())
+            .then(data => {
+              receitasOriginais = data;
+              aplicarFiltros();
+            })
+            .catch(error => {
+              console.error("Erro ao carregar tipos de receita:", error);
+              mensagem.textContent = "Erro ao carregar tipos de receita.";
+            });
 
-  <script>
-    function editarTipoReceita(id, nome) {
-      // Salvar no localStorage ou passar por query string
-      localStorage.setItem("tipoReceitaEditId", id);
-      localStorage.setItem("tipoReceitaEditNome", nome);
-      window.location.href = "alterarTipoReceita.html";
-    }
-  </script>
+    btnConfirmarExclusao.addEventListener("click", () => {
+      excluirTipoReceita(idParaExcluir);
+      modal.hide();
+    });
+    filtroNome.addEventListener("input", aplicarFiltros);
+    filtroTipo.addEventListener("change", aplicarFiltros);
+  });
 
-  <script src="../js/funcoes.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/scripts.js"></script>
-  </body>
-  </html>
+  function excluirTipoReceita(id) {
+    const URL = `http://localhost:8080/apis/tiporeceita/${id}`;
+    fetch(URL, {
+      method: "DELETE"
+    })
+            .then(response => {
+              if (response.ok) {
+                const toastLiveExample = document.getElementById('liveToast');
+                const toastMessage = document.getElementById('toastMessage');
+                toastMessage.textContent = 'Tipo de receita deletado com sucesso!';
+                toastMessage.className = 'text-success';
+
+                const toast = new bootstrap.Toast(toastLiveExample);
+                toast.show();
+
+                receitasOriginais = receitasOriginais.filter(r => r.id !== id);
+                aplicarFiltros();
+              } else {
+                throw new Error("Erro ao excluir evento.");
+              }
+            })
+            .catch(error => {
+              const toastLiveExample = document.getElementById('liveToast');
+              const toastMessage = document.getElementById('toastMessage');
+              toastMessage.textContent = 'Erro ao excluir tipo de receita.';
+              toastMessage.className = 'text-danger';
+
+              const toast = new bootstrap.Toast(toastLiveExample);
+              toast.show();
+            });
+  }
+</script>
+
+<script src="../js/funcoes.js"></script>
+<script src="../js/authManager.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="liveToast" class="toast align-items-center text-bg-light border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div id="toastMessage" class="toast-body">Mensagem</div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
