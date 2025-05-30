@@ -48,6 +48,7 @@ public class DespesasView {
         }
         return ResponseEntity.badRequest().body(new Mensagem("Usuario nao autenticado"));
     }
+
     @GetMapping("/aguardando")
     public ResponseEntity<Object> getAguardando(HttpServletRequest httpServletRequest){
         String token = httpServletRequest.getHeader("Authorization");
