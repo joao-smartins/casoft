@@ -29,23 +29,35 @@ public class UsuarioController {
         }
 
         try {
-            // Primeiro verifica se o usuário existe
-            Usuario usuario = usuarioContro.get(id, conexao);
-            if (usuario == null) {
+
+            System.out.println("ID usuario controller: " + usuarioContro.getId());
+            // Verifica se o usuário está tentando deletar a si mesmo
+            if (id == usuarioContro.getId()) {
+                resultado.put("erro", "Você não pode deletar seu próprio usuário");
+                return resultado;
+            }
+
+            // Cria uma instância de Usuario (que terá o DAO injetado pelo Spring)
+            Usuario usuario = new Usuario();
+
+            // Primeiro verifica se o usuario existe usando o método da classe Usuario
+            Usuario usuarioParaExcluir = usuario.get(id, conexao);
+            if (usuarioParaExcluir == null) {
                 resultado.put("erro", "Usuário não encontrado");
                 return resultado;
             }
 
-            System.out.println(usuario.getNome());
-
-            // Verifica se é o último admin ativo (usando o DAO)
-            if (usuarioContro.isUltimoAdminAtivo(id, conexao) && usuario.isAtivo()) {
+            int tot=usuario.contarAdminsAtivos(conexao);
+            System.out.println("Total de admins ativos: " + tot);
+            if (tot == 1){
+                System.out.println("erro, Não é possível excluir o último ADMIN ativo!");
                 resultado.put("erro", "Não é possível excluir o último ADMIN ativo!");
                 return resultado;
             }
 
-            // Tenta apagar o usuário
-            boolean sucesso = usuario.apagar(usuario, conexao);
+
+            // Tenta apagar o usuário usando o método da classe Usuario
+            boolean sucesso = usuario.apagar(usuarioParaExcluir, conexao);
             if (sucesso) {
                 resultado.put("mensagem", "Usuário deletado com sucesso");
             } else {
@@ -54,6 +66,8 @@ public class UsuarioController {
         } catch (Exception e) {
             System.err.println("Erro interno: " + e.getMessage());
             resultado.put("erro", "Erro interno: " + e.getMessage());
+        } finally {
+            conexao.Desconectar();
         }
 
         return resultado;
@@ -88,7 +102,7 @@ public class UsuarioController {
                     return resultado;
                 }
 
-                // 2. Busca usuário existente
+                // 2. Busca usuario existente
                 Usuario usuarioExistente = usuarioContro.get(usuario.getId(), conexao);
                 if (usuarioExistente == null) {
                     resultado.put("erro", "Usuário não encontrado");
@@ -103,7 +117,7 @@ public class UsuarioController {
                 }
 
                 // 4. Mantém dados sensíveis que não vieram do frontend
-                usuario.setNivelAcesso(usuarioExistente.getNivelAcesso());
+                usuario.setNivelAcesso(usuario.getNivelAcesso());
                 if (usuario.getSenha() == null || usuario.getSenha().isEmpty()) {
                     usuario.setSenha(usuarioExistente.getSenha());
                 }

@@ -11,6 +11,8 @@ import java.util.List;
 @Component
 public class Usuario {
 
+    @Autowired
+    private UsuarioDAO usuarioDAO;
     public static final String NIVEL_ADMIN = "ADMIN";
     public static final String NIVEL_PADRAO = "USER";
     private int id;
@@ -22,11 +24,11 @@ public class Usuario {
     private String cpf;
     private String telefone;
 
-    @Autowired
-    private UsuarioDAO usuarioDAO;
+
 
     // Construtores
     public Usuario() {
+        usuarioDAO=new UsuarioDAO();
     }
 
     public Usuario(String nome, String login, String senha, boolean ativo, String nivelAcesso, String cpf, String telefone) {
