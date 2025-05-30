@@ -6,6 +6,7 @@ import casoft.mvc.model.Usuario;
 import casoft.mvc.util.Mensagem;
 import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +50,7 @@ public class UsuarioView {
 
         return ResponseEntity.ok(new Mensagem(resultado.get("mensagem").toString()));
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Mensagem> deletar(@PathVariable int id) {
         System.out.println("Tentando excluir usuário ID: " + id);
@@ -57,15 +59,26 @@ public class UsuarioView {
             Map<String, Object> resultado = usuarioController.deletar(id);
 
             if (resultado.containsKey("erro")) {
-                System.out.println("Erro ao excluir: " + resultado.get("erro"));
-                return ResponseEntity.badRequest().body(new Mensagem(resultado.get("erro").toString()));
+                String erro = resultado.get("erro").toString();
+                System.out.println("Erro ao excluir: " + erro);
+
+                if (erro.contains("não encontrado")) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new Mensagem(erro));
+                } else if (erro.contains("último ADMIN")) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(new Mensagem(erro));
+                }
+
+                return ResponseEntity.badRequest().body(new Mensagem(erro));
             }
 
             System.out.println("Usuário excluído com sucesso");
             return ResponseEntity.ok(new Mensagem(resultado.get("mensagem").toString()));
         } catch (Exception e) {
             System.out.println("Exceção ao excluir usuário: " + e.getMessage());
-            return ResponseEntity.badRequest().body(new Mensagem("Erro interno ao excluir usuário"));
+            return ResponseEntity.internalServerError()
+                    .body(new Mensagem("Erro interno ao excluir usuário"));
         }
     }
 
