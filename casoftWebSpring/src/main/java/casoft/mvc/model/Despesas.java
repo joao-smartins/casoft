@@ -39,6 +39,19 @@ public class Despesas {
         this.evento_id = evento_id;
     }
 
+    public Despesas(int id, double valor, String data_venc, String data_lanc, double pagamento, String descricao, String status_conci, int tipoDespesa_id, Integer usuario_id, int evento_id) {
+        this.id = id;
+        this.valor = valor;
+        this.data_venc = data_venc;
+        this.data_lanc = data_lanc;
+        this.pagamento = pagamento;
+        this.descricao = descricao;
+        this.status_conci = status_conci;
+        this.tipoDespesa_id = tipoDespesa_id;
+        this.usuario_id = usuario_id;
+        this.evento_id = evento_id;
+    }
+
     public int getId() {
         return id;
     }
@@ -129,5 +142,9 @@ public class Despesas {
 
     public boolean remover(int id, Singleton conexao){
         return despesaDAO.apagar(id,conexao);
+    }
+
+    public Despesas alterar(Despesas despesas, Singleton conexao) {
+        return despesaDAO.alterar(despesas,conexao);
     }
 }

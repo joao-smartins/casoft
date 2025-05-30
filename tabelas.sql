@@ -151,13 +151,13 @@ CREATE TABLE public.despesa (
     despesa_id integer NOT NULL,
     despesa_val numeric NOT NULL,
     despesa_dt_venc date NOT NULL,
-    despesa_lancamento date NOT NULL,
+    despesa_dt_lanc date NOT NULL,
     despesa_pagamento numeric,
     despesa_desc character varying(100) NOT NULL,
     despesa_statusconci character varying(20),
-    categoriadesp_catdesp_id integer NOT NULL,
-    usuario_user_id integer NOT NULL,
-    evento_evento_id integer NOT NULL
+    catdesp_id integer NOT NULL,
+    user_id integer NOT NULL,
+    evento_id integer NOT NULL
 );
 
 
@@ -1007,7 +1007,7 @@ ALTER TABLE ONLY public.volun_even
     ADD CONSTRAINT volun_even_voluntario_volu_id_fkey FOREIGN KEY (voluntario_volu_id) REFERENCES public.voluntario(volu_id);
 
 
-ALTER TABLE parametrizacao
+ALTER TABLE public.parametrizacao
     ADD COLUMN complemento VARCHAR(255);
 
 -- Completed on 2025-05-16 14:23:47 -03
