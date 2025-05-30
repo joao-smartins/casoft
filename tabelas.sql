@@ -507,6 +507,19 @@ ALTER SEQUENCE public.voluntario_volu_id_seq OWNER TO postgres;
 ALTER SEQUENCE public.voluntario_volu_id_seq OWNED BY public.voluntario.volu_id;
 
 
+CREATE TABLE public.conciliacao (
+    conc_id SERIAL PRIMARY KEY,
+    conc_dt_problema DATE NOT NULL,
+    conc_desc_problema VARCHAR(40) NOT NULL,
+    conc_dt_solucao DATE,
+    conc_desc_solucao VARCHAR(40),
+    conc_receita_id INTEGER,
+    conc_despesa_id INTEGER,
+    CONSTRAINT fk_conc_receita FOREIGN KEY (conc_receita_id) REFERENCES public.receita(receita_id),
+    CONSTRAINT fk_conc_despesa FOREIGN KEY (conc_despesa_id) REFERENCES public.despesa(despesa_id)
+);
+
+
 --
 -- TOC entry 4327 (class 2604 OID 16692)
 -- Name: categoriadesp catdesp_id; Type: DEFAULT; Schema: public; Owner: postgres
