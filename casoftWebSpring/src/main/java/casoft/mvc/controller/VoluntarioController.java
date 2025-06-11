@@ -35,6 +35,7 @@ public class VoluntarioController {
                     json.put("cep", voluntario.getCep());
                     json.put("cell", voluntario.getCell());
                     json.put("comp", voluntario.getComp());
+                    json.put("numero", voluntario.getNumero());
                     voluntarioList.add(json);
                 }
                 conexao.Desconectar();
@@ -65,6 +66,7 @@ public class VoluntarioController {
                 json.put("cep", v.getCep());
                 json.put("cell", v.getCell());
                 json.put("comp", v.getComp());
+                json.put("numero", v.getNumero());
                 conexao.Desconectar();
                 return json;
             }
@@ -103,6 +105,7 @@ public class VoluntarioController {
                 json.put("cep", v.getCep());
                 json.put("cell", v.getCell());
                 json.put("comp", v.getComp());
+                json.put("numero", v.getNumero());
                 conexao.Desconectar();
                 return json;
             }
@@ -131,6 +134,7 @@ public class VoluntarioController {
                 json.put("cep", v.getCep());
                 json.put("cell", v.getCell());
                 json.put("comp", v.getComp());
+                json.put("numero", v.getNumero());
                 conexao.Desconectar();
                 return json;
             }

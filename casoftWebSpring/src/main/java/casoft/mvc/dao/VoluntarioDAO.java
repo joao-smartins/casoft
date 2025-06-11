@@ -121,6 +121,7 @@ public class VoluntarioDAO implements IDAO<Voluntario> {
                 v.setNome(rs.getString("volu_nome"));
                 v.setBairro(rs.getString("volu_bairro"));
                 v.setEmail(rs.getString("volu_email"));
+                v.setCell(rs.getString("volu_cell"));
                 v.setLogradouro(rs.getString("volu_logradouro"));
                 v.setComp(rs.getString("volu_comp"));
                 v.setCep(rs.getString("volu_cep"));

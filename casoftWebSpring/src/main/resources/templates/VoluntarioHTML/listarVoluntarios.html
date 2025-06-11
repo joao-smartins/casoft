@@ -1,10 +1,272 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Listar Voluntários</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="../css/estilo.css" rel="stylesheet" />
+  <script src="js/Auth.js" defer></script>
+
+  <style>
+    /* Header fixo no topo */
+
+    /* Centraliza todo o conteúdo dentro do main */
+    main.content {
+      height: calc(100vh - 56px); /* altura da viewport menos header (se header tem 56px de altura) */
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* vertical */
+      align-items: center;     /* horizontal */
+      padding: 1rem; /* padding opcional para espaçamento */
+    }
+
+    /* Container branco com borda arredondada e sombra */
+    .content-wrapper {
+      background: white;
+      margin: 1rem;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Ajusta a tabela e filtros para não ficarem muito largos */
+    main.content .filtros,
+    main.content .table-responsive {
+      width: 100%;
+      max-width: 900px; /* limite máximo para manter centralizado e não muito largo */
+    }
+
+    /* Remove margem do título para ficar melhor alinhado */
+    main.content h2 {
+      margin-bottom: 1rem;
+    }
+
+    /* Filtros alinhados */
+    .filtros {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    /* Inputs filtro */
+    .filtros input {
+      max-width: 300px;
+      flex-grow: 1;
+    }
+
+    /* Tabela */
+    .table-responsive {
+      max-width: 100%;
+      overflow-x: auto;
+      background: transparent; /* fundo branco está no container */
+      padding: 0;
+      box-shadow: none;
+    }
+
+    table {
+      white-space: nowrap;
+      background: white;
+      border-radius: 0.25rem;
+      box-shadow: 0 0 8px rgb(0 0 0 / 0.1);
+      width: 100%;
+    }
+    td, th {
+      vertical-align: middle !important;
+    }
+    /* Quebra em colunas específicas */
+    td:nth-child(1), td:nth-child(6), td:nth-child(7), td:nth-child(10) {
+      max-width: 150px;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    /* Botões pequenos com espaçamento */
+
+
+    /* Botões ações só com ícones, sem texto */
+
+
+    /* Botões quadrados, centralizados */
+
+    /* Ajusta padding da célula das ações para centralizar os botões */
+    td:last-child {
+      padding: 0.3rem 0.5rem;
+      white-space: nowrap;
+    }
+  </style>
 </head>
-<body>
+
+<body class="bg-light">
+
+<header class="header">
+  <div class="container">
+    <div class="header-container d-flex align-items-center">
+      <img src="../img/logo.png" alt="Logo">
+      <button class="menu-toggle d-md-none" id="menu-toggle" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger ms-auto">Deslogar</button>
+    </div>
+  </div>
+</header>
+
+<div class="sidebar" id="sidebar">
+  <h4 class="p-3">Menu Tipo de Receita</h4>
+  <a href="criarTipoReceita.html">Cadastro</a>
+  <a href="relatorioTipoReceita.html">Relatórios</a>
+  <a href="#">Configurações</a>
+  <a href="../home.html">Voltar</a>
+</div>
+
+<!-- Conteúdo principal -->
+<main class="content">
+  <div class="content-wrapper">
+    <h2 class="text-center mb-4">Voluntários Cadastrados</h2>
+
+    <div class="filtros">
+      <input type="text" id="buscaNome" class="form-control" placeholder="Buscar por nome" />
+      <input type="text" id="buscaCPF" class="form-control" placeholder="Buscar por CPF (somente números)" maxlength="11" />
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped align-middle text-center mb-0">
+        <thead class="table-light sticky-top" style="top: 0; z-index: 10;">
+        <tr>
+          <th style="min-width: 90px;">Ações</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>CPF</th>
+          <th>Telefone</th>
+          <th>CEP</th>
+          <th>Logradouro</th>
+          <th>Bairro</th>
+          <th>Número</th>
+          <th>Complemento</th>
+        </tr>
+        </thead>
+        <tbody id="tabelaVoluntarios">
+        <!-- Preenchido por JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const URL = "http://localhost:8080/apis/voluntario";
+    const tabela = document.getElementById("tabelaVoluntarios");
+    const buscaNome = document.getElementById("buscaNome");
+    const buscaCPF = document.getElementById("buscaCPF");
+
+    function formatCPF(cpf) {
+      if (!cpf) return "";
+      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    }
+
+    function formatPhone(phone) {
+      if (!phone) return "";
+      if (phone.length === 11) {
+        return phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+      } else if (phone.length === 10) {
+        return phone.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+      }
+      return phone;
+    }
+
+    function formatCEP(cep) {
+      if (!cep) return "";
+      return cep.replace(/(\d{5})(\d{3})/, "$1-$2");
+    }
+
+    // Limpa o valor para só dígitos no CPF
+    function cleanCPF(cpf) {
+      return (cpf || "").replace(/\D/g, "");
+    }
+
+    function carregarVoluntarios() {
+      fetch(URL)
+              .then(res => res.json())
+              .then(data => {
+                tabela.innerHTML = "";
+
+                const filtroNome = buscaNome.value.trim().toLowerCase();
+                const filtroCPF = cleanCPF(buscaCPF.value);
+
+                let voluntarios = data;
+
+                if (filtroNome) {
+                  voluntarios = voluntarios.filter(v =>
+                          v.nome.toLowerCase().includes(filtroNome)
+                  );
+                }
+                if (filtroCPF) {
+                  voluntarios = voluntarios.filter(v =>
+                          cleanCPF(v.cpf).includes(filtroCPF)
+                  );
+                }
+
+                if (voluntarios.length === 0) {
+                  tabela.innerHTML = `<tr><td colspan="10" class="text-center text-muted">Nenhum voluntário encontrado</td></tr>`;
+                  return;
+                }
+
+                voluntarios.forEach(v => {
+                  const linha = document.createElement("tr");
+                  linha.innerHTML = `
+              <td>
+                <button class="btn btn-primary btn-sm btn-editar" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-danger btn-sm btn-excluir" title="Excluir">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+              <td title="${v.nome}">${v.nome}</td>
+              <td title="${v.email}">${v.email}</td>
+              <td>${formatCPF(v.cpf)}</td>
+              <td>${formatPhone(v.cell)}</td>
+              <td>${formatCEP(v.cep)}</td>
+              <td title="${v.logradouro || ''}">${v.logradouro || ''}</td>
+              <td title="${v.bairro || ''}">${v.bairro || ''}</td>
+              <td>${v.numero || ''}</td>
+              <td title="${v.complemento || ''}">${v.complemento || ''}</td>
+            `;
+                  tabela.appendChild(linha);
+                });
+              })
+              .catch(err => {
+                tabela.innerHTML = `<tr><td colspan="10" class="text-center text-danger">Erro ao carregar voluntários</td></tr>`;
+                console.error("Erro ao buscar voluntários:", err);
+              });
+    }
+
+    buscaNome.addEventListener("input", carregarVoluntarios);
+    buscaCPF.addEventListener("input", carregarVoluntarios);
+
+    carregarVoluntarios();
+  });
+</script>
+
+<!-- Ícones Bootstrap -->
+<link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
+/>
+<script src="../js/authenticatedClient.js"></script>
+<script src="../js/tokenVerification.js"></script>
+<script src="../js/funcoes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
