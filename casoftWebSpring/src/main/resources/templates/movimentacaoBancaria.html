@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gerenciar Movimentações Bancárias</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/estilo.css" rel="stylesheet"/>
+</head>
+<body class="bg-light">
+
+<header class="header">
+    <div class="container">
+        <div class="header-container d-flex align-items-center">
+            <img src="img/logo.png" alt="Logo">
+            <button class="menu-toggle d-md-none" id="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger ml-auto">Deslogar</button>
+        </div>
+    </div>
+</header>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h4 class="p-3">Menu</h4>
+    <a href="../home.html">Home</a>
+    <a href="../ParametrizacaoHTML/cadastroEmpresa.html">Empresa</a>
+    <a href="../EventoHTML/homeEvento.html">Eventos</a>
+    <a href="../TipoReceitasHTML/homeTPReceita.html">Tipos de Receita</a>
+    <a href="../TipoDespesasHTML/tipoDespesa.html">Tipos de Despesas</a>
+    <a href="#">Relatórios</a>
+    <a href="#">Configurações</a>
+    <a href="gerenciarContas.html">Contas Bancárias</a>
+</div>
+
+<div class="content" id="content">
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-md-12">
+                <div class="card form-card">
+                    <div class="card-body p-3">
+                        <div class="card-section bg-orange text-dark py-3">
+                            <h3 class="text-center">Cadastro de Movimentação Bancária</h3>
+                        </div>
+                        <form id="formMovimentacao" onsubmit="return salvarMovimentacao(event)">
+                            <input type="hidden" id="idMovimentacao">
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="total" class="form-label">Total *</label>
+                                    <input type="number" step="0.01" id="total" class="form-control custom-input"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="data" class="form-label">Data *</label>
+                                    <input type="date" id="data" class="form-control custom-input" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="usuario" class="form-label">ID do Usuário *</label>
+                                    <input type="number" id="usuario" class="form-control custom-input" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="conta" class="form-label">ID da Conta Bancária *</label>
+                                    <input type="number" id="conta" class="form-control custom-input" required>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-6 mb-2">
+                                    <button type="button" class="btn btn-secondary w-100" onclick="limparFormulario()">
+                                        Limpar
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <button type="submit" class="btn btn-primary w-100">Salvar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-5">
+                    <div class="card-body">
+                        <h4 class="card-title mb-3">Movimentações Bancárias Cadastradas</h4>
+                        <div class="table-responsive">
+                            <table class="table" id="tabelaMovimentacoes">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Total</th>
+                                    <th>Data</th>
+                                    <th>ID do Usuário</th>
+                                    <th>ID da Conta</th>
+                                    <th>Ações</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/scriptsMovimentacoes.js"></script>
+<script src="js/authManager.js"></script>
+<script src="js/authenticatedClient.js"></script>
+<script src="js/tokenVerification.js"></script>
+
+</body>
+</html>

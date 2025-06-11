@@ -22,7 +22,7 @@ public class DespesasController {
 
     public Map<String,Object> addDespesa(String valor, String data_venc, String data_lanc, String pagamento, String descricao, String status_conci, String tipoDespesa_id, String usuario_id, String evento_id){
         Map<String,Object> json = new HashMap<>();
-        System.out.println("TIpo Despesa: "+usuario_id);
+        System.out.println("Tipo Despesa: "+usuario_id);
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){
             int evento;
@@ -63,7 +63,6 @@ public class DespesasController {
     }
     public Map<String,Object> uptDespesa(int id,String valor, String data_venc, String data_lanc, String pagamento, String descricao, String status_conci, String tipoDespesa_id, String usuario_id, String evento_id){
         Map<String,Object> json = new HashMap<>();
-        System.out.println("TIpo evento: "+evento_id);
         Singleton conexao= Singleton.getInstancia();
         if(conexao.conectar()){
             int evento;
@@ -194,5 +193,93 @@ public class DespesasController {
 
         }
         return jsonlist;
+    }
+    public Map<String,Object> uptDespesaQuitar(int id,String valor, String data_venc, String data_lanc, String pagamento, String descricao, String status_conci, String tipoDespesa_id, String usuario_id, String evento_id,String data_pag,String obs){
+        Map<String,Object> json = new HashMap<>();
+        System.out.println("TIpo evento: "+evento_id);
+        Singleton conexao= Singleton.getInstancia();
+        if(conexao.conectar()){
+            int evento;
+            if(!Objects.equals(evento_id, "null"))
+                evento=Integer.parseInt(evento_id);
+            else
+                evento=0;
+            Double pag;
+            if(!Objects.equals(pagamento, ""))
+                pag=Double.parseDouble(pagamento);
+            else
+                pag=0.0;
+            Despesas novaDespesas =new Despesas(id,Double.parseDouble(valor),data_venc,data_lanc,pag,descricao,status_conci,Integer.parseInt(tipoDespesa_id),Integer.parseInt(usuario_id),evento,data_pag,obs);
+            novaDespesas = despesasModel.alterar(novaDespesas,conexao);
+            if(novaDespesas !=null){
+                json.put("id", novaDespesas.getId());
+                json.put("val", novaDespesas.getValor());
+                json.put("data_venc", novaDespesas.getData_venc());
+                json.put("data_lanc", novaDespesas.getData_lanc());
+                json.put("pagamento", novaDespesas.getPagamento());
+                json.put("descricao", novaDespesas.getDescricao());
+                json.put("status", novaDespesas.getStatus_conci());
+                json.put("tipo_id", novaDespesas.getTipoDespesa_id());
+                json.put("usuario_id", novaDespesas.getUsuario_id());
+                json.put("evento_id", novaDespesas.getEvento_id());
+                json.put("data_pag", novaDespesas.getData_pag());
+                json.put("obs", novaDespesas.getObs());
+                json.put("pai_id", novaDespesas.getPai_id());
+                conexao.getConexao().commit();
+                return json;
+            }
+            else{
+                json.put("erro","Erro ao cadastrar a Empresa");
+                conexao.getConexao().rollback();
+            }
+            conexao.Desconectar();
+        }
+        else
+            json.put("erro","Erro ao conectar com o BD");
+        return json;
+    }
+    public Map<String,Object> addDespesa(String valor, String data_venc, String data_lanc, String pagamento, String descricao, String status_conci, String tipoDespesa_id, String usuario_id, String evento_id,Integer pai_id){
+        Map<String,Object> json = new HashMap<>();
+        System.out.println("Tipo Despesa: "+usuario_id);
+        Singleton conexao= Singleton.getInstancia();
+        if(conexao.conectar()){
+            int evento;
+            if(!Objects.equals(evento_id, ""))
+                evento=Integer.parseInt(evento_id);
+            else
+                evento=0;
+            Double pag;
+            if(!Objects.equals(pagamento, ""))
+                pag=Double.parseDouble(pagamento);
+            else
+                pag=0.0;
+            Despesas novaDespesas =new Despesas(Double.parseDouble(valor),data_venc,data_lanc,pag,descricao,status_conci,Integer.parseInt(tipoDespesa_id),Integer.parseInt(usuario_id),evento,pai_id);
+            novaDespesas = despesasModel.add(novaDespesas,conexao);
+            if(novaDespesas !=null){
+                json.put("id", novaDespesas.getId());
+                json.put("val", novaDespesas.getValor());
+                json.put("data_venc", novaDespesas.getData_venc());
+                json.put("data_lanc", novaDespesas.getData_lanc());
+                json.put("pagamento", novaDespesas.getPagamento());
+                json.put("descricao", novaDespesas.getDescricao());
+                json.put("status", novaDespesas.getStatus_conci());
+                json.put("tipo_id", novaDespesas.getTipoDespesa_id());
+                json.put("usuario_id", novaDespesas.getUsuario_id());
+                json.put("evento_id", novaDespesas.getEvento_id());
+                json.put("data_pag", novaDespesas.getData_pag());
+                json.put("obs", novaDespesas.getObs());
+                json.put("pai_id", novaDespesas.getPai_id());
+                conexao.getConexao().commit();
+                return json;
+            }
+            else{
+                json.put("erro","Erro ao cadastrar a Empresa");
+                conexao.getConexao().rollback();
+            }
+            conexao.Desconectar();
+        }
+        else
+            json.put("erro","Erro ao conectar com o BD");
+        return json;
     }
 }

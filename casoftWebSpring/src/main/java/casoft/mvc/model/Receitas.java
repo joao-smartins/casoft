@@ -1,7 +1,14 @@
 package casoft.mvc.model;
 
-import java.time.LocalDate;
+import casoft.mvc.dao.ReceitasDAO;
+import casoft.mvc.util.Singleton;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.util.List;
+
+@Component
 public class Receitas {
     private double valor;
     private boolean futura;
@@ -9,6 +16,9 @@ public class Receitas {
     private Evento evento;
     private CategoriaReceita categoria;
     private LocalDate data;
+
+    @Autowired
+    private ReceitasDAO receitasDAO;
 
     public Receitas(double valor, boolean futura, String descricao, Evento evento, CategoriaReceita categoria, LocalDate data) {
         this.valor = valor;
@@ -26,6 +36,7 @@ public class Receitas {
         this.categoria = categoria;
         this.data = data;
     }
+    public Receitas(){}
 
     public double getValor() {
         return valor;
@@ -74,4 +85,12 @@ public class Receitas {
     public void setData(LocalDate data) {
         this.data = data;
     }
+
+
+    //funcoes DAO
+    public Receitas gravar(Receitas receitas, Singleton conexao){return receitasDAO.gravar(receitas, conexao);}
+    public Receitas alterar(Receitas receitas, Singleton conexao){return receitasDAO.alterar(receitas, conexao);}
+    public List<Receitas> get(String filtro, Singleton conexao) {return receitasDAO.get(filtro,conexao);}
+    public Receitas get(int id, Singleton conexao) {return receitasDAO.get(id,conexao);}
+
 }

@@ -596,15 +596,17 @@
           }
         });
 
-        if (response.ok) {
-          alert(`Usuário "${usuarioNomeParaExcluir}" excluído com sucesso!`);
-          await carregarUsuarios();
-        } else {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Erro desconhecido');
+        const data = await response.json(); // Tente ler a resposta como JSON
+
+        if (!response.ok) {
+          // Se a resposta não estiver OK, mostre a mensagem de erro do backend
+          throw new Error(data.message || `Erro HTTP: ${response.status}`);
         }
+
+        alert(`Usuário "${usuarioNomeParaExcluir}" excluído com sucesso!`);
+        await carregarUsuarios();
       } catch (error) {
-        console.error('Erro na exclusão:', error);
+        console.error('Erro completo na exclusão:', error);
         alert(`Erro ao excluir usuário: ${error.message}`);
       } finally {
         modal.classList.remove('active');
