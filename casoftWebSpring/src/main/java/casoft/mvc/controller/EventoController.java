@@ -33,6 +33,7 @@ public class EventoController {
                     json.put("descricao", evento.getDescricao());
                     json.put("data", evento.getData());
                     json.put("status", evento.isStatus());
+                    json.put("id_resp",evento.getId_resp());
                     eventosList.add(json);
                 }
                 conexao.Desconectar();
@@ -59,6 +60,7 @@ public class EventoController {
                 json.put("descricao",e.getDescricao());
                 json.put("data",e.getData());
                 json.put("status",e.isStatus());
+                json.put("id_resp",e.getId_resp());
                 conexao.Desconectar();
                 return json;
             }
@@ -93,6 +95,7 @@ public class EventoController {
                 json.put("descricao",e.getDescricao());
                 json.put("data",e.getData());
                 json.put("status",e.isStatus());
+                json.put("id_resp",evento.getId_resp());
                 conexao.Desconectar();
                 return json;
             }
@@ -119,6 +122,7 @@ public class EventoController {
                     json.put("data",e.getData());
                     }
                 json.put("status",e.isStatus());
+                json.put("id_resp",evento.getId_resp());
                 conexao.Desconectar();
                 return json;
             }

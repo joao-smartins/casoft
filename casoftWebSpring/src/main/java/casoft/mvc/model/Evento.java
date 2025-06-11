@@ -14,19 +14,31 @@ public class Evento {
     private String descricao;
     private String data;
     private char status;
+    private int id_resp;
+
+
 
     @Autowired
     private EventosDAO dao;
 
-    public Evento(String nome, int id, String data, String descricao, char status) {
+    public Evento(String nome, int id, String data, String descricao, char status, int id_resp) {
         this.nome = nome;
         Id = id;
         this.data = data;
         this.descricao = descricao;
         this.status = status;
+        this.id_resp = id_resp;
     }
 
     public Evento() {
+    }
+
+    public int getId_resp() {
+        return id_resp;
+    }
+
+    public void setId_resp(int id_resp) {
+        this.id_resp = id_resp;
     }
 
     public int getId() {

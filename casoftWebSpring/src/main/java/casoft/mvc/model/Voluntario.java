@@ -11,13 +11,14 @@ import java.util.List;
 public class Voluntario {
     private int id;
     private String nome;
-    private int cell;
+    private String cell;
     private String cpf;
     private String email;
     private String logradouro;
     private String bairro;
     private String comp;
     private String cep;
+    private int numero;
 
     @Autowired
     private VoluntarioDAO dao;
@@ -25,7 +26,7 @@ public class Voluntario {
     public Voluntario() {
     }
 
-    public Voluntario(int id, String nome, int cell, String cpf, String email, String logradouro, String bairro, String comp, String cep) {
+    public Voluntario(int id, String nome, String cell, String cpf, String email, String logradouro, String bairro, String comp, String cep, int numero) {
         this.id = id;
         this.nome = nome;
         this.cell = cell;
@@ -35,6 +36,7 @@ public class Voluntario {
         this.bairro = bairro;
         this.comp = comp;
         this.cep = cep;
+        this.numero = numero;
     }
 
     public int getId() {
@@ -53,11 +55,11 @@ public class Voluntario {
         this.nome = nome;
     }
 
-    public int getCell() {
+    public String getCell() {
         return cell;
     }
 
-    public void setCell(int cell) {
+    public void setCell(String cell) {
         this.cell = cell;
     }
 
@@ -115,6 +117,14 @@ public class Voluntario {
 
     public Voluntario consultar(int Id, Singleton conexao){
         return dao.get(Id, conexao);
+    }
+
+    public int getNumero() {
+        return numero;
+    }
+
+    public void setNumero(int numero) {
+        this.numero = numero;
     }
 
     public Voluntario update(Voluntario voluntario, Singleton conexao){

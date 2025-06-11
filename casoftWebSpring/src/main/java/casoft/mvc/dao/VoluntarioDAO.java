@@ -13,17 +13,18 @@ public class VoluntarioDAO implements IDAO<Voluntario> {
     @Override
     public Voluntario gravar(Voluntario entidade, Singleton conexao) {
         String sql = """
-                INSERT INTO voluntario (volu_nome, volu_cell, volu_email, volu_logradouro,  volu_bairro, volu_comp, volu_cep, volu_cpf) 
-                VALUES ('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8')
+                INSERT INTO voluntario (volu_nome, volu_cell, volu_email, volu_logradouro,  volu_bairro, volu_comp, volu_cep, volu_cpf, volu_numero_end) 
+                VALUES ('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9')
                 """;
         sql = sql.replace("#1", entidade.getNome());
-        sql = sql.replace("#2",""+entidade.getCell() );
+        sql = sql.replace("#2",entidade.getCell() );
         sql = sql.replace("#3", entidade.getEmail());
         sql = sql.replace("#4",entidade.getLogradouro());
         sql = sql.replace("#5",entidade.getBairro());
         sql = sql.replace("#6",entidade.getComp());
         sql = sql.replace("#7",entidade.getCep().toString());
         sql = sql.replace("#8",entidade.getCpf());
+        sql = sql.replace("#9",""+entidade.getNumero());
 
         if (conexao.getConexao().manipular(sql)) {
             return entidade;
@@ -36,7 +37,7 @@ public class VoluntarioDAO implements IDAO<Voluntario> {
     @Override
     public Voluntario alterar(Voluntario entidade, Singleton conexao) {
         String sql = """
-        UPDATE evento SET 
+        UPDATE voluntario SET 
             volu_nome = '#1',
             volu_cell = '#2',
             volu_email = '#3',
@@ -44,18 +45,20 @@ public class VoluntarioDAO implements IDAO<Voluntario> {
             volu_bairro = '#5',
             volu_comp = '#6',
             volu_cep = '#7',
-            volu_cpf = '#8'
-        WHERE volu_id = #9;
+            volu_cpf = '#8',
+            volu_numero_end = '#9'
+        WHERE volu_id = #10;
         """;
         sql = sql.replace("#1", entidade.getNome())
-                .replace("#2",""+entidade.getCell() )
+                .replace("#2",entidade.getCell())
                 .replace("#3", entidade.getEmail())
                 .replace("#4",entidade.getLogradouro())
                 .replace("#5",entidade.getBairro())
                 .replace("#6",entidade.getComp())
                 .replace("#7",entidade.getCep())
                 .replace("#8",entidade.getCpf())
-                .replace("#9",""+ entidade.getId());
+                .replace("#9",""+entidade.getNumero() )
+                .replace("#10",""+ entidade.getId());
 
 
         if (conexao.getConexao().manipular(sql)) {
@@ -78,12 +81,13 @@ public class VoluntarioDAO implements IDAO<Voluntario> {
 
     @Override
     public Voluntario get(int id, Singleton conexao) {
-        String sql = "SELECT * FROM voluntario WHERE evento_id = " + id;
+        String sql = "SELECT * FROM voluntario WHERE volu_id = " + id;
         var rs = conexao.getConexao().consultar(sql);
         try {
             if (rs.next()) {
                 Voluntario v = new Voluntario();
                 v.setId(rs.getInt("volu_id"));
+                v.setCell(rs.getString("volu_cell"));
                 v.setNome(rs.getString("volu_nome"));
                 v.setBairro(rs.getString("volu_bairro"));
                 v.setEmail(rs.getString("volu_email"));
@@ -91,6 +95,7 @@ public class VoluntarioDAO implements IDAO<Voluntario> {
                 v.setComp(rs.getString("volu_comp"));
                 v.setCep(rs.getString("volu_cep"));
                 v.setCpf(rs.getString("volu_cpf"));
+                v.setNumero(rs.getInt("volu_numero_end"));
                 return v;
             }
         } catch (Exception e) {
@@ -120,6 +125,7 @@ public class VoluntarioDAO implements IDAO<Voluntario> {
                 v.setComp(rs.getString("volu_comp"));
                 v.setCep(rs.getString("volu_cep"));
                 v.setCpf(rs.getString("volu_cpf"));
+                v.setNumero(rs.getInt("volu_numero_end"));
                 voluntarios.add(v);
             }
 

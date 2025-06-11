@@ -57,7 +57,7 @@ public class CategoriaReceitaView {
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable int id){
         if(categoriaReceitaController.delete(id)){
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().body(new Mensagem("Categoria receita com sucesso"));
         }
         return ResponseEntity.badRequest().body(new Mensagem("Falha ao deletar!"));
     }
