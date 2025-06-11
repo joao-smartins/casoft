@@ -72,31 +72,45 @@ async function carregarDespesasPendentes() {
                 'Authorization': 'Bearer ' + token
             }
         });
-        
+
         if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`);
+            throw new Error(`Erro HTTP: ${response.status}`);
         }
 
         const dadosApi = await response.json();
-        
-        const despesasFormatadas = dadosApi.map(item => ({
-        id: item.id || 0,
-        descricao: item.descricao || 'Sem descrição',
-        categoria: item.categoria || 'Outros',
-        valor: item.val || 0, 
-        data_lancamento: item.data_lanc,
-        data_vencimento: item.data_venc || new Date().toISOString().split('T')[0], 
-        evento: item.evento || null,
-        status: item.status_conci 
-        }));
+        console.log("DADOS BRUTOS RECEBIDOS DA API:", dadosApi); // Mantenha para debug
 
-        console.log('Despesas formatadas:', despesasFormatadas);
+        // Mapeamento cuidadoso dos dados da API para o formato do frontend
+        const despesasFormatadas = dadosApi.map(item => {
+            // --- LÓGICA DE EXTRAÇÃO CORRIGIDA E MAIS SEGURA ---
+            const categoriaId = (item.categoria && item.categoria.id) ? item.categoria.id : null;
+            const eventoId = (item.evento && item.evento.id) ? item.evento.id : null;
+
+            return {
+                id: item.id || 0,
+                descricao: item.descricao || 'Sem descrição',
+                valor: item.val || 0,
+                data_lancamento: item.data_lanc,
+                data_vencimento: item.data_venc || new Date().toISOString().split('T')[0],
+                status: item.status_conci,
+                
+                // Guarda os objetos inteiros para exibição
+                categoria: item.categoria || { id: null, nome: 'Outros' },
+                evento: item.evento || null, 
+                
+                // Guarda os IDs extraídos corretamente para as requisições
+                tipoDespesa_id: categoriaId,
+                evento_id: eventoId
+            };
+        });
+
+        console.log('Despesas formatadas com IDs extraídos:', despesasFormatadas);
         return despesasFormatadas;
-        
+
     } catch (error) {
         console.error('Erro ao carregar despesas:', error);
-        //mostrarToast('Erro', 'Não foi possível carregar as despesas', 'error');
-        return []; 
+        mostrarToast('Erro', 'Não foi possível carregar as despesas pendentes.', 'error');
+        return [];
     }
 }
 
@@ -394,78 +408,113 @@ function calcularDiferenca() {
 }
 
 async function processarQuitacao() {
-try {
-    const formData = new FormData(document.getElementById('formQuitarDespesa'));
-    const despesaId = formData.get('despesa_id_quitar');
-    
-    // Encontrar a despesa completa na lista
-    const despesa = despesasPendentes.find(d => d.id == despesaId);
-    
-    if (!despesa) {
-        mostrarToast('Erro', 'Despesa não encontrada', 'error');
-        return;
-    }
+    try {
+        const formData = new FormData(document.getElementById('formQuitarDespesa'));
+        const despesaId = parseInt(formData.get('despesa_id_quitar'));
+        const valorPago = parseFloat(formData.get('valor_pago_modal'));
+        // Pegando os novos campos do formulário
+        const dataPagamento = formData.get('data_pagamento_modal') || new Date().toISOString().split('T')[0];
+        const observacoes = formData.get('observacoes_modal') || '';
 
-    // Obter valores do formulário
-    const valorPago = parseFloat(formData.get('valor_pago_modal'));
-    const dataPagamento = formData.get('data_pagamento_modal') || new Date().toISOString().split('T')[0];
-    
-    // Garantir valores padrão para campos obrigatórios
-    const dataLancamento = despesa.data_lancamento || despesa.data_vencimento || new Date().toISOString().split('T')[0];
-    const tipoDespesaId = despesa.tipoDespesa_id || '1';
-    const eventoId = despesa.evento_id || 'null';
-
-    if (!valorPago || isNaN(valorPago)) {
-        mostrarToast('Erro', 'Valor pago inválido', 'error');
-        return;
-    }
-
-    // Construir query string com fallbacks seguros
-    const params = new URLSearchParams();
-    params.append('id', despesaId);
-    params.append('valor', despesa.valor?.toFixed(2) || '0.00');
-    params.append('data_venc', despesa.data_vencimento || dataPagamento);
-    params.append('data_lanc', dataLancamento); 
-    params.append('pagamento', valorPago.toFixed(2));
-    params.append('descricao', despesa.descricao || 'Quitação de despesa');
-    params.append('status_conci', 'Pendente');
-    params.append('tipoDespesa_id', tipoDespesaId);
-    params.append('usuario_id', authManager.getId());
-    params.append('evento_id', eventoId);
-
-    console.log('Dados enviados:', {
-        data_lancamento: dataLancamento,
-        valores: params.toString()
-    });
-
-    // Chamada à API
-    const response = await fetch(`http://localhost:8080/apis/despesa?${params.toString()}`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': authManager.getToken()
+        const despesa = despesasPendentes.find(d => d.id === despesaId);
+        if (!despesa) {
+            mostrarToast('Erro', 'Despesa não encontrada para processar.', 'error');
+            return;
         }
-    });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao quitar despesa');
+        if (!valorPago || isNaN(valorPago) || valorPago <= 0) {
+            mostrarToast('Erro', 'O valor pago é inválido.', 'error');
+            return;
+        }
+
+        const token = authManager.getToken();
+        const headers = { 'Authorization': 'Bearer ' + token };
+
+        // Pagamento parcial
+        if (valorPago < despesa.valor) {
+            // 1. ATUALIZA A DESPESA ORIGINAL (PUT)
+            const paramsPut = new URLSearchParams();
+            paramsPut.append('id', despesa.id);
+            paramsPut.append('valor', despesa.valor);
+            paramsPut.append('data_venc', despesa.data_vencimento);
+            paramsPut.append('data_lanc', despesa.data_lancamento);
+            paramsPut.append('pagamento', valorPago.toFixed(2));
+            paramsPut.append('descricao', despesa.descricao);
+            paramsPut.append('status_conci', "Pendente"); 
+            paramsPut.append('tipoDespesa_id', despesa.tipoDespesa_id || '0');
+            paramsPut.append('usuario_id', authManager.getId());
+            paramsPut.append('evento_id', despesa.evento_id || '0');
+            // ADICIONANDO NOVOS PARÂMETROS OBRIGATÓRIOS
+            paramsPut.append('data_pag', dataPagamento);
+            paramsPut.append('obs', observacoes);
+
+            const responsePut = await fetch(`http://localhost:8080/apis/despesa/quitar?${paramsPut.toString()}`, {
+                method: 'PUT',
+                headers: headers
+            });
+
+            if (!responsePut.ok) {
+                throw new Error('Falha ao atualizar a despesa original.');
+            }
+
+            // 2. CRIA A NOVA DESPESA (POST)
+            const diferenca = despesa.valor - valorPago;
+            const paramsPost = new URLSearchParams();
+            paramsPost.append('descricao', `Restante de: ${despesa.descricao}`);
+            paramsPost.append('valor', diferenca.toFixed(2));
+            paramsPost.append('data_venc', despesa.data_vencimento);
+            paramsPost.append('data_lanc', new Date().toISOString().split('T')[0]);
+            paramsPost.append('status_conci', "Aguardando");
+            paramsPost.append('tipoDespesa_id', despesa.tipoDespesa_id || '0');
+            paramsPost.append('evento_id', despesa.evento_id || '0');
+            paramsPost.append('usuario_id', authManager.getId());
+            paramsPost.append('pai_id', despesa.id);
+            paramsPost.append('pagamento', '0.00');
+
+            const responsePost = await fetch(`http://localhost:8080/apis/despesa/quitar?${paramsPost.toString()}`, {
+                method: 'POST',
+                headers: headers
+            });
+
+            if (!responsePost.ok) {
+                throw new Error('Falha ao criar a nova despesa com o valor restante.');
+            }
+            mostrarToast('Sucesso', 'Pagamento parcial registrado e nova despesa criada!', 'success');
+        } else {
+            // Pagamento total
+            const paramsQuitacao = new URLSearchParams();
+            paramsQuitacao.append('id', despesa.id);
+            paramsQuitacao.append('valor', despesa.valor);
+            paramsQuitacao.append('data_venc', despesa.data_vencimento);
+            paramsQuitacao.append('data_lanc', despesa.data_lancamento);
+            paramsQuitacao.append('pagamento', valorPago.toFixed(2));
+            paramsQuitacao.append('descricao', despesa.descricao);
+            paramsQuitacao.append('status_conci', "Pendente");
+            paramsQuitacao.append('tipoDespesa_id', despesa.tipoDespesa_id || '0');
+            paramsQuitacao.append('usuario_id', authManager.getId());
+            paramsQuitacao.append('evento_id', despesa.evento_id || '0');
+            // ADICIONANDO NOVOS PARÂMETROS OBRIGATÓRIOS
+            paramsQuitacao.append('data_pag', dataPagamento);
+            paramsQuitacao.append('obs', observacoes);
+
+            const response = await fetch(`http://localhost:8080/apis/despesa/quitar?${paramsQuitacao.toString()}`, {
+                method: 'PUT',
+                headers: headers
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro na quitação.');
+            }
+            mostrarToast('Sucesso', 'Despesa quitada com sucesso!', 'success');
+        }
+
+        await carregarDados();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalQuitarDespesa'));
+        modal.hide();
+    } catch (error) {
+        console.error('Erro no processo de quitação:', error);
+        mostrarToast('Erro', error.message || 'Não foi possível completar a operação.', 'error');
     }
-
-    // Atualizar interface
-    despesasPendentes = await carregarDespesasPendentes();
-    renderizarDespesas(despesasPendentes);
-    atualizarContador();
-    
-    // Fechar modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modalQuitarDespesa'));
-    modal.hide();
-    
-    mostrarToast('Sucesso', 'Despesa quitada com sucesso!', 'success');
-
-} catch (error) {
-    console.error('Erro ao quitar despesa:', error);
-    mostrarToast('Erro', error.message || 'Erro ao quitar despesa', 'error');
-}
 }
 
 function aplicarFiltros() {

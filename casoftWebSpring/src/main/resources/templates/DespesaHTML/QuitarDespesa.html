@@ -186,7 +186,7 @@
             </div>
 
             <!-- Formulário de Quitação -->
-            <div class="mb-3">
+                        <div class="mb-3">
               <label for="valor_pago_modal" class="form-label">
                 Valor Pago <span class="required">*</span>
               </label>
@@ -194,12 +194,21 @@
                 <span class="input-group-text">R$</span>
                 <input type="number" id="valor_pago_modal" name="valor_pago_modal" 
                        class="form-control" step="0.01" min="0.01" required
-                       placeholder="0,00" readonly>
+                       placeholder="0,00">
               </div>
               <div class="invalid-feedback">
-                <!--Por favor, informe o valor pago. -->
+                Por favor, informe o valor pago.
               </div>
-              <!--<small class="text-muted">Informe o valor efetivamente pago para esta despesa</small> -->
+              <small class="text-muted">Informe o valor efetivamente pago para esta despesa</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="observacoes_modal" class="form-label">
+                Observações
+              </label>
+              <textarea id="observacoes_modal" name="observacoes_modal" 
+                        class="form-control" rows="2" 
+                        placeholder="Observações sobre o pagamento (opcional)"></textarea>
             </div>
 
             <!-- Resumo da Quitação -->
