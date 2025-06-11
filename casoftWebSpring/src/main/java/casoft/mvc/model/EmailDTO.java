@@ -1,4 +1,4 @@
-package casoft.mvc.dto;
+package casoft.mvc.model;
 
 import casoft.mvc.dao.EmailDAO;
 import casoft.mvc.util.Singleton;

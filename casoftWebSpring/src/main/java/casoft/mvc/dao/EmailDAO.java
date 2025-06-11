@@ -1,5 +1,5 @@
 package casoft.mvc.dao;
-import casoft.mvc.dto.EmailDTO;
+import casoft.mvc.model.EmailDTO;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 

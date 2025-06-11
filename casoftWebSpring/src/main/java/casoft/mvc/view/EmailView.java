@@ -1,7 +1,7 @@
 package casoft.mvc.view;
 
-import casoft.mvc.dto.EmailDTO;
-import casoft.mvc.service.EmailService;
+import casoft.mvc.model.EmailDTO;
+import casoft.mvc.controller.EmailService;
 import jakarta.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;

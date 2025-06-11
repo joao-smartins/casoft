@@ -1,4 +1,4 @@
-package casoft.mvc.service;
+package casoft.mvc.controller;
 
 import casoft.mvc.util.Singleton;
 import jakarta.mail.MessagingException;
@@ -19,7 +19,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
     @Autowired
-    private casoft.mvc.dto.EmailDTO emailDTO;
+    private casoft.mvc.model.EmailDTO emailDTO;
 
     public void enviarEmailMultiplo(List<String> destinatarios, String assunto, String mensagem) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
