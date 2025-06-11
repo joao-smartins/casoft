@@ -275,7 +275,7 @@
                             <button class="btn btn-danger btn-sm btn-excluir" title="Excluir">
                                 <i class="bi bi-trash-fill"></i>
                             </button>
-                            <button class="btn btn-success btn-sm" title="Voluntários">
+                            <button class="btn btn-success btn-sm" id="buttonVoluntarios"title="Voluntários">
                                 <i class="bi bi-person-gear"></i>
                             </button>
                         </div>
@@ -296,6 +296,10 @@
                     idParaExcluir = evento.id;
                     modal.show();
                 });
+                buttonVoluntarios.addEventListener("click", () => {
+                    window.location.href = `adicionarVoluntarios.html?eventoId=${evento.id}`;
+                });
+
             });
         });
     }

@@ -1,6 +1,7 @@
 package casoft.mvc.model;
 
 import casoft.mvc.dao.EventosDAO;
+import casoft.mvc.util.Conexao;
 import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -87,6 +88,18 @@ public class Evento {
 
     public Evento consultar(int Id, Singleton conexao){
         return dao.get(Id, conexao);
+    }
+
+    public List<Voluntario> consultaVolu(Conexao conexao, int id){
+        return dao.getVolu(conexao,id);
+    }
+
+    public boolean putvoluntario(int evento_id, int voluntario_id, Singleton conexao){
+        return dao.adicionarVoluntarioAoEvento(evento_id, voluntario_id, conexao);
+    }
+
+    public boolean deletevoluntario(int evento_id, int voluntario_id, Singleton conexao){
+        return dao.removerVoluntarioDoEvento(evento_id, voluntario_id, conexao);
     }
 
     public Evento update(Evento evento, Singleton conexao){

@@ -1,6 +1,8 @@
 package casoft.mvc.dao;
 
 import casoft.mvc.model.Evento;
+import casoft.mvc.model.Voluntario;
+import casoft.mvc.util.Conexao;
 import casoft.mvc.util.Singleton;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
@@ -118,6 +120,62 @@ public class EventosDAO implements IDAO<Evento> {
         }
         return null;
     }
+
+    public List<Voluntario> getVolu(Conexao conexao, int idEvento){
+        String sql = """
+        SELECT v.* FROM voluntario v
+        JOIN volu_even ve ON ve.voluntario_voluntario_id = v.voluntario_id
+        WHERE ve.evento_evento_id = #1
+        """.replace("#1", String.valueOf(idEvento));
+
+        List<Voluntario> voluntarios = new ArrayList<>();
+        var rs = conexao.consultar(sql);
+        try {
+            while (rs.next()) {
+                Voluntario v = new Voluntario();
+                v.setId(rs.getInt("voluntario_id"));
+                v.setCell(rs.getString("volu_cell"));
+                v.setNome(rs.getString("volu_nome"));
+                v.setBairro(rs.getString("volu_bairro"));
+                v.setEmail(rs.getString("volu_email"));
+                v.setLogradouro(rs.getString("volu_logradouro"));
+                v.setComp(rs.getString("volu_comp"));
+                v.setCep(rs.getString("volu_cep"));
+                v.setCpf(rs.getString("volu_cpf"));
+                v.setNumero(rs.getInt("volu_numero_end"));
+                voluntarios.add(v);
+            }
+            return voluntarios;
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar voluntários do evento: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public boolean adicionarVoluntarioAoEvento(int eventoId, int voluntarioId, Singleton conexao) {
+        String sql = """
+        INSERT INTO volun_even (evento_evento_id, voluntario_voluntario_id)
+        VALUES ('#1', '#2')
+        """;
+        sql = sql.replace("#1", ""+eventoId)
+                .replace("#2",""+ voluntarioId);
+
+        if(conexao.getConexao().manipular(sql))
+            return true;
+        return false;
+    }
+
+    public boolean removerVoluntarioDoEvento(int eventoId, int voluntarioId, Singleton conexao) {
+        String sql = """
+        DELETE FROM volun_even
+        WHERE evento_id = #1 AND voluntario_id = #2
+        """;
+        sql = sql.replace("#1", String.valueOf(eventoId))
+                .replace("#2", String.valueOf(voluntarioId));
+
+        return conexao.getConexao().manipular(sql);
+    }
+
 
     public void inativarEventos(LocalDate hoje, Singleton conexao){
         String sql = "UPDATE evento SET evento_status = 'I' where evento_data < '#1' and evento_status = 'A'";

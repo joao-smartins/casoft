@@ -28,6 +28,33 @@ public class EventosView {
         return ResponseEntity.badRequest().body(new Mensagem(json.get("erro").toString()));
     }
 
+    @GetMapping("/{id}/voluntario")
+    public ResponseEntity<Object> createIdVolu(@PathVariable int id){
+        List<Map<String,Object>> json = eventoController.getIdVolu(id);
+        if(!json.isEmpty()){
+                return ResponseEntity.ok().body(json);
+        }
+        return ResponseEntity.badRequest().body(new Mensagem("Voluntario não deletado!"));
+    }
+
+    @PostMapping("/{id}/voluntario/{voluntarioId}")
+    public ResponseEntity<Object> putIdVolu(@PathVariable int id, @PathVariable int voluntarioId){
+        boolean mensagem = eventoController.createIdVolu(id, voluntarioId);
+        if(mensagem == true){
+            return ResponseEntity.ok().body(mensagem);
+        }
+        return ResponseEntity.badRequest().body(new Mensagem("Voluntario não adicionado!"));
+    }
+
+    @DeleteMapping("/{id}/voluntario/{voluntarioId}")
+    public ResponseEntity<Object> deleteIdVolu(@PathVariable int id, @PathVariable int voluntarioId){
+        boolean mensagem = eventoController.deleteIdVolu(id, voluntarioId);
+        if(mensagem == true){
+            return ResponseEntity.ok().body(mensagem);
+        }
+        return ResponseEntity.badRequest().body(new Mensagem("Voluntario não adicionado!"));
+    }
+
     @GetMapping
     public ResponseEntity<Object> getAll(){
         List<Map<String,Object>> listJson = eventoController.getAll("");
