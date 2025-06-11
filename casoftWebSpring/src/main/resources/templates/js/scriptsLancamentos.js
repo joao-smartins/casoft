@@ -147,7 +147,29 @@ function renderizarTabelaLancamentos(lancamentosParaRenderizar) {
     }
 
     lancamentosParaRenderizar.forEach(lanc => {
-        tbody.innerHTML += `<tr><td>${lanc.id}</td><td>${lanc.dataLancamento || ""}</td><td>${lanc.descricao}</td><td>${lanc.origem || ""}</td><td>${lanc.destino || ""}</td><td>${lanc.contaBancariaId || ""}</td><td>${lanc.receitaId || ""}</td><td>${lanc.despesaId || ""}</td><td>${lanc.movimentacaoBancariaId || ""}</td><td><button class="btn btn-sm btn-warning" onclick='editarLancamento(${JSON.stringify(lanc)})'>Editar</button><button class="btn btn-sm btn-danger" onclick='excluirLancamento(${lanc.id})'>Excluir</button></td></tr>`;
+        tbody.innerHTML += `
+            <tr>
+                <td>${lanc.id}</td>
+                <td>${lanc.dataLancamento || ""}</td>
+                <td>${lanc.descricao}</td>
+                <td>${lanc.origem || ""}</td>
+                <td>${lanc.destino || ""}</td>
+                <td>${lanc.contaBancariaId || ""}</td>
+                <td>${lanc.receitaId || ""}</td>
+                <td>${lanc.despesaId || ""}</td>
+                <td>${lanc.movimentacaoBancariaId || ""}</td>
+                <td class="d-flex flex-column align-items-center justify-content-center gap-1">
+                    <button class="btn btn-sm btn-warning w-100 mb-1 d-flex align-items-center justify-content-center"
+                        onclick='editarLancamento(${JSON.stringify(lanc)})'>
+                        <i class="bi bi-pencil-square me-1"></i> Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger w-100 d-flex align-items-center justify-content-center"
+                        onclick='excluirLancamento(${lanc.id})'>
+                        <i class="bi bi-trash me-1"></i> Excluir
+                    </button>
+                </td>
+            </tr>
+        `;
     });
 }
 
@@ -276,8 +298,170 @@ function editarLancamento(lanc) {
     }
 }
 
+// Funções de validação individuais
+function validarDescricao() {
+    const input = document.getElementById("descricao");
+    const erro = document.getElementById("erroDescricao");
+    if (!input.value.trim()) {
+        erro.innerHTML = "<strong>Descrição é obrigatória.</strong>";
+        input.classList.add("is-invalid");
+        input.style.borderColor = "red";
+        return false;
+    } else {
+        erro.innerHTML = "";
+        input.classList.remove("is-invalid");
+        input.style.borderColor = "";
+        return true;
+    }
+}
+
+function validarOrigem() {
+    const input = document.getElementById("origem");
+    const erro = document.getElementById("erroOrigem");
+    if (!input.value.trim()) {
+        erro.innerHTML = "<strong>Origem é obrigatória.</strong>";
+        input.classList.add("is-invalid");
+        input.style.borderColor = "red";
+        return false;
+    } else {
+        erro.innerHTML = "";
+        input.classList.remove("is-invalid");
+        input.style.borderColor = "";
+        return true;
+    }
+}
+
+function validarDestino() {
+    const input = document.getElementById("destino");
+    const erro = document.getElementById("erroDestino");
+    if (!input.value.trim()) {
+        erro.innerHTML = "<strong>Destino é obrigatório.</strong>";
+        input.classList.add("is-invalid");
+        input.style.borderColor = "red";
+        return false;
+    } else {
+        erro.innerHTML = "";
+        input.classList.remove("is-invalid");
+        input.style.borderColor = "";
+        return true;
+    }
+}
+
+function validarData() {
+    const input = document.getElementById("data");
+    const erro = document.getElementById("erroData");
+    const valor = input.value;
+    if (!valor) {
+        erro.innerHTML = "<strong>Data é obrigatória.</strong>";
+        input.classList.add("is-invalid");
+        input.style.borderColor = "red";
+        return false;
+    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+        erro.innerHTML = "<strong>Data inválida.</strong>";
+        input.classList.add("is-invalid");
+        input.style.borderColor = "red";
+        return false;
+    } else {
+        erro.innerHTML = "";
+        input.classList.remove("is-invalid");
+        input.style.borderColor = "";
+        return true;
+    }
+}
+
+function validarReceita() {
+    const input = document.getElementById("receita");
+    const erro = document.getElementById("erroReceita");
+    if (document.getElementById("radioReceita").checked) {
+        if (!input.value || isNaN(input.value)) {
+            erro.innerHTML = "<strong>Informe um valor numérico para Receita.</strong>";
+            input.classList.add("is-invalid");
+            input.style.borderColor = "red";
+            return false;
+        } else {
+            erro.innerHTML = "";
+            input.classList.remove("is-invalid");
+            input.style.borderColor = "";
+            return true;
+        }
+    } else {
+        erro.innerHTML = "";
+        input.classList.remove("is-invalid");
+        input.style.borderColor = "";
+        return true;
+    }
+}
+
+function validarDespesa() {
+    const input = document.getElementById("despesa");
+    const erro = document.getElementById("erroDespesa");
+    if (document.getElementById("radioDespesa").checked) {
+        if (!input.value || isNaN(input.value)) {
+            erro.innerHTML = "<strong>Informe um valor numérico para Despesa.</strong>";
+            input.classList.add("is-invalid");
+            input.style.borderColor = "red";
+            return false;
+        } else {
+            erro.innerHTML = "";
+            input.classList.remove("is-invalid");
+            input.style.borderColor = "";
+            return true;
+        }
+    } else {
+        erro.innerHTML = "";
+        input.classList.remove("is-invalid");
+        input.style.borderColor = "";
+        return true;
+    }
+}
+
+// Adiciona listeners para validação automática
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("descricao").addEventListener("input", validarDescricao);
+    document.getElementById("descricao").addEventListener("blur", validarDescricao);
+
+    document.getElementById("origem").addEventListener("input", validarOrigem);
+    document.getElementById("origem").addEventListener("blur", validarOrigem);
+
+    document.getElementById("destino").addEventListener("input", validarDestino);
+    document.getElementById("destino").addEventListener("blur", validarDestino);
+
+    document.getElementById("data").addEventListener("input", validarData);
+    document.getElementById("data").addEventListener("blur", validarData);
+
+    document.getElementById("receita").addEventListener("input", validarReceita);
+    document.getElementById("receita").addEventListener("blur", validarReceita);
+
+    document.getElementById("despesa").addEventListener("input", validarDespesa);
+    document.getElementById("despesa").addEventListener("blur", validarDespesa);
+
+    // Atualiza validação ao trocar tipo
+    document.getElementById("radioReceita").addEventListener("change", () => {
+        validarReceita();
+        validarDespesa();
+    });
+    document.getElementById("radioDespesa").addEventListener("change", () => {
+        validarReceita();
+        validarDespesa();
+    });
+});
+
+// Atualize a função principal para usar as novas validações
+function validarLancamento() {
+    let valido = true;
+    if (!validarDescricao()) valido = false;
+    if (!validarOrigem()) valido = false;
+    if (!validarDestino()) valido = false;
+    if (!validarData()) valido = false;
+    if (!validarReceita()) valido = false;
+    if (!validarDespesa()) valido = false;
+    return valido;
+}
+
 async function salvarLancamento(event) {
     event.preventDefault();
+    if (!validarLancamento()) return;
+
     const id = document.getElementById("idLancamento").value;
     const lancamento = {
         descricao: document.getElementById("descricao").value,
@@ -323,3 +507,62 @@ function limparFormulario() {
     document.getElementById("movimentacaoBancariaIdHidden").value = "";
     document.getElementById("conta").value = "";
 }
+
+let ordemAtual = { coluna: null, direcao: 'asc' };
+
+function ordenarLancamentos(coluna) {
+    if (ordemAtual.coluna === coluna) {
+        ordemAtual.direcao = ordemAtual.direcao === 'asc' ? 'desc' : 'asc';
+    } else {
+        ordemAtual.coluna = coluna;
+        ordemAtual.direcao = 'asc';
+    }
+
+    let lista = [...todosOsLancamentos];
+    lista.sort((a, b) => {
+        let valA = a[coluna];
+        let valB = b[coluna];
+
+        // Tenta converter para número se possível
+        if (!isNaN(valA) && !isNaN(valB) && valA !== null && valB !== null && valA !== "" && valB !== "") {
+            valA = Number(valA);
+            valB = Number(valB);
+        }
+
+        if (valA === undefined || valA === null) valA = '';
+        if (valB === undefined || valB === null) valB = '';
+
+        if (valA < valB) return ordemAtual.direcao === 'asc' ? -1 : 1;
+        if (valA > valB) return ordemAtual.direcao === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    renderizarTabelaLancamentos(lista);
+    atualizarSetasOrdenacao();
+}
+
+function atualizarSetasOrdenacao() {
+    document.querySelectorAll('#tabelaLancamentos th.sortable').forEach(th => {
+        const span = th.querySelector('.sort-icons');
+        if (!span) return;
+        if (th.dataset.col === ordemAtual.coluna) {
+            if (ordemAtual.direcao === 'asc') {
+                span.innerHTML = '<i class="bi bi-caret-up-fill"></i>';
+            } else {
+                span.innerHTML = '<i class="bi bi-caret-down-fill"></i>';
+            }
+        } else {
+            span.innerHTML = '<i class="bi bi-caret-up"></i><i class="bi bi-caret-down"></i>';
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Adiciona evento de clique para ordenar
+    document.querySelectorAll('#tabelaLancamentos th.sortable').forEach(th => {
+        th.style.cursor = "pointer";
+        th.addEventListener('click', () => {
+            ordenarLancamentos(th.dataset.col);
+        });
+    });
+});
