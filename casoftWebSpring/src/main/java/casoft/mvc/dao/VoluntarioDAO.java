@@ -47,7 +47,7 @@ public class VoluntarioDAO implements IDAO<Voluntario> {
             volu_cep = '#7',
             volu_cpf = '#8',
             volu_numero_end = '#9'
-        WHERE volu_id = #10;
+        WHERE volu_id = #T;
         """;
         sql = sql.replace("#1", entidade.getNome())
                 .replace("#2",entidade.getCell())
@@ -57,10 +57,8 @@ public class VoluntarioDAO implements IDAO<Voluntario> {
                 .replace("#6",entidade.getComp())
                 .replace("#7",entidade.getCep())
                 .replace("#8",entidade.getCpf())
-                .replace("#9",""+entidade.getNumero() )
-                .replace("#10",""+ entidade.getId());
-
-
+                .replace("#9",""+entidade.getNumero())
+                .replace("#T",""+ entidade.getId());
         if (conexao.getConexao().manipular(sql)) {
             return entidade;
         } else {

@@ -248,8 +248,6 @@ CREATE TABLE public.evento (
 ALTER TABLE public.evento OWNER TO postgres;
 
 
-ALTER TABLE ONLY public.evento
-    ADD CONSTRAINT evento_volu_volu_id_fkey FOREIGN KEY (evento_id_resp) REFERENCES public.voluntario(volu_id);
 --
 -- TOC entry 222 (class 1259 OID 16751)
 -- Name: evento_evento_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -1043,6 +1041,9 @@ ALTER TABLE public.conciliacao
 ALTER TABLE public.conciliacao
     ADD CONSTRAINT fk_conc_despesa FOREIGN KEY (conc_despesa_id) REFERENCES public.despesa(despesa_id);
 
+
+ALTER TABLE ONLY public.evento
+    ADD CONSTRAINT evento_volu_volu_id_fkey FOREIGN KEY (evento_id_resp) REFERENCES public.voluntario(volu_id);
 
 -- Completed on 2025-05-16 14:23:47 -03
 

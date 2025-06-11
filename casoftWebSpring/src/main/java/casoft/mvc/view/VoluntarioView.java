@@ -1,6 +1,7 @@
 package casoft.mvc.view;
 
 import casoft.mvc.controller.VoluntarioController;
+import casoft.mvc.model.CategoriaReceita;
 import casoft.mvc.model.Voluntario;
 import casoft.mvc.util.Mensagem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,4 +45,20 @@ public class VoluntarioView {
         return ResponseEntity.badRequest().body(new Mensagem("Não há voluntários registrados!"));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> delete(@PathVariable int id){
+        if(voluntarioController.delete(id)){
+            return ResponseEntity.ok().body(new Mensagem("Voluntário deletado com sucesso"));
+        }
+        return ResponseEntity.badRequest().body(new Mensagem("Falha ao deletar!"));
+    }
+
+    @PutMapping
+    public ResponseEntity<Object> update(@RequestBody Voluntario voluntario){
+        Map<String, Object> json = voluntarioController.update(voluntario);
+        if(json.get("erro")==null){
+            return ResponseEntity.ok().body(json);
+        }
+        return ResponseEntity.badRequest().body(new Mensagem(json.get("erro").toString()));
+    }
 }
