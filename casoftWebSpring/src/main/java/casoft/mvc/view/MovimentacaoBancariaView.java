@@ -42,7 +42,7 @@ public class MovimentacaoBancariaView {
             return ResponseEntity.badRequest().body(new Mensagem(json.get("erro").toString()));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<Object> updtMovimentacao(@PathVariable("id") int id, @RequestBody MovimentacaoBancaria movimentacao_atualizada) {
         Map<String, Object> json = movimentacaoController.updtMovimentacao(id, movimentacao_atualizada);
         if (json.get("erro") == null)
@@ -60,4 +60,6 @@ public class MovimentacaoBancariaView {
         else
             return ResponseEntity.badRequest().body(new Mensagem(json.get("erro").toString()));
     }
+
+
 }
