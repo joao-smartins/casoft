@@ -33,7 +33,7 @@ public class SaldoView {
         double totalDespesas = 0.0;
         try {
             if (conexao.conectar()) {
-                List<Receitas> receitas = receitasModel.get("", conexao);
+                List<Receitas> receitas = receitasModel.consultar("", conexao);
                 List<Despesas> despesas = despesasModel.listar("", conexao);
                 for (Receitas r : receitas) {
                     totalReceitas += r.getValor();
@@ -67,7 +67,7 @@ public class SaldoView {
         double totalDespesas = 0.0;
         try {
             if (conexao.conectar()) {
-                List<Receitas> receitas = receitasModel.get("", conexao);
+                List<Receitas> receitas = receitasModel.consultar("", conexao);
                 List<Despesas> despesas = despesasModel.listar("", conexao);
                 if (statusReceita != null && !statusReceita.isEmpty()) {
                     if (statusReceita.equalsIgnoreCase("Pendente") ||
@@ -75,7 +75,7 @@ public class SaldoView {
                         statusReceita.equalsIgnoreCase("Aguardando")) {
                         String statusFiltro = statusReceita;
                         receitas = receitas.stream()
-                                .filter(r -> statusFiltro.equalsIgnoreCase(r.isFutura()))
+                                .filter(r -> statusFiltro.equalsIgnoreCase(r.getStatusConciliacao()))
                                 .toList();
                     }
                 }

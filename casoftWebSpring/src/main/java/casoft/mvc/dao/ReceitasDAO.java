@@ -80,6 +80,39 @@ public class ReceitasDAO {
         return receitas;
     }
 
+
+    public Receitas consultar(int id, Singleton conexao) {
+        Receitas receitas = null;
+        String sql = "";
+        if(id> 0){
+             sql = "SELECT * FROM receita WHERE receita_id = " + id;
+        }
+        else{
+             sql = "SELECT * FROM receita";
+        }
+
+        try ( var rs = conexao.getConexao().consultar(sql)){
+            while (rs.next()) {
+                Receitas r = new Receitas();
+                r.setId(rs.getInt("receita_id"));
+                r.setValor(rs.getDouble("receita_val"));
+                r.setFutura(rs.getBoolean("receita_futura"));
+                r.setDescricao(rs.getString("receita_desc"));
+                r.setEventoId(rs.getInt("evento_id"));
+                r.setCategoria(rs.getInt("catrec_id"));
+                r.setDatavencimento(rs.getDate("receita_datavencimento").toLocalDate());
+                r.setQuitada(rs.getBoolean("receita_quitada"));
+                r.setStatusConciliacao(rs.getString("receita_statusconciliacao"));
+                r.setPagamento(rs.getInt("receita_pagamento"));
+                r.setUsuario_id(rs.getInt("id"));
+                receitas = r;
+            }
+        } catch(Exception er) {
+            System.out.println("Erro ao carregar receitas: " + er.getMessage());
+        }
+        return receitas;
+    }
+
     public boolean apagar(int id, Singleton conexao) {
         String sql = "DELETE FROM receita WHERE receita_id = "+id;
         return conexao.getConexao().manipular(sql);

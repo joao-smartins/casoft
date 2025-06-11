@@ -149,6 +149,7 @@ public class Receitas {
 
     public Receitas alterar(Receitas entidade, Singleton conexao) {return receitasDAO.alterar(entidade, conexao);}
     public List<Receitas> consultar(String filtro, Singleton conexao) {return receitasDAO.consultar(filtro,conexao);}
+    public Receitas get(int id, Singleton conexao) {return receitasDAO.consultar(id,conexao);}
     public boolean apagar(int id, Singleton conexao) {return receitasDAO.apagar(id,conexao);}
     public Receitas gravar(Receitas entidade, Singleton conexao) {return receitasDAO.gravar(entidade,conexao);}
 

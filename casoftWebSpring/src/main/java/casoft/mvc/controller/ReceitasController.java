@@ -99,6 +99,37 @@ public class ReceitasController {
         return jsonList;
     }
 
+    public Map<String, Object> get(int id) {
+                        Map<String, Object> json = new HashMap<>();
+                        Singleton conexao = Singleton.getInstancia();
+
+                        if (conexao.conectar()) {
+                            try {
+                                Receitas receita = receitasModel.get(id, conexao);
+                                if (receita != null) {
+                                    json.put("receita_id", receita.getId());
+                                    json.put("receita_val", receita.getValor());
+                                    json.put("receita_futura", receita.isFutura());
+                                    json.put("receita_desc", receita.getDescricao());
+                                    json.put("evento_id", receita.getEventoId());
+                                    json.put("catrec_id", receita.getCategoria());
+                                    json.put("receita_datavencimento", receita.getDatavencimento());
+                                    json.put("receita_quitada", receita.isQuitada());
+                                    json.put("receita_statusconciliacao", receita.getStatusConciliacao());
+                                    json.put("receita_pagamento", receita.getPagamento());
+                                    json.put("id", receita.getUsuario_id());
+                                    conexao.getConexao().commit();
+                                } else {
+                                    json.put("erro", "Receita não encontrada");
+                                }
+                            } finally {
+                                conexao.Desconectar();
+                            }
+                        }
+                        return json;
+    }
+
+
     public Map<String, Object> delete(int id) {
         Map<String, Object> json = new HashMap<>();
         Singleton conexao = Singleton.getInstancia();
