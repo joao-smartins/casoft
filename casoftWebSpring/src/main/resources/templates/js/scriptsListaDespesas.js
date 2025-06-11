@@ -1,11 +1,10 @@
-
 // Variáveis globais
 let despesaSelecionadaId = null;
 let tabelaDespesas = null;
 const modalConfirmacao = new bootstrap.Modal(document.getElementById('confirmModal'));
 const API_BASE_URL = "http://localhost:8080/apis";
+let despesas = [];
 
-// Inicialização quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', function() {
     inicializarPagina();
 });
@@ -17,240 +16,363 @@ async function inicializarPagina() {
         await carregarEExibirDespesas();
         
         configurarEventListeners();
+        configurarValidacoesFormularios();
     } catch (error) {
-    console.error('Erro na inicialização:', error);
-    mostrarMensagem('Erro ao carregar dados iniciais', 'error');
+        console.error('Erro na inicialização:', error);
+        criarToast('Erro ao carregar dados iniciais', 'error');
     }
 }
 
 function configurarEventListeners() {
-    // Botão de nova despesa
-    document.getElementById('btnMostrarFormulario').addEventListener('click', toggleFormulario);
-    
-    // Botão de confirmação do modal
-    document.getElementById('btnConfirmAction').addEventListener('click', confirmarAcao);
-    
-    // Formulário de cadastro
-    document.getElementById('formDespesa').addEventListener('submit', handleSubmitForm);
-    
-    // Filtros
-    document.getElementById('btnAplicarFiltros').addEventListener('click', aplicarFiltros);
     document.getElementById('btnLimparFiltros').addEventListener('click', limparFiltros);
-    
-    // Auto-aplicar filtros quando mudarem
+    document.getElementById('btnMostrarFormulario').addEventListener('click', toggleFormularioCadastro);
+    document.getElementById('btnConfirmAction').addEventListener('click', confirmarAcao);
+    document.getElementById('formDespesa').addEventListener('submit', handleSubmitFormCadastro);
+    document.getElementById('formEditarDespesa').addEventListener('submit', handleSubmitFormEdicao);
+    document.getElementById('formEditarDespesa').querySelector('.btn-outline-secondary').addEventListener('click', limparFormularioEdicao);
+
     ['filtroStatus', 'filtroDataInicio', 'filtroDataFim'].forEach(id => {
-    document.getElementById(id).addEventListener('change', aplicarFiltros);
+        document.getElementById(id).addEventListener('change', aplicarFiltros);
+    });
+
+    // Event listeners for data validation (already in place from previous version)
+    const dataVencCadastro = document.getElementById('data_venc');
+    const hoje = new Date().toISOString().split('T')[0];
+    dataVencCadastro.setAttribute('min', hoje);
+
+    dataVencCadastro.addEventListener('input', () => {
+        const erroDataObrigatoria = document.getElementById('erroDataObrigatoria');
+        const erroDataInvalida = document.getElementById('erroDataInvalida');
+        erroDataObrigatoria.style.display = 'none';
+        erroDataInvalida.style.display = 'none';
+        dataVencCadastro.classList.remove('is-invalid');
+        dataVencCadastro.classList.remove('is-valid');
+        if (!dataVencCadastro.value) {
+            erroDataObrigatoria.style.display = 'block';
+            dataVencCadastro.classList.add('is-invalid');
+        } else if (dataVencCadastro.value < hoje) {
+            erroDataInvalida.style.display = 'block';
+            dataVencCadastro.classList.add('is-invalid');
+        } else {
+            dataVencCadastro.classList.add('is-valid');
+        }
     });
 }
-// === FUNÇÕES DE CARREGAMENTO DE DADOS ===
+
+function configurarValidacoesFormularios() {
+    // Impede datas menores que hoje para o formulário de cadastro
+    const dataVencCadastro = document.getElementById('data_venc');
+    const hoje = new Date().toISOString().split('T')[0];
+    dataVencCadastro.setAttribute('min', hoje);
+
+    // Adiciona listener para a data de vencimento do formulário de cadastro
+    dataVencCadastro.addEventListener('input', () => {
+        const erroDataObrigatoria = document.getElementById('erroDataObrigatoria');
+        const erroDataInvalida = document.getElementById('erroDataInvalida');
+        
+        erroDataObrigatoria.style.display = 'none';
+        erroDataInvalida.style.display = 'none';
+        dataVencCadastro.classList.remove('is-invalid');
+        dataVencCadastro.classList.remove('is-valid'); // Limpa o valid para revalidar
+
+        if (!dataVencCadastro.value) {
+            erroDataObrigatoria.style.display = 'block';
+            dataVencCadastro.classList.add('is-invalid');
+        } else if (dataVencCadastro.value < hoje) {
+            erroDataInvalida.style.display = 'block';
+            dataVencCadastro.classList.add('is-invalid');
+        } else {
+            dataVencCadastro.classList.add('is-valid');
+        }
+    });
+
+    // Impede datas menores que hoje para o formulário de edição
+    const dataVencEdicao = document.getElementById('data_venc_editar');
+    console.log("Elemento dataVencEdicao:", dataVencEdicao)
+    dataVencEdicao.setAttribute('min', hoje);
+
+    // Adiciona listener para a data de vencimento do formulário de edição
+    dataVencEdicao.addEventListener('input', () => {
+        const erroDataObrigatoria = document.getElementById('erroDataVencEditarObrigatoria');
+        const erroDataInvalida = document.getElementById('erroDataVencEditarInvalida');
+        
+        erroDataObrigatoria.style.display = 'none';
+        erroDataInvalida.style.display = 'none';
+        dataVencEdicao.classList.remove('is-invalid');
+        dataVencEdicao.classList.remove('is-valid'); // Limpa o valid para revalidar
+
+        if (!dataVencEdicao.value) {
+            erroDataObrigatoria.style.display = 'block';
+            dataVencEdicao.classList.add('is-invalid');
+        } else if (dataVencEdicao.value < hoje) {
+            erroDataInvalida.style.display = 'block';
+            dataVencEdicao.classList.add('is-invalid');
+        } else {
+            dataVencEdicao.classList.add('is-valid');
+        }
+    });
+
+    // Adiciona validação genérica de Bootstrap para ambos os formulários
+    document.querySelectorAll('.needs-validation').forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+
+        // Limpa validação ao digitar para todos os campos do formulário
+        form.querySelectorAll('input, select, textarea').forEach(campo => {
+            campo.addEventListener('input', () => {
+                if (campo.checkValidity()) {
+                    campo.classList.remove('is-invalid');
+                    campo.classList.add('is-valid');
+                    if (campo.nextElementSibling && campo.nextElementSibling.classList.contains('invalid-feedback')) {
+                        campo.nextElementSibling.style.display = 'none';
+                    }
+                } else {
+                    campo.classList.remove('is-valid');
+                }
+            });
+        });
+    });
+}
+
+
 async function carregarDespesas() {
     try {
+        mostrarLoading(true);
         const token = authManager.getToken();
-        const response = await fetch("http://localhost:8080/apis/despesa", {
+        const response = await fetch(`${API_BASE_URL}/despesa`, {
             headers: {
                 'Authorization': 'Bearer ' + token
             }
         });
 
-        if (!response.ok) throw new Error('Erro ao carregar despesas');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            const errorMessage = errorData.message || `Erro HTTP ${response.status}`;
+            throw new Error(errorMessage);
+        }
 
-        const despesas = await response.json();
-        return despesas;
+        const dadosDespesas = await response.json();
+        return dadosDespesas;
 
     } catch (error) {
-        console.error('Erro:', error);
-        alert('Não foi possível carregar as despesas');
+        console.error('Erro ao carregar despesas:', error);
+        criarToast(`Não foi possível carregar as despesas: ${error.message}.`, 'error');
         return [];
+    } finally {
+        mostrarLoading(false);
     }
 }
 
 async function carregarEExibirDespesas() {
     try {
-    const despesas = await carregarDespesas();
-    
-    // Destruir tabela existente se houver
-    if (tabelaDespesas) {
-        tabelaDespesas.destroy();
-    }
-    
-    // Inicializar nova tabela
-    tabelaDespesas = $('#tabela-despesas').DataTable({
-        data: despesas,
-        columns: [
-        { 
-            data: 'descricao', 
-            title: 'Descrição',
-            render: function(data, type, row) {
-            if (type === 'display' && data && data.length > 50) {
-                return `<span title="${data}" class="truncated-desc">${data.substring(0, 30)}...</span>`;
-            }
-            return data || 'Sem descrição';
-            }
-        },
-        {
-            data: 'categoria',
-            title: 'Categoria',
-            render: data => data?.nome || 'Sem categoria'
-        },
-        {
-            data: 'val',
-            title: 'Valor (R$)',
-            render: data => formatarMoeda(data),
-            className: 'text-end'
-        },
-        {
-            data: 'data_venc',
-            title: 'Vencimento',
-            render: data => formatarData(data),
-            className: 'text-center'
-        },
-        {
-            data: 'status_conci',
-            title: 'Status',
-            render: data => `<span class="${getStatusClass(data)}">${data || 'Indefinido'}</span>`,
-            className: 'text-center'
-        },
-        {
-            data: 'evento',
-            title: 'Evento',
-            render: data => data?.nome || '<em class="text-muted">Nenhum</em>'
-        },
-        {
-            data: null,
-            title: 'Ações',
-            render: (data, type, row) => `
-            <div class="action-buttons">
-                <button class="btn btn-sm btn-warning" onclick="editarDespesa(${row.id})" title="Editar">
-                	<i class="bi bi-pencil-square"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="confirmarExclusao(${row.id})" title="Excluir">
-                	<i class="bi bi-trash"></i>
-                </button>
-            </div>
-            `,
-            orderable: false,
-            className: 'text-center'
-        }
-        ],
-        language: {
-        url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/pt-BR.json'
-        },
-        order: [[3, 'asc']], // Ordenar por vencimento
-        responsive: true,
-        scrollX: true,
-        autoWidth: false,
-        pageLength: 5,
-        lengthMenu: [[5,10, 25, 50, 100, -1], [5,10, 25, 50, 100, "Todos"]]
+        despesas = await carregarDespesas();
         
-    });
-    // Aguarda 100ms antes de ajustar as colunas
-    $(window).on('resize', function() {
         if (tabelaDespesas) {
-            tabelaDespesas.columns.adjust().responsive.recalc();
+            tabelaDespesas.destroy();
         }
-    });
+        
+        tabelaDespesas = $('#tabela-despesas').DataTable({
+            data: despesas,
+            columns: [
+            { 
+                data: 'descricao', 
+                title: 'Descrição',
+                render: function(data, type, row) {
+                    if (type === 'display' && data && data.length > 50) {
+                        return `<span title="${data}" class="truncated-desc">${data.substring(0, 30)}...</span>`;
+                    }
+                    return data || 'Sem descrição';
+                }
+            },
+            {
+                data: 'categoria',
+                title: 'Categoria',
+                render: data => data?.nome || 'Sem categoria'
+            },
+            {
+                data: 'val',
+                title: 'Valor (R$)',
+                render: data => formatarMoeda(data),
+                className: 'text-end'
+            },
+            {
+                data: 'data_venc',
+                title: 'Vencimento',
+                render: data => formatarData(data),
+                className: 'text-center'
+            },
+            {
+                data: 'status_conci',
+                title: 'Status',
+                render: function(data, type, row) {
+                    if (type === 'display') { // Aplica a mudança apenas para exibição
+                        let displayText = data || 'Indefinido';
+                        if (displayText === 'Pendente') { // Se o valor for 'Pendente'
+                            displayText = 'Pago'; // Mude para 'Pago' para exibição
+                        }
+                        return `<span class="${getStatusClass(data)}">${displayText}</span>`;
+                    }
+                    return data || 'Indefinido'; // Para outros tipos (ordenar, filtrar), mantenha o valor original
+                },
+                className: 'text-center'
+            },
+            {
+                data: 'evento',
+                title: 'Evento',
+                render: data => data?.nome || '<em class="text-muted">Nenhum</em>'
+            },
+            {
+                data: null,
+                title: 'Ações',
+                render: (data, type, row) => `
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" onclick="mostrarFormularioEdicao(${row.id})" title="Editar">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="confirmarExclusao(${row.id})" title="Excluir">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+                `,
+                orderable: false,
+                className: 'text-center'
+            }
+            ],
+            language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/pt-BR.json'
+            },
+            order: [[3, 'asc']],
+            responsive: true,
+            scrollX: true,
+            autoWidth: false,
+            pageLength: 5,
+            lengthMenu: [[5,10, 25, 50, 100, -1], [5,10, 25, 50, 100, "Todos"]]
+            
+        });
+        $(window).on('resize', function() {
+            if (tabelaDespesas) {
+                tabelaDespesas.columns.adjust().responsive.recalc();
+            }
+        });
     } catch (error) {
-    console.error('Erro ao exibir despesas:', error);
+        console.error('Erro ao exibir despesas:', error);
+        criarToast('Erro ao exibir despesas na tabela.', 'error');
     }
 }
 
 async function carregarCategorias() {
     try {
-    const token = authManager.getToken();
-    const response = await fetch(`${API_BASE_URL}/tipoDespesas`, {
-        method: 'GET',
-        headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-        }
-    });
-    
-    const selectCategoria = document.getElementById('tipoDespesa_id');
-    
-    if (response.ok) {
-        const categorias = await response.json();
-        selectCategoria.innerHTML = '<option value="">Selecione uma categoria</option>';
-        
-        categorias.forEach(categoria => {
-        const option = document.createElement('option');
-        option.value = categoria.id;
-        option.textContent = categoria.nome;
-        selectCategoria.appendChild(option);
+        const token = authManager.getToken();
+        const response = await fetch(`${API_BASE_URL}/tipoDespesas`, {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+            }
         });
-    } else {
-        throw new Error('Erro ao carregar categorias');
-    }
+        
+        const selectCategoria = document.getElementById('tipoDespesa_id');
+        const selectCategoriaEditar = document.getElementById('tipoDespesa_id_editar');
+        
+        if (response.ok) {
+            const categorias = await response.json();
+            const defaultOption = '<option value="">Selecione uma categoria</option>';
+            selectCategoria.innerHTML = defaultOption;
+            selectCategoriaEditar.innerHTML = defaultOption;
+            
+            categorias.forEach(categoria => {
+                const option = document.createElement('option');
+                option.value = categoria.id;
+                option.textContent = categoria.nome;
+                selectCategoria.appendChild(option);
+                selectCategoriaEditar.appendChild(option.cloneNode(true));
+            });
+        } else {
+            throw new Error('Erro ao carregar categorias');
+        }
     } catch (error) {
-    console.error('Erro ao carregar categorias:', error);
-    document.getElementById('tipoDespesa_id').innerHTML = '<option value="">Erro ao carregar categorias</option>';
+        console.error('Erro ao carregar categorias:', error);
+        document.getElementById('tipoDespesa_id').innerHTML = '<option value="">Erro ao carregar categorias</option>';
+        document.getElementById('tipoDespesa_id_editar').innerHTML = '<option value="">Erro ao carregar categorias</option>';
     }
 }
 
 async function carregarEventos() {
     try {
-    const token = authManager.getToken();
-    const response = await fetch(`${API_BASE_URL}/eventos`, {
-        method: 'GET',
-        headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-        }
-    });
-    
-    const selectEvento = document.getElementById('evento_id');
-    
-    if (response.ok) {
-        const eventos = await response.json();
-        selectEvento.innerHTML = '<option value="">Nenhum evento selecionado</option>';
-        
-        eventos.forEach(evento => {
-        const option = document.createElement('option');
-        option.value = evento.id;
-        option.textContent = evento.nome;
-        selectEvento.appendChild(option);
+        const token = authManager.getToken();
+        const response = await fetch(`${API_BASE_URL}/eventos`, {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+            }
         });
-    } else {
-        throw new Error('Erro ao carregar eventos');
-    }
+        
+        const selectEvento = document.getElementById('evento_id');
+        const selectEventoEditar = document.getElementById('evento_id_editar');
+        
+        if (response.ok) {
+            const eventos = await response.json();
+            const defaultOption = '<option value="">Nenhum evento selecionado</option>';
+            selectEvento.innerHTML = defaultOption;
+            selectEventoEditar.innerHTML = defaultOption;
+            
+            eventos.forEach(evento => {
+                const option = document.createElement('option');
+                option.value = evento.id;
+                option.textContent = evento.nome;
+                selectEvento.appendChild(option);
+                selectEventoEditar.appendChild(option.cloneNode(true));
+            });
+        } else {
+            throw new Error('Erro ao carregar eventos');
+        }
     } catch (error) {
-    console.error('Erro ao carregar eventos:', error);
-    document.getElementById('evento_id').innerHTML = '<option value="">Erro ao carregar eventos</option>';
+        console.error('Erro ao carregar eventos:', error);
+        document.getElementById('evento_id').innerHTML = '<option value="">Erro ao carregar eventos</option>';
+        document.getElementById('evento_id_editar').innerHTML = '<option value="">Erro ao carregar eventos</option>';
     }
 }
 
-// === FUNÇÕES DE MANIPULAÇÃO DO FORMULÁRIO ===
 
-function toggleFormulario() {
+function toggleFormularioCadastro() {
     const formulario = document.getElementById('formularioDespesa');
     const btn = document.getElementById('btnMostrarFormulario');
+    const formularioEdicao = document.getElementById('formularioEdicaoDespesa');
+
+    if (formularioEdicao.style.display === 'block') {
+        toggleFormularioEdicao();
+    }
     
     if (formulario.style.display === 'none' || formulario.style.display === '') {
-    formulario.style.display = 'block';
-    btn.textContent = 'Cancelar';
-    btn.className = 'btn btn-secondary';
-    formulario.scrollIntoView({ behavior: 'smooth' });
+        formulario.style.display = 'block';
+        btn.textContent = 'Cancelar';
+        btn.className = 'btn btn-secondary';
+        limparFormularioCadastro();
+        formulario.scrollIntoView({ behavior: 'smooth' });
     } else {
-    formulario.style.display = 'none';
-    btn.textContent = 'Nova Despesa';
-    btn.className = 'btn btn-primary';
-    limparFormulario();
+        formulario.style.display = 'none';
+        btn.textContent = 'Nova Despesa';
+        btn.className = 'btn btn-primary';
+        limparFormularioCadastro();
     }
 }
 
-function limparFormulario() {
+function limparFormularioCadastro() {
     document.getElementById('formDespesa').reset();
-    limparErrosValidacao();
+    limparErrosValidacao('formDespesa');
 }
 
-function limparErrosValidacao() {
-    document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-}
-
-async function handleSubmitForm(event) {
+async function handleSubmitFormCadastro(event) {
     event.preventDefault();
 
-    if (!validarFormulario()) {
+    if (!validarFormulario('formDespesa')) {
+        criarToast('Por favor, corrija os erros no formulário de cadastro.', 'error');
         return;
     }
 
@@ -265,33 +387,36 @@ async function handleSubmitForm(event) {
         const dados = new URLSearchParams();
 
         const dataLanc = new Date().toISOString().split('T')[0];
-        const usuarioId = localStorage.getItem('usuario_id');
 
+        // Adiciona todos os campos do formulário aos dados como RequestParams
         for (const [key, value] of formData.entries()) {
-            if (key === 'evento_id') {
-                dados.append('evento_id', value ? value : '');
-            } else {
+             // Exclua campos que não são RequestParams ou que são tratados de forma diferente
+             if (key !== 'id_editar') { // 'id_editar' é do form de edição, não cadastro
                 dados.append(key, value);
             }
         }
-        dados.append('pagamento', 0);
+        dados.append('pagamento', 0); // Sempre 0 no cadastro inicial
         dados.append('data_lanc', dataLanc);
         dados.append('usuario_id', authManager.getId());
         dados.append('status_conci', "Aguardando");
 
         const token = authManager.getToken();
-        const response = await fetch(`${API_BASE_URL}/despesa`, {
+        // Construa a URL com a query string
+        const urlComParams = `${API_BASE_URL}/despesa?${dados.toString()}`;
+
+        const response = await fetch(urlComParams, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/x-www-form-urlencoded'
+                // NÃO envie 'Content-Type': 'application/x-www-form-urlencoded'
+                // quando os parâmetros estão na URL. Pode causar problemas no backend.
             },
-            body: dados.toString()
+            // Não envie 'body' pois os dados já estão na URL
         });
 
         if (response.ok) {
             criarToast('Despesa cadastrada com sucesso!', 'success');
-            toggleFormulario();
+            toggleFormularioCadastro();
             await carregarEExibirDespesas();
         } else {
             const errorData = await response.json().catch(() => ({}));
@@ -307,52 +432,278 @@ async function handleSubmitForm(event) {
     }
 }
 
-function validarFormulario() {
-    limparErrosValidacao();
+
+function toggleFormularioEdicao() {
+    const formularioEdicao = document.getElementById('formularioEdicaoDespesa');
+    
+    if (formularioEdicao.style.display === 'none' || formularioEdicao.style.display === '') {
+        formularioEdicao.style.display = 'block';
+        formularioEdicao.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        formularioEdicao.style.display = 'none';
+        limparFormularioEdicao();
+    }
+}
+
+function limparFormularioEdicao() {
+    document.getElementById('formEditarDespesa').reset();
+    limparErrosValidacao('formEditarDespesa');
+}
+
+function mostrarFormularioEdicao(id) {
+    const formularioCadastro = document.getElementById('formularioDespesa');
+    if (formularioCadastro.style.display === 'block') {
+        toggleFormularioCadastro();
+    }
+
+    const despesa = despesas.find(d => d.id === id);
+    if (!despesa) {
+        criarToast('Despesa não encontrada para edição.', 'error');
+        return;
+    }
+
+    $('#id_editar').val(despesa.id);
+    $('#descricao_editar').val(despesa.descricao);
+    $('#valor_editar').val(despesa.val);
+    $('#pagamento_editar').val(despesa.pagamento ?? '');
+    $('#data_venc_editar').val(despesa.data_venc);
+    $('#status_conci_editar').val(despesa.status_conci);
+    $('#tipoDespesa_id_editar').val(despesa.categoria?.id || '');
+    $('#evento_id_editar').val(despesa.evento?.id || '');
+
+    limparErrosValidacao('formEditarDespesa');
+
+    toggleFormularioEdicao();
+}
+
+async function handleSubmitFormEdicao(event) {
+    event.preventDefault();
+
+    console.log("1. handleSubmitFormEdicao chamado."); // Log 1
+
+    if (!validarFormulario('formEditarDespesa')) {
+        console.log("2. Validação do formulário de edição falhou."); // Log 2
+        criarToast('Por favor, corrija os erros no formulário de edição.', 'error');
+        return;
+    }
+
+    console.log("3. Validação do formulário de edição bem-sucedida. Preparando requisição."); // Log 3
+
+    const btnSalvar = document.getElementById('btnSalvarEdicao');
+    const originalText = btnSalvar.innerHTML;
+
+    try {
+        btnSalvar.disabled = true;
+        btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...';
+
+        const id = parseInt($('#id_editar').val());
+        if (isNaN(id)) {
+            throw new Error("ID da despesa inválido para edição (NaN).");
+        }
+        console.log("4. ID da despesa:", id);
+
+        const dados = new URLSearchParams();
+        
+        // Sempre inclua o ID no RequestParam, além do PathVariable se o backend espera
+        dados.append('id', id); 
+        dados.append('descricao', $('#descricao_editar').val());
+        dados.append('valor', $('#valor_editar').val());
+        
+        // Removidos os campos 'pagamento_editar' e 'status_conci_editar' do HTML.
+        // Envie valores fixos para o backend se eles são obrigatórios.
+        dados.append('pagamento', 0); // Valor fixo para pagamento
+        dados.append('status_conci', 'Aguardando'); // Valor fixo para status
+
+        dados.append('data_venc', $('#data_venc_editar').val());
+        dados.append('tipoDespesa_id', $('#tipoDespesa_id_editar').val());
+        
+        let eventoId = $('#evento_id_editar').val();
+        if (eventoId === null || eventoId === '') { // Verifica se não é null nem string vazia
+            eventoId = '0'
+        }
+        dados.append('evento_id', eventoId);
+        const despesaOriginal = despesas.find(d => d.id === id);
+        if (despesaOriginal) {
+            dados.append('data_lanc', despesaOriginal.data_lanc);
+            dados.append('usuario_id', authManager.getId());
+        } else {
+            console.warn("Despesa original não encontrada para copiar data_lanc/usuario_id. Isso pode causar erro no backend se esses campos forem obrigatórios.");
+            // Você pode precisar adicionar uma lógica para obter esses valores de alguma forma
+            // se eles são obrigatórios no PUT e a despesa original não for encontrada.
+        }
+        
+        console.log("5. Parâmetros a serem enviados:", dados.toString());
+
+        const token = authManager.getToken();
+        if (!token) {
+            throw new Error("Token de autenticação não encontrado.");
+        }
+        console.log("6. Token encontrado. Iniciando fetch PUT.");
+
+        const urlComParams = `${API_BASE_URL}/despesa/${id}?${dados.toString()}`;
+
+        const response = await fetch(urlComParams, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        console.log("7. Resposta do fetch recebida. Status:", response.status);
+
+        if (response.ok) {
+            criarToast('Despesa atualizada com sucesso!', 'success');
+            toggleFormularioEdicao();
+            await carregarEExibirDespesas();
+            console.log("8. Despesa atualizada e tabela recarregada.");
+        } else {
+            const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido da API.' }));
+            throw new Error(errorData.message || `Erro HTTP ${response.status}`);
+        }
+
+    } catch (error) {
+        console.error('handleSubmitFormEdicao: ERRO CAPTURADO:', error);
+        criarToast(`Erro ao atualizar despesa: ${error.message}`, 'error');
+    } finally {
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = originalText;
+        console.log("10. Finalizado handleSubmitFormEdicao.");
+    }
+}
+
+
+function validarFormulario(formId) {
+    const form = document.getElementById(formId);
     let isValid = true;
 
-    // Validar categoria
-    const categoria = document.getElementById('tipoDespesa_id');
-    if (!categoria.value) {
-    mostrarErroValidacao('tipoDespesa_id', 'Selecione uma categoria');
-    isValid = false;
+    form.classList.add('was-validated');
+    form.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
+
+    // ... (restante da função validarFormulario permanece a mesma)
+    // Apenas certificando que o comportamento dos feedbacks de erro esteja ok.
+
+    if (formId === 'formDespesa') {
+        const categoria = document.getElementById('tipoDespesa_id');
+        if (!categoria.value) {
+            mostrarErroValidacao('tipoDespesa_id', 'Por favor, selecione uma categoria.');
+            isValid = false;
+        }
+
+        const valor = document.getElementById('valor');
+        if (!valor.value || parseFloat(valor.value) <= 0) {
+            mostrarErroValidacao('valor', 'Por favor, informe um valor válido maior que zero.');
+            isValid = false;
+        }
+
+        const dataVenc = document.getElementById('data_venc');
+        const hoje = new Date().toISOString().split('T')[0];
+        if (!dataVenc.value) {
+            document.getElementById('erroDataObrigatoria').style.display = 'block';
+            dataVenc.classList.add('is-invalid');
+            isValid = false;
+        } else if (dataVenc.value < hoje) {
+            document.getElementById('erroDataInvalida').style.display = 'block';
+            dataVenc.classList.add('is-invalid');
+            isValid = false;
+        }
+    } 
+    else if (formId === 'formEditarDespesa') {
+        const descricaoEditar = document.getElementById('descricao_editar');
+        if (!descricaoEditar.value.trim()) {
+            mostrarErroValidacao('descricao_editar', 'A descrição é obrigatória.');
+            isValid = false;
+        }
+
+        const valorEditar = document.getElementById('valor_editar');
+        if (!valorEditar.value || parseFloat(valorEditar.value) <= 0) {
+            mostrarErroValidacao('valor_editar', 'Informe um valor válido maior que zero.');
+            isValid = false;
+        }
+
+        const dataVencEditar = document.getElementById('data_venc_editar');
+        const hoje = new Date().toISOString().split('T')[0];
+        if (!dataVencEditar.value) {
+            document.getElementById('erroDataVencEditarObrigatoria').style.display = 'block';
+            dataVencEditar.classList.add('is-invalid');
+            isValid = false;
+        } else if (dataVencEditar.value < hoje) {
+            document.getElementById('erroDataVencEditarInvalida').style.display = 'block';
+            dataVencEditar.classList.add('is-invalid');
+            isValid = false;
+        }
+
+
+        const tipoDespesaEditar = document.getElementById('tipoDespesa_id_editar');
+        if (!tipoDespesaEditar.value) {
+            mostrarErroValidacao('tipoDespesa_id_editar', 'Selecione uma categoria.');
+            isValid = false;
+        }
     }
 
-    // Validar valor
-    const valor = document.getElementById('valor');
-    if (!valor.value || parseFloat(valor.value) <= 0) {
-    mostrarErroValidacao('valor', 'Informe um valor válido maior que zero');
-    isValid = false;
+    if (!form.checkValidity()) {
+        isValid = false;
     }
-
-    // Validar data de vencimento
-    const dataVenc = document.getElementById('data_venc');
-    if (!dataVenc.value) {
-    mostrarErroValidacao('data_venc', 'Informe a data de vencimento');
-    isValid = false;
-    }
-
 
     return isValid;
 }
 
+
+function limparErrosValidacao(formId) {
+    const form = document.getElementById(formId);
+    form.classList.remove('was-validated');
+    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    form.querySelectorAll('.is-valid').forEach(el => el.classList.remove('is-valid'));
+    form.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
+}
+
 function mostrarErroValidacao(fieldId, message) {
     const field = document.getElementById(fieldId);
-    const errorElement = document.getElementById(`error-${fieldId}`);
+    let errorElement;
     
+    if (fieldId === 'data_venc' || fieldId === 'data_venc_editar') {
+        const idObrigatoria = fieldId === 'data_venc' ? 'erroDataObrigatoria' : 'erroDataVencEditarObrigatoria';
+        const idInvalida = fieldId === 'data_venc' ? 'erroDataInvalida' : 'erroDataVencEditarInvalida';
+
+        document.getElementById(idObrigatoria).style.display = 'none';
+        document.getElementById(idInvalida).style.display = 'none';
+
+        if (message.includes('obrigatória') || message.includes('informe a data')) {
+            errorElement = document.getElementById(idObrigatoria);
+        } else if (message.includes('anterior a hoje') || message.includes('inválida')) {
+            errorElement = document.getElementById(idInvalida);
+        }
+    } else {
+        errorElement = field.nextElementSibling;
+        while (errorElement && !errorElement.classList.contains('invalid-feedback')) {
+            errorElement = errorElement.nextElementSibling;
+        }
+    }
+
     field.classList.add('is-invalid');
     if (errorElement) {
-    errorElement.textContent = message;
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
     }
 }
 
-// === FUNÇÕES DE AÇÕES (EDITAR/EXCLUIR) ===
-
-function editarDespesa(id) {
-    window.location.href = `AlterarDespesa.html?id=${id}`;
-}
+// ... (restante das funções de exclusão, filtros e utilitárias permanecem as mesmas)
 
 function confirmarExclusao(id) {
+    // 1. Encontrar a despesa na lista global 'despesas'
+    const despesaParaExcluir = despesas.find(d => d.id === id);
+
+    if (!despesaParaExcluir) {
+        criarToast('Despesa não encontrada para exclusão.', 'error');
+        return;
+    }
+
+    // 2. Verificar o status da despesa
+    if (despesaParaExcluir.status_conci === 'Pendente') {
+        criarToast('Não é possível excluir despesas PAGAS.', 'warning');
+        return; // Impede a continuação da exclusão
+    }
+
+    // Se o status não for "Pendente", procede com a exclusão
     despesaSelecionadaId = id;
     document.getElementById('modalMessage').textContent = 'Deseja realmente excluir esta despesa? Esta ação não pode ser desfeita.';
     document.getElementById('btnConfirmAction').className = 'btn btn-danger';
@@ -360,38 +711,38 @@ function confirmarExclusao(id) {
     modalConfirmacao.show();
 }
 
+
 async function confirmarAcao() {
     if (despesaSelecionadaId) {
-    await excluirDespesa();
+        await excluirDespesa();
     }
 }
 
 async function excluirDespesa() {
     try {
-    const token = authManager.getToken();
-    const response = await fetch(`${API_BASE_URL}/despesa/${despesaSelecionadaId}`, {
-        method: 'DELETE',
-        headers: {
-        'Authorization': `Bearer ${token}`
-        }
-    });
+        const token = authManager.getToken();
+        const response = await fetch(`${API_BASE_URL}/despesa/${despesaSelecionadaId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
 
-    if (response.ok) {
-        mostrarMensagem('Despesa excluída com sucesso!', 'success');
-        await carregarEExibirDespesas();
-    } else {
-        throw new Error(`Erro HTTP ${response.status}`);
-    }
+        if (response.ok) {
+            criarToast('Despesa excluída com sucesso!', 'success');
+            await carregarEExibirDespesas();
+        } else {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Erro HTTP ${response.status}`);
+        }
     } catch (error) {
-    console.error('Erro ao excluir despesa:', error);
-    mostrarMensagem('Erro ao excluir despesa', 'error');
+        console.error('Erro ao excluir despesa:', error);
+        criarToast(`Erro ao excluir despesa: ${error.message}`, 'error');
     } finally {
-    modalConfirmacao.hide();
-    despesaSelecionadaId = null;
+        modalConfirmacao.hide();
+        despesaSelecionadaId = null;
     }
 }
-
-// === FUNÇÕES DE FILTROS ===
 
 function aplicarFiltros() {
     if (!tabelaDespesas) return;
@@ -400,15 +751,13 @@ function aplicarFiltros() {
     const filtroDataInicio = document.getElementById('filtroDataInicio').value;
     const filtroDataFim = document.getElementById('filtroDataFim').value;
 
-    // Limpa filtros anteriores de data para não acumular
     $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => fn.name !== 'filtroPorData');
 
-    // Filtro de status (coluna 4)
     tabelaDespesas.column(4).search(filtroStatus);
 
     if (filtroDataInicio || filtroDataFim) {
-        const dataInicio = filtroDataInicio ? new Date(filtroDataInicio) : null;
-        const dataFim = filtroDataFim ? new Date(filtroDataFim) : null;
+        const dataInicio = filtroDataInicio ? new Date(filtroDataInicio + 'T00:00:00') : null;
+        const dataFim = filtroDataFim ? new Date(filtroDataFim + 'T23:59:59') : null;
 
         if (dataInicio && isNaN(dataInicio.getTime())) {
             criarToast('Data inicial inválida', 'error');
@@ -425,15 +774,13 @@ function aplicarFiltros() {
             return;
         }
 
-        // Adiciona o filtro personalizado
         const filtroPorData = function(settings, data, dataIndex) {
-            const dataDespesaStr = data[3]; // Ajuste conforme a coluna da sua data
+            const dataDespesaStr = data[3];
             if (!dataDespesaStr) return true;
 
-            // Converter data no formato dd/mm/yyyy
             const partes = dataDespesaStr.split('/');
             if (partes.length !== 3) return false;
-            const dataDespesa = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`); // yyyy-mm-dd
+            const dataDespesa = new Date(`${partes[2]}-${partes[1]}-${partes[0]}T00:00:00`); 
 
             if (isNaN(dataDespesa.getTime())) return false;
 
@@ -442,7 +789,6 @@ function aplicarFiltros() {
 
             return depoisDeInicio && antesDeFim;
         };
-        // Nomear função para poder removê-la depois
         Object.defineProperty(filtroPorData, 'name', { value: 'filtroPorData' });
 
         $.fn.dataTable.ext.search.push(filtroPorData);
@@ -451,18 +797,12 @@ function aplicarFiltros() {
     tabelaDespesas.draw();
 }
 
-
-// Adicionar event listeners para os filtros
-document.getElementById('filtroDataInicio').addEventListener('change', aplicarFiltros);
-document.getElementById('filtroDataFim').addEventListener('change', aplicarFiltros);
-document.getElementById('filtroStatus').addEventListener('change', aplicarFiltros);
-
 function limparFiltros() {
+    console.log("Função limparFiltros chamada.");
     document.getElementById('filtroStatus').value = '';
     document.getElementById('filtroDataInicio').value = '';
     document.getElementById('filtroDataFim').value = '';
 
-    // Remove filtro de datas
     $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => fn.name !== 'filtroPorData');
 
     if (tabelaDespesas) {
@@ -470,27 +810,33 @@ function limparFiltros() {
     }
 }
 
-// === FUNÇÕES UTILITÁRIAS ===
-
 function formatarMoeda(valor) {
     return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
+        style: 'currency',
+        currency: 'BRL'
     }).format(valor || 0);
 }
 
 function formatarData(dataString) {
     if (!dataString) return '';
     try {
-    return new Date(dataString + 'T00:00:00').toLocaleDateString('pt-BR');
+        const date = new Date(dataString + 'T00:00:00'); 
+        return date.toLocaleDateString('pt-BR');
     } catch {
-    return dataString;
+        return dataString;
     }
 }
 
 function getStatusClass(status) {
     const statusLower = (status || '').toLowerCase();
-    return `status-${statusLower}`;
+    if (statusLower === 'aguardando') {
+        return 'status-aguardando';
+    } else if (statusLower === 'conciliado') {
+        return 'status-conciliado';
+    } else if (statusLower === 'pendente') {
+        return 'status-pendente';
+    }
+    return '';
 }
 
 function mostrarLoading(show) {
@@ -499,41 +845,26 @@ function mostrarLoading(show) {
     const filtrosArea = document.getElementById('filtrosArea');
     
     if (show) {
-    loadingArea.style.display = 'block';
-    tabelaArea.style.display = 'none';
-    filtrosArea.style.display = 'none';
+        loadingArea.style.display = 'block';
+        tabelaArea.style.display = 'none';
+        filtrosArea.style.display = 'none';
     } else {
-    loadingArea.style.display = 'none';
-    tabelaArea.style.display = 'block';
-    filtrosArea.style.display = 'flex';
+        loadingArea.style.display = 'none';
+        tabelaArea.style.display = 'block';
+        filtrosArea.style.display = 'flex';
     }
 }
-
-function mostrarMensagem(mensagem, tipo = 'info') {
-    // Implementação simples com alert - pode ser substituída por toast/notification
-    if (tipo === 'success') {
-    alert('✅ ' + mensagem);
-    } else if (tipo === 'error') {
-    alert('❌ ' + mensagem);
-    } else {
-    alert('ℹ️ ' + mensagem);
-    }
-}
-
-// === FUNÇÕES DE NOTIFICAÇÃO AVANÇADA (OPCIONAL) ===
 
 function criarToast(mensagem, tipo = 'info') {
-    // Criar container de toasts se não existir
     let toastContainer = document.getElementById('toast-container');
     if (!toastContainer) {
-    toastContainer = document.createElement('div');
-    toastContainer.id = 'toast-container';
-    toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-    toastContainer.style.zIndex = '9999';
-    document.body.appendChild(toastContainer);
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
     }
 
-    // Criar o toast
     const toastId = 'toast-' + Date.now();
     const toastHtml = `
     <div id="${toastId}" class="toast align-items-center text-white bg-${getTipoBootstrap(tipo)} border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -548,16 +879,14 @@ function criarToast(mensagem, tipo = 'info') {
     
     toastContainer.insertAdjacentHTML('beforeend', toastHtml);
     
-    // Mostrar o toast
     const toastElement = document.getElementById(toastId);
     const bsToast = new bootstrap.Toast(toastElement, {
-    delay: tipo === 'error' ? 8000 : 4000
+        delay: tipo === 'error' ? 8000 : 4000
     });
     bsToast.show();
     
-    // Remover o toast após ser fechado
     toastElement.addEventListener('hidden.bs.toast', () => {
-    toastElement.remove();
+        toastElement.remove();
     });
 }
 
@@ -578,157 +907,3 @@ function getIconeTipo(tipo) {
     default: return 'ℹ️';
     }
 }
-function editarDespesa(id) {
-  const despesa = despesas.find(d => d.id === id);
-  if (!despesa) {
-    alert('Despesa não encontrada!');
-    return;
-  }
-
-  // Preencher os campos do formulário de edição
-  $('#id_editar').val(despesa.id);
-  $('#descricao_editar').val(despesa.descricao);
-  $('#valor_editar').val(despesa.val);
-  $('#pagamento_editar').val(despesa.valor_pago ?? '');
-  $('#data_venc_editar').val(despesa.data_venc);
-  $('#status_conci_editar').val(despesa.status_conci);
-
-  // Abrir o modal
-  const modal = new bootstrap.Modal(document.getElementById('modalEditarDespesa'));
-  modal.show();
-}
-async function atualizarDespesa(despesa) {
-    try {
-        const token = authManager.getToken();
-
-        const response = await fetch(`http://localhost:8080/apis/despesa/${despesa.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify(despesa)
-        });
-
-        if (!response.ok) {
-            throw new Error('Erro ao atualizar a despesa');
-        }
-
-        const despesaAtualizada = await response.json();
-        return despesaAtualizada;
-
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('Não foi possível atualizar a despesa');
-        throw error;
-    }
-}
-$('#formEditarDespesa').on('submit', async function(e) {
-    e.preventDefault();
-
-    const id = parseInt($('#id_editar').val());
-
-    const despesaAtualizada = {
-        id: id,
-        descricao: $('#descricao_editar').val(),
-        val: parseFloat($('#valor_editar').val()),
-        valor_pago: $('#pagamento_editar').val() ? parseFloat($('#pagamento_editar').val()) : null,
-        data_venc: $('#data_venc_editar').val(),
-        status_conci: $('#status_conci_editar').val()
-    };
-
-    try {
-        const resposta = await atualizarDespesa(despesaAtualizada);
-
-        // Atualiza localmente na lista de despesas, se necessário
-        const index = despesas.findIndex(d => d.id === id);
-        if (index !== -1) {
-            despesas[index] = resposta;
-        }
-
-        // Atualiza a tabela
-        tabelaDespesas.clear().rows.add(despesas).draw();
-
-        // Fecha o modal
-        bootstrap.Modal.getInstance(document.getElementById('modalEditarDespesa')).hide();
-
-        alert('Despesa atualizada com sucesso!');
-    } catch (error) {
-        console.error('Falha ao atualizar despesa:', error);
-    }
-});
-(() => {
-  'use strict'
-
-  // Pega todos os formulários que possuem a classe 'needs-validation'
-  const forms = document.querySelectorAll('.needs-validation')
-
-  Array.from(forms).forEach(form => {
-    form.addEventListener('submit', event => {
-      if (!form.checkValidity()) {
-        event.preventDefault()
-        event.stopPropagation()
-      }
-
-      form.classList.add('was-validated')
-    }, false)
-  })
-})()
-
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('formDespesa');
-    const dataVenc = document.getElementById('data_venc');
-    const erroDataInvalida = document.getElementById('erroDataInvalida');
-    const erroDataObrigatoria = document.getElementById('erroDataObrigatoria');
-
-    // Impede datas menores que hoje
-    const hoje = new Date().toISOString().split('T')[0];
-    dataVenc.setAttribute('min', hoje);
-
-    form.addEventListener('submit', (event) => {
-        let formValido = true;
-
-        // Resetar mensagens de erro da data
-        erroDataInvalida.style.display = 'none';
-        erroDataObrigatoria.style.display = 'none';
-        dataVenc.classList.remove('is-invalid');
-
-        // Validação da data
-        if (!dataVenc.value) {
-            erroDataObrigatoria.style.display = 'block';
-            dataVenc.classList.add('is-invalid');
-            formValido = false;
-        } else if (dataVenc.value < hoje) {
-            erroDataInvalida.style.display = 'block';
-            dataVenc.classList.add('is-invalid');
-            formValido = false;
-        }
-
-        // Validação padrão Bootstrap
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            formValido = false;
-        }
-
-        if (!formValido) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-    });
-
-    // Remove erros quando o usuário corrige
-    document.querySelectorAll('input, select, textarea').forEach((campo) => {
-        campo.addEventListener('input', () => {
-            if (campo.checkValidity()) {
-                campo.classList.remove('is-invalid');
-                campo.classList.add('is-valid');
-                if (campo.id === 'data_venc') {
-                    erroDataObrigatoria.style.display = 'none';
-                    erroDataInvalida.style.display = 'none';
-                }
-            } else {
-                campo.classList.remove('is-valid');
-            }
-        });
-    });
-});

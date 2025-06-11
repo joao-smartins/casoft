@@ -1023,6 +1023,21 @@ ALTER TABLE ONLY public.volun_even
 ALTER TABLE public.parametrizacao
     ADD COLUMN complemento VARCHAR(255);
 
+
+ALTER TABLE public.despesa
+    ADD COLUMN despesa_dt_pag DATE;
+
+ALTER TABLE public.despesa
+    ADD COLUMN despesa_obs VARCHAR(255);
+
+ALTER TABLE public.despesa
+    ADD COLUMN despesa_pai_id INTEGER NULL;
+
+ALTER TABLE public.despesa
+    ADD CONSTRAINT fk_despesa_pai
+        FOREIGN KEY (despesa_pai_id) REFERENCES public.despesa(despesa_id);
+
+
 -- Completed on 2025-05-16 14:23:47 -03
 
 --
