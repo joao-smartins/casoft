@@ -27,10 +27,9 @@ public class LancamentoBancario {
     public LancamentoBancario() {
     }
 
-    public LancamentoBancario(Integer id, LocalDate dt_lanc, String descricao,
+    public LancamentoBancario(LocalDate dt_lanc, String descricao,
                               String origem, String destino, Integer contaBancariaId,
                               Integer movimentacaoBancariaId, Integer receitaId, Integer despesaId) {
-        this.id = id;
         this.dt_lanc = dt_lanc;
         this.descricao = descricao;
         this.origem = origem;
