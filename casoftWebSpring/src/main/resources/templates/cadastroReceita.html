@@ -1,1088 +1,406 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Cadastro de Receitas</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #FF6B00; /* laranja */
-            --secondary-color: #343a40; /* cinza escuro */
-            --border-color: #e0e0e0;
-            --hover-color: #f8f9fa;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-        }
+    <link rel="stylesheet" href="css/receita.css">
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-
-        /* Layout */
-        .app-container {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            grid-template-rows: 70px 1fr;
-            min-height: 100vh;
-        }
-
-        .header {
-            grid-column: 1 / 3;
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            padding: 0 30px;
-            z-index: 10;
-        }
-
-        .header-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            width: 100%;
-        }
-
-        .header img {
-            height: 40px;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: var(--secondary-color);
-        }
-
-        .header-actions {
-            margin-left: auto;
-        }
-
-        .sidebar {
-            background-color: white;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-            padding: 20px 0;
-        }
-
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 25px;
-            color: var(--secondary-color);
-            text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-        }
-
-        .sidebar a:hover {
-            background-color: var(--hover-color);
-            color: var(--primary-color);
-        }
-
-        .sidebar a.active {
-            border-left: 3px solid var(--primary-color);
-            background-color: rgba(255, 107, 0, 0.1);
-            color: var(--primary-color);
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        /* Card */
-        .form-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-
-        .card-header {
-            padding: 15px 25px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .bg-orange {
-            background-color: var(--primary-color);
-        }
-
-        .card-header h2 {
-            margin: 0;
-            font-size: 1.3rem;
-        }
-
-        .card-body {
-            padding: 25px;
-        }
-
-        /* Formulário */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--secondary-color);
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="number"],
-        .form-group input[type="date"],
-        .form-group select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input[type="text"]:focus,
-        .form-group input[type="number"]:focus,
-        .form-group input[type="date"]:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
-        }
-
-        .form-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-checkbox input {
-            width: auto;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            justify-content: flex-end;
-        }
-
-        /* Botões */
-        .btn-cadastrar {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: 500;
-            transition: all 0.3s;
-            box-shadow: 0 2px 10px rgba(255, 107, 0, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .btn-cadastrar:hover {
-            background-color: #e05e00;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.4);
-        }
-
-        .btn-salvar {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-weight: 500;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-
-        .btn-salvar:hover {
-            background-color: #218838;
-        }
-
-        .btn-cancelar {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-weight: 500;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-
-        .btn-cancelar:hover {
-            background-color: #23272b;
-        }
-
-        /* Tabela de Receitas */
-        #tabelaReceitas {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 15px;
-        }
-
-        #tabelaReceitas th {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: 500;
-            position: sticky;
-            top: 0;
-        }
-
-        #tabelaReceitas td {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-        }
-
-        #tabelaReceitas tr:last-child td {
-            border-bottom: none;
-        }
-
-        #tabelaReceitas tr:hover td {
-            background-color: var(--hover-color);
-        }
-
-        .valor-receita {
-            font-weight: 500;
-            color: var(--success-color);
-        }
-
-        /* Botões de Ação */
-        .btn-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-alterar, .btn-quitar, .btn-excluir {
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        .btn-alterar {
-            background-color: var(--primary-color);
-            color: white;
-            border: 1px solid var(--primary-color);
-        }
-
-        .btn-alterar:hover {
-            background-color: #e05e00;
-            border-color: #e05e00;
-        }
-
-        .btn-quitar {
-            background-color: var(--success-color);
-            color: white;
-            border: 1px solid var(--success-color);
-        }
-
-        .btn-quitar:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
-        }
-
-        .btn-excluir {
-            background-color: var(--danger-color);
-            color: white;
-            border: 1px solid var(--danger-color);
-        }
-
-        .btn-excluir:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-
-        /* Modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-
-        .modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .modal-content p {
-            margin-bottom: 25px;
-            font-size: 1.1rem;
-        }
-
-        .modal-content button {
-            margin: 0 10px;
-            padding: 8px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            border: none;
-            font-weight: 500;
-        }
-
-        #btnConfirmarExclusao {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        #btnCancelarExclusao {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        /* Loader */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-            display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Mensagens de erro */
-        .error-message {
-            color: var(--danger-color);
-            margin-top: 5px;
-            font-size: 0.85rem;
-            display: none;
-        }
-
-        .form-group.invalid .error-message {
-            display: block;
-        }
-
-        .form-group.invalid input,
-        .form-group.invalid select {
-            border-color: var(--danger-color) !important;
-            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2) !important;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                display: none;
-            }
-
-            .header {
-                grid-column: 1;
-            }
-
-            .header-actions .btn-cadastrar {
-                display: none;
-            }
-
-            .floating-btn {
-                display: flex;
-            }
-
-            .content {
-                padding: 15px;
-            }
-        }
-
-        /* Botão Flutuante */
-        .floating-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: white;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 100;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .floating-btn:hover {
-            transform: scale(1.1);
-            background-color: #e05e00;
-        }
-
-        /* Status */
-        .badge-status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .badge-pendente {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .badge-quitado {
-            background-color: #d4edda;
-            color: #155724;
-        }
-    </style>
 </head>
 <body>
-<!-- Container de Verificação -->
-<div id="verificacao-container">
-    <div class="spinner" id="spinner"></div>
-    <div class="mensagem-erro" id="mensagemErro">
-        <h2>⛔ Acesso Negado</h2>
-        <p id="mensagemTexto">Você não tem permissão para acessar esta página.</p>
-        <button class="botao-voltar" id="botaoVoltar">Voltar à Página Inicial</button>
-    </div>
-</div>
-
-<!-- Conteúdo Principal -->
 <div class="app-container">
     <!-- Header -->
-    <div class="header">
+    <header class="header">
         <div class="header-container">
             <img src="img/logo.png" alt="Logo">
             <h1>Controle de Receitas</h1>
             <div class="header-actions">
-                <a href="#" class="btn-cadastrar" id="btnNovaReceita">
-                    <i class="fas fa-plus"></i> Nova Receita
-                </a>
+
             </div>
         </div>
-    </div>
+    </header>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <nav class="sidebar">
         <a href="home.html"><i class="fas fa-home"></i> Home</a>
         <a href="#" class="active"><i class="fas fa-money-bill-wave"></i> Receitas</a>
         <a href="#"><i class="fas fa-credit-card"></i> Despesas</a>
         <a href="#"><i class="fas fa-chart-pie"></i> Relatórios</a>
         <a href="#"><i class="fas fa-cog"></i> Configurações</a>
-    </div>
+    </nav>
 
-    <!-- Conteúdo -->
-    <div class="content">
-        <!-- Formulário de Cadastro (inicialmente oculto) -->
-        <div class="form-card" id="formCadastro" style="display: none;">
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="form-card">
             <div class="card-header bg-orange">
-                <i class="fas fa-money-bill-wave"></i>
-                <h2>Cadastro de Receita</h2>
+                <h2>Cadastrar Nova Receita</h2>
             </div>
             <div class="card-body">
-                <form id="receitaForm">
+                <form id="formReceita">
                     <div class="form-group">
-                        <label for="valor">Valor</label>
-                        <input type="number" id="valor" name="valor" step="0.01" min="0" required>
-                        <span class="error-message">Por favor, informe o valor da receita</span>
+                        <label for="valor">Valor*</label>
+                        <input type="number" id="valor" step="0.01" min="0.01" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="descricao">Descrição</label>
-                        <input type="text" id="descricao" name="descricao" required>
-                        <span class="error-message">Por favor, informe a descrição da receita</span>
+                        <label for="descricao">Descrição*</label>
+                        <input type="text" id="descricao" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="data">Data</label>
-                        <input type="date" id="data" name="data" required>
-                        <span class="error-message">Por favor, informe a data da receita</span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="categoria">Categoria</label>
-                        <select id="categoria" name="categoria" required>
-                            <option value="">Selecione uma categoria</option>
-                            <!-- Opções serão preenchidas via JavaScript -->
+                        <label for="eventoId">Evento*</label>
+                        <select id="eventoId" required>
+                            <option value="">Selecione um evento</option>
+                            <!-- Opções serão carregadas via JavaScript -->
                         </select>
-                        <span class="error-message">Por favor, selecione uma categoria</span>
                     </div>
 
-                    <div class="form-group form-checkbox">
-                        <input type="checkbox" id="futura" name="futura">
-                        <label for="futura">Receita Futura</label>
+                    <div class="form-group">
+                        <label for="categoriaId">Categoria*</label>
+                        <select id="categoriaId" required>
+                            <option value="">Selecione uma categoria</option>
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dataVencimento">Data de Vencimento*</label>
+                        <input type="date" id="dataVencimento" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuarioId">Usuário*</label>
+                        <select id="usuarioId" required>
+                            <option value="">Selecione um usuário</option>
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </select>
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-cancelar" id="btnCancelar">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                        <button type="submit" class="btn-salvar">
-                            <i class="fas fa-save"></i> Salvar Receita
-                        </button>
+                        <button type="button" class="btn-cancelar" id="btnCancelar">Cancelar</button>
+                        <button type="submit" class="btn-salvar">Salvar Receita</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Listagem de Receitas -->
-        <div class="form-card">
-            <div class="card-header bg-orange">
-                <i class="fas fa-list"></i>
-                <h2>Receitas Cadastradas</h2>
-            </div>
-            <div class="card-body">
-                <div style="overflow-x: auto;">
-                    <table id="tabelaReceitas">
-                        <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Descrição</th>
-                            <th>Categoria</th>
-                            <th>Valor</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <!-- Dados serão carregados dinamicamente -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <!-- Tabela de Receitas -->
+        <div class="tabela-container">
+            <h3>Lista de Receitas Cadastradas</h3>
+            <table class="tabela-receitas">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody id="tabelaReceitasBody">
+                <!-- Dados serão carregados via JavaScript -->
+                </tbody>
+            </table>
         </div>
-    </div>
+    </main>
 </div>
 
-<!-- Modal de Confirmação -->
-<div id="modalConfirmacao" class="modal">
-    <div class="modal-content">
-        <p id="modalMessage">Deseja realmente excluir esta receita?</p>
-        <button id="btnConfirmarExclusao">Confirmar</button>
-        <button id="btnCancelarExclusao">Cancelar</button>
-    </div>
-</div>
-
-<!-- Loader -->
-<div class="loader" id="loader"></div>
-
-<!-- Botão Flutuante para Mobile -->
-<button class="floating-btn" id="floatingBtn">
-    <i class="fas fa-plus"></i>
-</button>
-
+<script src="js/authManager.js"></script>
+<script src="js/authenticatedClient.js"></script>
+<script src="js/tokenVerification.js"></script>
 <script>
-    // Função principal de inicialização da página
-    function inicializarPagina() {
-        // Elementos do DOM
-        const formCadastro = document.getElementById('formCadastro');
-        const btnNovaReceita = document.getElementById('btnNovaReceita');
-        const receitaForm = document.getElementById('receitaForm');
-        const btnCancelar = document.getElementById('btnCancelar');
-        const tabelaReceitas = document.getElementById('tabelaReceitas').getElementsByTagName('tbody')[0];
-        const loader = document.getElementById('loader');
-        const modal = document.getElementById('modalConfirmacao');
-        const modalMessage = document.getElementById('modalMessage');
-        const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
-        const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
-        const floatingBtn = document.getElementById('floatingBtn');
 
-        // Variáveis de estado
-        let receitaIdParaExcluir = null;
-        let receitaParaEditar = null;
-        const categoriasMap = {};
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     carregarReceitas();
+    // });
+    //
+    // function carregarReceitas() {
+    //     const token = authManager.getToken();
+    //     const tabelaBody = document.getElementById('tabelaReceitasBody');
+    //     tabelaBody.innerHTML = '<tr><td colspan="5">Carregando receitas...</td></tr>';
+    //
+    //     fetch('http://localhost:8080/apis/receita', {
+    //         method: 'GET',
+    //         headers: {
+    //             'Authorization': `Bearer ${token}`,
+    //             'Content-Type': 'application/json'
+    //         }
+    //     })
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error(`Erro ${response.status}: ${response.statusText}`);
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             console.log("Dados recebidos da API:", data);
+    //             tabelaBody.innerHTML = '';
+    //
+    //             if (!Array.isArray(data)) {
+    //                 throw new Error('Formato de dados inválido: esperado um array');
+    //             }
+    //
+    //             if (data.length === 0) {
+    //                 tabelaBody.innerHTML = '<tr><td colspan="5">Nenhuma receita encontrada</td></tr>';
+    //                 return;
+    //             }
+    //
+    //             // Remove o agrupamento por ID e exibe todos os registros
+    //             data.forEach(receita => {
+    //                 const row = document.createElement('tr');
+    //
+    //                 row.innerHTML = `
+    //         <td>${receita.receita_id}</td>
+    //         <td>${receita.receita_desc || 'Não informado'}</td>
+    //         <td>${formatarValor(receita.receita_val)}</td>
+    //         <td>${formatarStatus(receita.receita_statusconciliacao)}</td>
+    //         <td>
+    //             <button onclick="editarReceita(${receita.id})">Editar</button>
+    //             <button onclick="excluirReceita(${receita.id})">Excluir</button>
+    //         </td>
+    //     `;
+    //                 tabelaBody.appendChild(row);
+    //             });
+    //         })
+    //         .catch(error => {
+    //             console.error('Erro ao carregar receitas:', error);
+    //             tabelaBody.innerHTML = `
+    //         <tr>
+    //             <td colspan="5">
+    //                 Erro ao carregar receitas: ${error.message || 'Erro desconhecido'}
+    //                 <button onclick="carregarReceitas()">Tentar novamente</button>
+    //             </td>
+    //         </tr>
+    //     `;
+    //         });
+    // }
+    //
+    // function formatarValor(valor) {
+    //     const numero = parseFloat(valor) || 0;
+    //     return numero.toLocaleString('pt-BR', {
+    //         style: 'currency',
+    //         currency: 'BRL'
+    //     });
+    // }
+    //
+    // function formatarStatus(status) {
+    //     if (!status) return 'Desconhecido';
+    //     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    // }
 
-        // URL base da API
-        const API_BASE = 'http://localhost:8080/apis/receitas';
 
-        // Mostrar/ocultar formulário
-        btnNovaReceita.addEventListener('click', (e) => {
+
+
+
+    //Script Cadastro
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elementos do formulário
+        const formReceita = document.getElementById('formReceita');
+        const valorInput = document.getElementById('valor');
+        const dataVencimentoInput = document.getElementById('dataVencimento');
+        const eventoSelect = document.getElementById('eventoId');
+        const categoriaSelect = document.getElementById('categoriaId');
+        const usuarioSelect = document.getElementById('usuarioId');
+
+        // Carregar combos ao iniciar
+        carregarCombos();
+
+        // Validação do valor
+        valorInput.addEventListener('input', function() {
+            validarValor();
+        });
+
+        // Verificação automática da data (regra 4)
+        dataVencimentoInput.addEventListener('change', function() {
+            verificarDataFutura();
+        });
+
+        // Envio do formulário
+        formReceita.addEventListener('submit', function(e) {
             e.preventDefault();
-            formCadastro.style.display = 'block';
-            receitaForm.reset();
-            receitaParaEditar = null;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (validarFormulario()) {
+                const receitaData = prepararDadosReceita();
+                cadastrarReceita(receitaData);
+            }
         });
 
-        floatingBtn.addEventListener('click', () => {
-            formCadastro.style.display = 'block';
-            receitaForm.reset();
-            receitaParaEditar = null;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        btnCancelar.addEventListener('click', () => {
-            formCadastro.style.display = 'none';
-            receitaForm.reset();
-            receitaParaEditar = null;
-        });
-
-        // Carregar categorias
-        async function carregarCategorias() {
-            try {
-                const response = await fetch('http://localhost:8080/apis/tiporeceita', {
-                    headers: {
-                        'Authorization': `Bearer ${authManager.getToken()}`
-                    }
-                });
-                if (!response.ok) throw new Error('Erro ao carregar categorias');
-
-                const categorias = await response.json();
-                const select = document.getElementById('categoria');
-
-                // Limpa opções existentes (exceto a primeira)
-                while (select.options.length > 1) select.remove(1);
-
-                categorias.forEach(cat => {
-                    categoriasMap[cat.id] = cat.nome;
-                    const option = document.createElement('option');
-                    option.value = cat.id;
-                    option.textContent = cat.nome;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Erro ao carregar categorias:', error);
-                showModal('Erro ao carregar categorias', true);
+        // Função para validar valor
+        function validarValor() {
+            if (parseFloat(valorInput.value) <= 0 || isNaN(parseFloat(valorInput.value))) {
+                valorInput.parentElement.classList.add('invalid');
+                return false;
+            } else {
+                valorInput.parentElement.classList.remove('invalid');
+                return true;
             }
         }
 
-        // Carregar receitas
-        async function carregarReceitas() {
-            showLoader();
-            try {
-                // 1. Verifica se o token existe
-                const token = authManager.getToken();
-                if (!token) {
-                    throw new Error('Usuário não autenticado. Faça login novamente.');
-                }
-
-                // 2. Configura a requisição com headers adequados
-                const requestOptions = {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    // credentials: 'include' // Descomente se usar cookies
-                };
-
-                console.log('Enviando requisição para:', API_BASE, requestOptions);
-
-                // 3. Faz a requisição
-                const response = await fetch(API_BASE, requestOptions);
-
-                // 4. Trata erros HTTP
-                if (!response.ok) {
-                    // Tenta extrair a mensagem de erro do corpo da resposta
-                    let errorMsg = `Erro HTTP: ${response.status}`;
-                    try {
-                        const errorData = await response.json();
-                        errorMsg = errorData.message || errorMsg;
-                    } catch (e) {
-                        console.warn('Não foi possível ler corpo do erro:', e);
-                    }
-
-                    // Tratamento específico para status conhecidos
-                    if (response.status === 401) {
-                        authManager.logout();
-                        window.location.href = 'login.html';
-                        return;
-                    }
-
-                    throw new Error(errorMsg);
-                }
-
-                // 5. Processa a resposta
-                const receitas = await response.json();
-                console.log('Dados recebidos:', receitas);
-
-                if (!Array.isArray(receitas)) {
-                    throw new Error('Formato de dados inválido recebido da API');
-                }
-
-                // 6. Renderiza os dados
-                renderizarReceitas(receitas);
-            } catch (error) {
-                console.error('Erro detalhado:', error);
-
-                let errorMessage = error.message;
-                if (error.message.includes('Failed to fetch')) {
-                    errorMessage = 'Falha na conexão com o servidor. Verifique sua internet.';
-                } else if (error.message.includes('Unexpected token')) {
-                    errorMessage = 'Resposta inválida do servidor.';
-                }
-
-                tabelaReceitas.innerHTML = `
-            <tr>
-                <td colspan="6" style="color: var(--danger-color); text-align: center; padding: 20px;">
-                    ${errorMessage}<br>
-                    <button onclick="window.location.reload()" class="btn-alterar" style="margin-top: 10px;">
-                        <i class="fas fa-sync-alt"></i> Tentar novamente
-                    </button>
-                </td>
-            </tr>
-        `;
-
-                showModal(`Erro: ${errorMessage}`, true);
-            } finally {
-                hideLoader();
-            }
-        }
-        // Renderizar receitas na tabela
-        function renderizarReceitas(receitas) {
-            tabelaReceitas.innerHTML = '';
-
-            if (!receitas || receitas.length === 0) {
-                tabelaReceitas.innerHTML = '<tr><td colspan="6">Nenhuma receita cadastrada ainda.</td></tr>';
-                return;
-            }
-
-            receitas.forEach(receita => {
-                const row = tabelaReceitas.insertRow();
-                const categoriaNome = categoriasMap[receita.categoria] || 'N/A';
-                const statusClass = receita.quitada ? 'badge-quitado' : 'badge-pendente';
-                const statusText = receita.quitada ? 'Quitado' : 'Pendente';
-
-                row.innerHTML = `
-                <td>${formatarData(receita.data)}</td>
-                <td>${receita.descricao || 'N/A'}</td>
-                <td>${categoriaNome}</td>
-                <td class="valor-receita">R$ ${receita.valor ? receita.valor.toFixed(2).replace('.', ',') : '0,00'}</td>
-                <td><span class="badge-status ${statusClass}">${statusText}</span></td>
-                <td>
-                    <div class="btn-actions">
-                        <button class="btn-alterar" data-id="${receita.id}">
-                            <i class="fas fa-edit"></i> Alterar
-                        </button>
-                        ${!receita.quitada ? `
-                        <button class="btn-quitar" data-id="${receita.id}">
-                            <i class="fas fa-check"></i> Quitar
-                        </button>` : ''}
-                        <button class="btn-excluir" data-id="${receita.id}" data-descricao="${receita.descricao}">
-                            <i class="fas fa-trash"></i> Excluir
-                        </button>
-                    </div>
-                </td>
-            `;
-            });
-
-            // Adiciona eventos aos botões após renderizar
-            adicionarEventListenersAcoes();
+        // Função para verificar data futura (regra 4)
+        function verificarDataFutura() {
+            const hoje = new Date().toISOString().split('T')[0];
+            return dataVencimentoInput.value > hoje;
         }
 
-        // Adiciona event listeners para os botões de ação
-        function adicionarEventListenersAcoes() {
-            document.querySelectorAll('.btn-alterar').forEach(btn => {
-                btn.addEventListener('click', (e) => editarReceita(e.target.closest('button').getAttribute('data-id')));
-            });
-
-            document.querySelectorAll('.btn-quitar').forEach(btn => {
-                btn.addEventListener('click', (e) => quitarReceita(e.target.closest('button').getAttribute('data-id')));
-            });
-
-            document.querySelectorAll('.btn-excluir').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const button = e.target.closest('button');
-                    receitaIdParaExcluir = button.getAttribute('data-id');
-                    const descricao = button.getAttribute('data-descricao');
-                    modalMessage.textContent = `Deseja realmente excluir a receita "${descricao}"?`;
-                    modal.classList.add('active');
-                });
-            });
-        }
-
-        // Editar receita
-        async function editarReceita(id) {
-            showLoader();
-            try {
-                const response = await fetch(`${API_BASE}/${id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${authManager.getToken()}`
-                    }
-                });
-                if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-
-                const receita = await response.json();
-                receitaParaEditar = receita;
-
-                // Preenche o formulário
-                document.getElementById('valor').value = receita.valor;
-                document.getElementById('descricao').value = receita.descricao;
-                document.getElementById('data').value = receita.data.split('T')[0];
-                document.getElementById('categoria').value = receita.categoria;
-                document.getElementById('futura').checked = receita.futura || false;
-
-                formCadastro.style.display = 'block';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } catch (error) {
-                console.error('Erro ao carregar receita:', error);
-                showModal('Erro ao carregar receita para edição', true);
-            } finally {
-                hideLoader();
-            }
-        }
-
-        // Quitar receita
-        async function quitarReceita(id) {
-            showLoader();
-            try {
-                const response = await fetch(`${API_BASE}/${id}/quitar`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${authManager.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) throw new Error(await response.text());
-
-                showModal('Receita quitada com sucesso!');
-                await carregarReceitas();
-            } catch (error) {
-                console.error('Erro ao quitar receita:', error);
-                showModal(`Erro ao quitar receita: ${error.message}`, true);
-            } finally {
-                hideLoader();
-            }
-        }
-
-        // Formatar data
-        function formatarData(dataString) {
-            try {
-                const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-                return new Date(dataString).toLocaleDateString('pt-BR', options);
-            } catch (e) {
-                console.error("Erro ao formatar data:", dataString, e);
-                return dataString;
-            }
-        }
-
-        // Validação do formulário
+        // Função para validar todo o formulário
         function validarFormulario() {
             let valido = true;
-            const campos = ['valor', 'descricao', 'data', 'categoria'];
 
-            campos.forEach(id => {
-                const campo = document.getElementById(id);
-                const grupo = campo.closest('.form-group');
+            // Validar valor
+            if (!validarValor()) {
+                valido = false;
+            }
 
+            // Validar outros campos obrigatórios
+            const camposObrigatorios = [
+                'descricao', 'eventoId', 'categoriaId', 'dataVencimento', 'usuarioId'
+            ];
+
+            camposObrigatorios.forEach(campoId => {
+                const campo = document.getElementById(campoId);
                 if (!campo.value) {
-                    grupo.classList.add('invalid');
+                    campo.parentElement.classList.add('invalid');
                     valido = false;
                 } else {
-                    grupo.classList.remove('invalid');
+                    campo.parentElement.classList.remove('invalid');
                 }
             });
 
             return valido;
         }
 
-        // Envio do formulário
-        receitaForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!validarFormulario()) return;
-
-            showLoader();
-
-            // Objeto corrigido para enviar a categoria como objeto com ID
-            const receitaData = {
-                valor: parseFloat(document.getElementById('valor').value),
-                descricao: document.getElementById('descricao').value,
-                data: document.getElementById('data').value,
-                categoria: {
-                    id: parseInt(document.getElementById('categoria').value)
-                },
-                futura: document.getElementById('futura').checked
-            };
-
-            console.log('Dados sendo enviados:', JSON.stringify(receitaData, null, 2));
-
+        // Função para carregar combos
+        async function carregarCombos() {
             try {
-                let response;
-                const url = receitaParaEditar ? `${API_BASE}/${receitaParaEditar.id}` : API_BASE;
-                const method = receitaParaEditar ? 'PUT' : 'POST';
+                // Carregar eventos
+                const eventos = await fetchData('/apis/eventos');
+                preencherSelect(eventoSelect, eventos, 'evento_id', 'evento_nome');
 
-                response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Authorization': `Bearer ${authManager.getToken()}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(receitaData)
-                });
+                // Carregar categorias
+                const categorias = await fetchData('/apis/tiporeceita');
+                preencherSelect(categoriaSelect, categorias, 'catrec_id', 'catrec_nome');
 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => null);
-                    throw new Error(errorData?.message || `Erro HTTP: ${response.status}`);
-                }
+                // Carregar usuários
+                const usuarios = await fetchData('/api/usuarios/todos');
+                preencherSelect(usuarioSelect, usuarios, 'user_id', 'user_nome');
 
-                showModal(receitaParaEditar ? 'Receita atualizada com sucesso!' : 'Receita cadastrada com sucesso!');
-                formCadastro.style.display = 'none';
-                receitaForm.reset();
-                await carregarReceitas();
             } catch (error) {
-                console.error('Erro detalhado ao salvar receita:', error);
-                showModal(`Erro ao salvar receita: ${error.message}`, true);
-            } finally {
-                hideLoader();
+                console.error('Erro ao carregar combos:', error);
+                alert('Erro ao carregar dados. Tente recarregar a página.');
             }
-        });
-        // Confirmação de exclusão
-        btnConfirmarExclusao.addEventListener('click', async () => {
-            if (!receitaIdParaExcluir) return;
+        }
 
-            showLoader();
+        // Função genérica para buscar dados
+        async function fetchData(endpoint) {
+            const token = localStorage.getItem('token');
+            const API_BASE_URL = 'http://localhost:8080'; // ALTERE PARA SUA URL
+
             try {
-                const response = await fetch(`${API_BASE}/${receitaIdParaExcluir}`, {
-                    method: 'DELETE',
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                     headers: {
-                        'Authorization': `Bearer ${authManager.getToken()}`,
-                        'Content-Type': 'application/json'
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 });
 
-                if (!response.ok) throw new Error(await response.text());
-
-                showModal('Receita excluída com sucesso!');
-                await carregarReceitas();
-            } catch (error) {
-                console.error('Erro ao excluir receita:', error);
-                showModal(`Erro ao excluir receita: ${error.message}`, true);
-            } finally {
-                modal.classList.remove('active');
-                receitaIdParaExcluir = null;
-                hideLoader();
-            }
-        });
-
-        // Cancelar exclusão
-        btnCancelarExclusao.addEventListener('click', () => {
-            modal.classList.remove('active');
-            receitaIdParaExcluir = null;
-        });
-
-        // Fecha o modal ao clicar fora
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-                receitaIdParaExcluir = null;
-            }
-        });
-
-        // Validação em tempo real
-        document.querySelectorAll('input, select').forEach(input => {
-            input.addEventListener('input', function() {
-                if (this.value.trim() !== '') {
-                    this.closest('.form-group').classList.remove('invalid');
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Erro ${response.status}: ${errorText}`);
                 }
-            });
-        });
 
-        // Utilitários
-        function showLoader() {
-            loader.style.display = 'block';
+                return await response.json();
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                throw error;
+            }
         }
 
-        function hideLoader() {
-            loader.style.display = 'none';
-        }
-
-        function showModal(message, isError = false) {
-            modalMessage.textContent = message;
-            modalMessage.style.color = isError ? 'var(--danger-color)' : 'var(--secondary-color)';
-            modal.classList.add('active');
-        }
-
-        // Configuração inicial
-        document.getElementById('data').valueAsDate = new Date();
-
-        (async function () {
-            await carregarCategorias();
-            await carregarReceitas();
-        })();
-
-    }
-
-    // Certifique-se de chamar a função inicializarPagina() após a verificação do token
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
-            // Elementos DOM
-            const verificationContainer = document.getElementById('verificacao-container');
-            const spinner = document.getElementById('spinner');
-            const appContainer = document.querySelector('.app-container');
-
-            // 1. Verifica autenticação
-            const isValid = await authManager.verificarToken();
-
-            if (!isValid) {
-                mostrarErro("Sua sessão expirou. Faça login novamente.");
-                return;
+        // Função para preencher selects
+        function preencherSelect(selectElement, dados, valorField, textoField) {
+            // Limpa opções existentes, mantendo a primeira (vazia)
+            while (selectElement.options.length > 1) {
+                selectElement.remove(1);
             }
 
-            // 2. Mostra o conteúdo se autenticado
-            verificationContainer.style.display = 'none';
-            appContainer.style.display = 'grid';
-
-            // 3. Inicializa a página
-            inicializarPagina();
-
-        } catch (error) {
-            console.error('Erro na verificação:', error);
-            mostrarErro("Ocorreu um erro inesperado. Tente novamente mais tarde.");
+            dados.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item[valorField] || item.id; // Adapta para diferentes estruturas
+                option.textContent = item[textoField] || item.nome;
+                selectElement.appendChild(option);
+            });
         }
+
+        // Função para preparar os dados da receita
+        function prepararDadosReceita() {
+            return {
+                valor: parseFloat(valorInput.value),
+                futura: verificarDataFutura(),
+                descricao: document.getElementById('descricao').value,
+                eventoId: parseInt(document.getElementById('eventoId').value),
+                categoriaId: parseInt(document.getElementById('categoriaId').value),
+                dataVencimento: dataVencimentoInput.value,
+                quitada: false, // Como definido no seu código
+                statusConciliacao: "pendente",
+                pagamento: 0,
+                usuarioId: parseInt(document.getElementById('usuarioId').value)
+            };
+        }
+        // Função para cadastrar receita
+        async function cadastrarReceita(receitaData) {
+            try {
+                const token = authManager.getToken();
+                const API_BASE_URL = 'http://localhost:8080'; // Confirme se esta é a URL correta
+
+                // Converter os dados para URLSearchParams
+                const formData = new URLSearchParams();
+                formData.append('valor', receitaData.valor);
+                formData.append('futura', receitaData.futura);
+                formData.append('descricao', receitaData.descricao);
+                formData.append('eventoId', receitaData.eventoId);
+                formData.append('categoriaId', receitaData.categoriaId);
+                formData.append('dataVencimento', receitaData.dataVencimento);
+                formData.append('quitada', receitaData.quitada);
+                formData.append('statusConciliacao', receitaData.statusConciliacao);
+                formData.append('pagamento', receitaData.pagamento);
+                formData.append('usuarioId', receitaData.usuarioId);
+
+                console.log('Enviando para:', `${API_BASE_URL}/cadastroReceita`);
+                console.log('Dados:', Object.fromEntries(formData.entries()));
+
+                const response = await fetch(`${API_BASE_URL}/apis/receita/cadastroReceita`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                        // Não definir Content-Type - será automaticamente application/x-www-form-urlencoded
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Erro ao cadastrar receita');
+                }
+
+                const data = await response.json();
+                alert('Receita cadastrada com sucesso!');
+                formReceita.reset();
+
+            } catch (error) {
+                console.error('Erro no cadastro:', error);
+                alert('Falha no cadastro: ' + error.message);
+            }
+        }
+        // Botão cancelar
+        document.getElementById('btnCancelar').addEventListener('click', function() {
+            if (confirm('Deseja cancelar o cadastro? Os dados preenchidos serão perdidos.')) {
+                formReceita.reset();
+            }
+        });
     });
 </script>
-<script src="js/authManager.js"></script>
 </body>
 </html>

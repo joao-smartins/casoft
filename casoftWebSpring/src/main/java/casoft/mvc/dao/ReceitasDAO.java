@@ -1,30 +1,45 @@
 package casoft.mvc.dao;
 
-import casoft.mvc.model.CategoriaReceita;
 import casoft.mvc.model.Receitas;
 import casoft.mvc.util.Singleton;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class ReceitasDAO implements IDAO<Receitas> {
+public class ReceitasDAO {
 
-    @Override
     public Receitas gravar(Receitas entidade, Singleton conexao) {
         String sql = """
-            INSERT INTO receitas (rec_valor, rec_futura, rec_descricao, rec_evento_id, rec_categoria_id, rec_data)
-            VALUES (#1, #2, '#3', #4, #5, '#6')
-            """;
-        sql = sql.replace("#1", String.valueOf(entidade.getValor()))
-                .replace("#2", entidade.isFutura() ? "true" : "false")
-                .replace("#3", entidade.getDescricao())
-                .replace("#4", entidade.getEvento() != null ? String.valueOf(entidade.getEvento().getId()) : "NULL")
-                .replace("#5", String.valueOf(entidade.getCategoria().getId()))
-                .replace("#6", entidade.getData().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        INSERT INTO receita (
+            receita_val, 
+            receita_futura, 
+            receita_desc, 
+            evento_id, 
+            catrec_id, 
+            receita_datavencimento, 
+            receita_quitada, 
+            receita_statusconciliacao, 
+            receita_pagamento, 
+            id
+        ) VALUES (
+            #1, #2, '#3', #4, #5, '#6', #7, '#8', #9, #A
+        );
+        """;
+
+        sql = sql.replace("#1", String.valueOf(entidade.getValor()));
+        sql = sql.replace("#2", entidade.isFutura() ? "true" : "false"); // Corrigido aqui
+        sql = sql.replace("#3", entidade.getDescricao());
+        sql = sql.replace("#4", String.valueOf(entidade.getEventoId()));
+        sql = sql.replace("#5", String.valueOf(entidade.getCategoria()));
+        sql = sql.replace("#6", entidade.getDatavencimento().toString());
+        sql = sql.replace("#7", entidade.isQuitada() ? "true" : "false"); // Também corrigido
+        sql = sql.replace("#8", entidade.getStatusConciliacao());
+        sql = sql.replace("#9", String.valueOf(entidade.getPagamento()));
+        sql = sql.replace("#A", String.valueOf(entidade.getUsuario_id()));
+
+        System.out.println("SQL gerado: " + sql); // Adicione este log para verificação
 
         if (conexao.getConexao().manipular(sql)) {
             return entidade;
@@ -34,53 +49,69 @@ public class ReceitasDAO implements IDAO<Receitas> {
         }
     }
 
-
-
-    @Override
-    public List<Receitas> get(String filtro, Singleton conexao) {
+    public List<Receitas> consultar(String filtro, Singleton conexao) {
         List<Receitas> receitas = new ArrayList<>();
-        String sql = "SELECT * FROM receitas";
+        String sql = "SELECT * FROM receita";
+
         if (filtro != null && !filtro.isBlank()) {
             sql += " WHERE " + filtro;
         }
-        ResultSet rs = conexao.getConexao().consultar(sql);
+
+        var rs = conexao.getConexao().consultar(sql);
         try {
             while (rs.next()) {
-                Receitas r = new Receitas(
-                        rs.getDouble("rec_valor"),
-                        rs.getBoolean("rec_futura"),
-                        rs.getString("rec_descricao"),
-                        null, // Evento (seria necessário buscar do banco)
-                        new CategoriaReceita(rs.getInt("rec_categoria_id"), ""), // Categoria (simplificado)
-                        rs.getDate("rec_data").toLocalDate()
-                );
+                Receitas r = new Receitas();
+                r.setId(rs.getInt("receita_id"));
+                r.setValor(rs.getDouble("receita_val"));
+                r.setFutura(rs.getBoolean("receita_futura"));
+                r.setDescricao(rs.getString("receita_desc"));
+                r.setEventoId(rs.getInt("evento_id"));
+                r.setCategoria(rs.getInt("catrec_id"));
+                r.setDatavencimento(rs.getDate("receita_datavencimento").toLocalDate());
+                r.setQuitada(rs.getBoolean("receita_quitada"));
+                r.setStatusConciliacao(rs.getString("receita_statusconciliacao"));
+                r.setPagamento(rs.getInt("receita_pagamento"));
+                r.setUsuario_id(rs.getInt("id"));
                 receitas.add(r);
             }
-        } catch (Exception e) {
-            System.out.println("Erro ao buscar receitas: " + e.getMessage());
+        } catch(Exception er) {
+            System.out.println("Erro ao carregar receitas: " + er.getMessage());
         }
         return receitas;
     }
 
-    @Override
+    public boolean apagar(int id, Singleton conexao) {
+        String sql = "DELETE FROM receita WHERE receita_id = "+id;
+        return conexao.getConexao().manipular(sql);
+    }
+
     public Receitas alterar(Receitas entidade, Singleton conexao) {
         String sql = """
-            UPDATE receitas SET
-                rec_valor = #1,
-                rec_futura = #2,
-                rec_descricao = '#3',
-                rec_evento_id = #4,
-                rec_categoria_id = #5,
-                rec_data = '#6'
-            WHERE rec_id = #7
+            UPDATE receita SET
+                receita_val = #1, 
+                receita_futura = '#2', 
+                receita_desc = '#3', 
+                evento_id = #4, 
+                catrec_id = #5, 
+                receita_datavencimento = '#6', 
+                receita_quitada = #7, 
+                receita_statusconciliacao = '#8', 
+                receita_pagamento = #9, 
+                user_id = #A
+            WHERE receita_id = #B
             """;
-        sql = sql.replace("#1", String.valueOf(entidade.getValor()))
-                .replace("#2", entidade.isFutura() ? "1" : "0")
-                .replace("#3", entidade.getDescricao())
-                .replace("#4", entidade.getEvento() != null ? String.valueOf(entidade.getEvento().getId()) : "NULL")
-                .replace("#5", String.valueOf(entidade.getCategoria().getId()))
-                .replace("#6", entidade.getData().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-                .replace("#7", "1"); // Supondo que haja um ID na tabela
+
+        sql = sql.replace("#1", String.valueOf(entidade.getValor()));
+        sql = sql.replace("#2", entidade.isFutura() ? "true" : "false");
+        sql = sql.replace("#3", entidade.getDescricao());
+        sql = sql.replace("#4", String.valueOf(entidade.getEventoId()));
+        sql = sql.replace("#5", String.valueOf(entidade.getCategoria()));
+        sql = sql.replace("#6", entidade.getDatavencimento().toString());
+        sql = sql.replace("#7", entidade.isQuitada() ? "true" : "false");
+        sql = sql.replace("#8", entidade.getStatusConciliacao());
+        sql = sql.replace("#9", String.valueOf(entidade.getPagamento()));
+        sql = sql.replace("#A", String.valueOf(entidade.getUsuario_id()));
+        sql = sql.replace("#B", String.valueOf(entidade.getId()));
 
         if (conexao.getConexao().manipular(sql)) {
             return entidade;
@@ -88,31 +119,5 @@ public class ReceitasDAO implements IDAO<Receitas> {
             System.out.println("Erro: " + conexao.getConexao().getMensagemErro());
             return null;
         }
-    }
-
-    @Override
-    public boolean apagar(Receitas entidade, Singleton conexao) {
-        return false;
-    }
-
-    @Override
-    public Receitas get(int id, Singleton conexao) {
-        String sql = "SELECT * FROM receitas WHERE rec_id = " + id;
-        ResultSet rs = conexao.getConexao().consultar(sql);
-        try {
-            if (rs.next()) {
-                return new Receitas(
-                        rs.getDouble("rec_valor"),
-                        rs.getBoolean("rec_futura"),
-                        rs.getString("rec_descricao"),
-                        null, // Evento (seria necessário buscar)
-                        new CategoriaReceita(rs.getInt("rec_categoria_id"), ""), // Categoria (simplificado)
-                        rs.getDate("rec_data").toLocalDate()
-                );
-            }
-        } catch (Exception e) {
-            System.out.println("Erro ao buscar receita: " + e.getMessage());
-        }
-        return null;
     }
 }
