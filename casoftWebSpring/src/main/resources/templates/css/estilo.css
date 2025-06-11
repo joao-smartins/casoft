@@ -295,3 +295,8 @@ tbody tr:hover {
   }
 }
 
+/* Pode ser colocado em css/estilo.css */
+.is-invalid {
+    border-color: red !important;
+    box-shadow: 0 0 0 0.2rem rgba(255,0,0,.15);
+}

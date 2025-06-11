@@ -206,6 +206,10 @@ public class Despesas {
         return despesaDAO.consultar(filtro,conexao);
     }
 
+    public Despesas get(int id, Singleton conexao) {
+        return despesaDAO.get(id,conexao);
+    }
+
     public boolean remover(int id, Singleton conexao){
         return despesaDAO.apagar(id,conexao);
     }

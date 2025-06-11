@@ -74,8 +74,8 @@ public class LancamentoBancarioDAO implements IDAO<LancamentoBancario> {
 
     @Override
     public boolean apagar(LancamentoBancario entidade, Singleton conexao) {
-        String sql = "DELETE FROM lancamentosbancarios WHERE lanbanc_id = " + entidade.getLancamentoId() +
-                " AND movimentacaobancaria_movbanc_id = " + entidade.getMovimentacaoBancariaId();
+        System.out.println("Apagando lançamento bancário: " + entidade.getLancamentoId());
+        String sql = "DELETE FROM lancamentosbancarios WHERE lanbanc_id = " + entidade.getLancamentoId();
         return conexao.getConexao().manipular(sql);
     }
 

@@ -142,6 +142,53 @@ public class DespesasController {
         }
         return jsonlist;
     }
+
+    public Map<String, Object> getById(int id) {
+        Map<String, Object> json = new HashMap<>();
+        Singleton conexao = Singleton.getInstancia();
+        if (conexao.conectar()) {
+            Despesas despesas = despesasModel.get(id, conexao);
+            if (despesas != null) {
+                Evento evento = null;
+                if (despesas.getEvento_id() != 0)
+                    evento = eventoModel.consultar(despesas.getEvento_id(), conexao);
+                TipoDespesas tipoDespesas = tipoDespesasModel.consultar(despesas.getTipoDespesa_id(), conexao);
+
+                Map<String, Object> eventoJson = new HashMap<>();
+                if (evento != null) {
+                    eventoJson.put("id", evento.getId());
+                    eventoJson.put("nome", evento.getNome());
+                }
+                Map<String, Object> tipoDespesaJson = new HashMap<>();
+                if (tipoDespesas != null) {
+                    tipoDespesaJson.put("id", tipoDespesas.getId());
+                    tipoDespesaJson.put("nome", tipoDespesas.getNome());
+                }
+                json.put("id", despesas.getId());
+                json.put("val", despesas.getValor());
+                json.put("data_venc", despesas.getData_venc());
+                json.put("data_lanc", despesas.getData_lanc());
+                json.put("pagamento", despesas.getPagamento());
+                json.put("descricao", despesas.getDescricao());
+                json.put("status_conci", despesas.getStatus_conci());
+                json.put("categoria", tipoDespesaJson);
+                json.put("evento", eventoJson);
+                try {
+                    conexao.getConexao().commit();
+                } catch (Exception e) {
+                    json.put("erro", "Erro ao realizar commit");
+                }
+            } else {
+                json.put("erro", "Despesa não encontrada");
+            }
+            conexao.Desconectar();
+        } else {
+            json.put("erro", "Erro ao conectar com o BD");
+        }
+        return json;
+    }
+
+
     public Map<String,Object> delete(int id){
         Map<String,Object> json=new HashMap<>();
         Singleton conexao= Singleton.getInstancia();
