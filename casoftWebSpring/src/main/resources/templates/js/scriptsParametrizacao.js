@@ -7,14 +7,33 @@ function limparFormulario() {
 // Enviar formulário
 function enviarFormulario(event) {
     event.preventDefault(); // Evita o recarregamento da página
+
     var fdados = document.getElementById("formEmpresa");
-    const cnpjValido = validarCampo('cnpj', 14, 'CNPJ deve ter 14 dígitos.');
+
+    const cnpjInput = document.getElementById('cnpj');
+    const cnpjValue = cnpjInput.value;
+    const cnpjFeedback = document.getElementById('cnpjFeedback');
+
+    let isCnpjValid = validarCNPJ(cnpjValue);
+
+    if (!isCnpjValid) {
+        cnpjInput.classList.add('is-invalid');
+        cnpjFeedback.textContent = 'CNPJ inválido.';
+        cnpjInput.focus(); 
+        return false; 
+    } else {
+        cnpjInput.classList.remove('is-invalid');
+        cnpjInput.classList.add('is-valid');
+        cnpjFeedback.textContent = '';
+    }
+
     const cepValido = validarCampo('cep', 8, 'CEP deve ter 8 dígitos.');
     const telValido = validarCampo('telefone', 10, 'Telefone deve ter 10 ou 11 dígitos.');
-  
-    if(!cnpjValido || !cepValido || !telValido)
-      return;
-    // Obtendo o token do localStorage
+
+    if (!isCnpjValid || !cepValido || !telValido) {
+        return false;
+    }
+
     const token = authManager.getToken();
 
     const URL = "http://localhost:8080/apis/param";
@@ -31,11 +50,15 @@ function enviarFormulario(event) {
     .then((response) => response.json())
     .then((json) => {
         alert(json.mensagem);
+        // Opcional: Limpar formulário se o cadastro/alteração for bem-sucedido
+        // limparFormulario();
     })
     .catch((error) => {
         alert("Erro ao cadastrar empresa. Por favor, tente novamente. " + error.message);
         console.error("Erro:", error);
     });
+
+    return false; // Retorna false para evitar submissão padrão do formulário
 }
 
 // Event listeners para formatação de campos
@@ -213,4 +236,53 @@ function validarCampo(inputId, length, message) {
     feedback.textContent = '';
     return true;
   }
+}
+function validarCNPJ(cnpj) {
+    cnpj = cnpj.replace(/[^\d]+/g, '');
+
+    if (cnpj == '') return false;
+
+    if (cnpj.length != 14) return false;
+
+    if (cnpj == "00000000000000" ||
+        cnpj == "11111111111111" ||
+        cnpj == "22222222222222" ||
+        cnpj == "33333333333333" ||
+        cnpj == "44444444444444" ||
+        cnpj == "55555555555555" ||
+        cnpj == "66666666666666" ||
+        cnpj == "77777777777777" ||
+        cnpj == "88888888888888" ||
+        cnpj == "99999999999999")
+        return false;
+
+    // Valida DVs
+    let tamanho = cnpj.length - 2
+    let numeros = cnpj.substring(0, tamanho);
+    let digitos = cnpj.substring(tamanho);
+    let soma = 0;
+    let pos = tamanho - 7;
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2)
+            pos = 9;
+    }
+    let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado != digitos.charAt(0))
+        return false;
+
+    tamanho = tamanho + 1;
+    numeros = cnpj.substring(0, tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+    for (let i = tamanho; i >= 1; i--) {
+        soma += numeros.charAt(tamanho - i) * pos--;
+        if (pos < 2)
+            pos = 9;
+    }
+    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado != digitos.charAt(1))
+        return false;
+
+    return true;
 }

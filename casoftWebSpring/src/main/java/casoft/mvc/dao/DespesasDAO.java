@@ -12,48 +12,60 @@ public class DespesasDAO {
 
     public Despesas gravar(Despesas entidade, Singleton conexao) {
         String sql;
-        if(entidade.getEvento_id()==0)
-            sql = """
-            INSERT INTO despesa (
-                despesa_val, 
-                despesa_dt_venc, 
-                despesa_dt_lanc, 
-                despesa_pagamento, 
-                despesa_desc, 
-                despesa_statusconci, 
-                catdesp_id, 
-                user_id
-            ) VALUES (
-                #2, '#3', '#4', '#5', '#6', '#7', #8, #9
-            );
-            """;
-        else
-            sql = """
-            INSERT INTO despesa (
-                despesa_val, 
-                despesa_dt_venc, 
-                despesa_dt_lanc, 
-                despesa_pagamento, 
-                despesa_desc, 
-                despesa_statusconci, 
-                catdesp_id, 
-                user_id, 
-                evento_id
-            ) VALUES (
-                #2, '#3', '#4', '#5', '#6', '#7', #8, #9, #A
-            );
-            """;
 
-        sql = sql.replace("#2", String.valueOf(entidade.getValor()));
-        sql = sql.replace("#3", entidade.getData_venc());
-        sql = sql.replace("#4", entidade.getData_lanc());
-        sql = sql.replace("#5", ""+entidade.getPagamento());
-        sql = sql.replace("#6", entidade.getDescricao());
-        sql = sql.replace("#7", entidade.getStatus_conci());
-        sql = sql.replace("#8", String.valueOf(entidade.getTipoDespesa_id()));
-        sql = sql.replace("#9", String.valueOf(entidade.getUsuario_id()));
-        sql = sql.replace("#A", String.valueOf(entidade.getEvento_id()));
+        sql = """
+    INSERT INTO despesa (
+        despesa_val,
+        despesa_dt_venc,
+        despesa_dt_lanc,
+        despesa_pagamento,
+        despesa_desc,
+        despesa_statusconci,
+        catdesp_id,
+        user_id"""; // Não fecha ainda para adicionar os opcionais
 
+        // Verifica campos opcionais para incluir no INSERT
+        if (entidade.getEvento_id() != 0) {
+            sql += ", evento_id";
+        }
+        if (entidade.getData_pag() != null) {
+            sql += ", despesa_dt_pag";
+        }
+        if (entidade.getObs() != null && !entidade.getObs().isEmpty()) {
+            sql += ", despesa_obs";
+        }
+        if (entidade.getPai_id() != null) {
+            sql += ", despesa_pai_id";
+        }
+
+        sql += ") VALUES ("; // Começa os valores
+
+        sql += String.valueOf(entidade.getValor()) + ", ";
+        sql += "'" + entidade.getData_venc() + "', ";
+        sql += "'" + entidade.getData_lanc() + "', ";
+        sql += "'" + entidade.getPagamento() + "', ";
+        sql += "'" + entidade.getDescricao() + "', ";
+        sql += "'" + entidade.getStatus_conci() + "', ";
+        sql += String.valueOf(entidade.getTipoDespesa_id()) + ", ";
+        sql += String.valueOf(entidade.getUsuario_id());
+
+        // Adiciona os valores dos campos opcionais
+        if (entidade.getEvento_id() != 0) {
+            sql += ", " + entidade.getEvento_id();
+        }
+        if (entidade.getData_pag() != null) {
+            sql += ", '" + entidade.getData_pag() + "'";
+        }
+        if (entidade.getObs() != null && !entidade.getObs().isEmpty()) {
+            sql += ", '" + entidade.getObs() + "'";
+        }
+        if (entidade.getPai_id() != null) {
+            sql += ", " + entidade.getPai_id();
+        }
+
+        sql += ")";
+
+        System.out.println(sql);
         if (conexao.getConexao().manipular(sql)) {
             return entidade;
         } else {
@@ -107,33 +119,18 @@ public class DespesasDAO {
     public Despesas alterar(Despesas entidade, Singleton conexao) {
         String sql;
 
-        if(entidade.getEvento_id()==0)
-            sql = """
-            UPDATE despesa  set
-                despesa_val = #1, 
-                despesa_dt_venc = '#2', 
-                despesa_dt_lanc = '#3', 
-                despesa_pagamento = '#4', 
-                despesa_desc = '#5', 
-                despesa_statusconci = '#6', 
-                catdesp_id = #7, 
-                user_id = #8
-            WHERE despesa_id = #9
-            """;
-        else
-            sql = """
-            UPDATE despesa  set
-                despesa_val = #1, 
-                despesa_dt_venc = '#2', 
-                despesa_dt_lanc = '#3', 
-                despesa_pagamento = '#4', 
-                despesa_desc = '#5', 
-                despesa_statusconci = '#6', 
-                catdesp_id = #7, 
-                user_id = #8,
-                evento_id = #A
-            WHERE despesa_id = #9
-            """;
+        sql = """
+        UPDATE despesa  set
+            despesa_val = #1, 
+            despesa_dt_venc = '#2', 
+            despesa_dt_lanc = '#3', 
+            despesa_pagamento = '#4', 
+            despesa_desc = '#5', 
+            despesa_statusconci = '#6', 
+            catdesp_id = #7, 
+            user_id = #8
+           
+        """;
 
         sql = sql.replace("#1", String.valueOf(entidade.getValor()));
         sql = sql.replace("#2", entidade.getData_venc());
@@ -143,9 +140,23 @@ public class DespesasDAO {
         sql = sql.replace("#6", entidade.getStatus_conci());
         sql = sql.replace("#7", String.valueOf(entidade.getTipoDespesa_id()));
         sql = sql.replace("#8", String.valueOf(entidade.getUsuario_id()));
-        sql = sql.replace("#9", String.valueOf(entidade.getId()));
-        sql = sql.replace("#A", String.valueOf(entidade.getEvento_id()));
+        if(entidade.getEvento_id()!=0){
+            sql+=",evento_id = "+entidade.getEvento_id();
+        }
+        if(entidade.getData_pag()!=null){
+            sql+=",despesa_dt_pag = '"+entidade.getData_pag()+"'";
+        }
+        if(entidade.getObs()!=null && !entidade.getObs().isEmpty()){
+            sql+=",despesa_obs = '"+entidade.getObs()+"'";
+        }
+        if(entidade.getPai_id() != null){
+            sql+=",despesa_pai_id = "+entidade.getPai_id();
+        }
 
+
+        sql+=" WHERE despesa_id = "+entidade.getId();
+
+        System.out.println(sql);
         if (conexao.getConexao().manipular(sql)) {
             return entidade;
         } else {
@@ -153,4 +164,5 @@ public class DespesasDAO {
             return null;
         }
     }
+
 }

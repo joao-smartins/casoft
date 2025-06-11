@@ -12,6 +12,7 @@
             --secondary-color: #343a40; /* cinza escuro */
             --border-color: #e0e0e0;
             --hover-color: #f8f9fa;
+            --danger-color: #dc3545;
         }
 
         body {
@@ -216,6 +217,23 @@
                 padding: 20px 15px;
             }
         }
+        .form-group.invalid input,
+        .form-group.invalid select {
+            border-color: var(--danger-color) !important;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2) !important;
+        }
+
+        /* Estilo para mensagens de erro */
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group.invalid .error-message {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -244,7 +262,7 @@
                         <h3 class="text-center m-0"><i class="fas fa-user-edit"></i> Alteração de Usuário</h3>
                     </div>
                     <div class="card-body p-0">
-                        <form id="formUsuario">
+                        <form id="formUsuario" class="needs-validation" novalidate>
                             <!-- Dados Básicos -->
                             <div class="card-section">
                                 <h5 class="section-title"><i class="fas fa-id-card"></i> Dados Básicos</h5>
@@ -254,7 +272,9 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-user"></i></span>
                                             <input type="text" id="nome" name="nome" class="form-control" required maxlength="100">
+
                                         </div>
+
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="login" class="form-label">Login <span class="text-danger">*</span></label>
@@ -299,6 +319,14 @@
                                                 <label class="form-check-label" for="ativoNao"><i class="fas fa-times-circle text-danger"></i> Inativo</label>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="nivelAcesso" class="form-label">Nível de Acesso <span class="text-danger">*</span></label>
+                                        <select id="nivelAcesso" name="nivelAcesso" class="form-select" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="ADMIN">Administrador</option>
+                                            <option value="USUARIO">Usuário</option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -410,16 +438,25 @@
             if (!response.ok) throw new Error(`Erro ${response.status}: ${response.statusText}`);
 
             usuarioAtual = await response.json();
-            document.getElementById('nome').value = usuarioAtual.nome || '';
-            document.getElementById('login').value = usuarioAtual.login || '';
-            document.getElementById('cpf').value = formatarCPF(usuarioAtual.cpf || '');
-            document.getElementById('telefone').value = formatarTelefone(usuarioAtual.telefone || '');
-            document.getElementById(usuarioAtual.ativo ? 'ativoSim' : 'ativoNao').checked = true;
+            preencherFormulario(usuarioAtual);
         } catch (error) {
             console.error('Erro ao carregar usuário:', error);
             showAlert(`Falha ao carregar dados do usuário: ${error.message}`, 'danger');
         } finally {
             toggleLoading(false);
+        }
+    }
+
+    function preencherFormulario(usuario) {
+        document.getElementById('nome').value = usuario.nome || '';
+        document.getElementById('login').value = usuario.login || '';
+        document.getElementById('cpf').value = formatarCPF(usuario.cpf || '');
+        document.getElementById('telefone').value = formatarTelefone(usuario.telefone || '');
+        document.getElementById(usuario.ativo ? 'ativoSim' : 'ativoNao').checked = true;
+
+        // Definir o nível de acesso
+        if (usuario.nivelAcesso) {
+            document.getElementById('nivelAcesso').value = usuario.nivelAcesso;
         }
     }
 
@@ -448,54 +485,53 @@
         e.target.value = value;
     });
 
-    // Validação de CPF e Telefone
-    document.getElementById('formUsuario')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // Validação de formulário
+    function validarFormulario() {
+        let isValid = true;
+        const camposObrigatorios = ['nome', 'login', 'cpf', 'telefone', 'nivelAcesso'];
 
+        camposObrigatorios.forEach(id => {
+            const campo = document.getElementById(id);
+            if (!campo.value.trim()) {
+                campo.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                campo.classList.remove('is-invalid');
+            }
+        });
+
+        // Validação de CPF
         const cpf = document.getElementById('cpf').value;
-        const telefone = document.getElementById('telefone').value;
-
         if (!validarCPF(cpf)) {
-            showAlert('CPF inválido!');
-            return;
+            document.getElementById('cpf').classList.add('is-invalid');
+            isValid = false;
         }
 
+        // Validação de Telefone
+        const telefone = document.getElementById('telefone').value;
         if (!validarTelefone(telefone)) {
-            showAlert('Telefone inválido!');
-            return;
+            document.getElementById('telefone').classList.add('is-invalid');
+            isValid = false;
         }
 
-        toggleLoading(true);
+        // Validação de senha
+        const senha = document.getElementById('senha').value;
+        const confirmarSenha = document.getElementById('confirmarSenha').value;
 
-        try {
-            const formData = {
-                nome: document.getElementById('nome').value,
-                login: document.getElementById('login').value,
-                cpf: cpf.replace(/\D/g, ''),
-                telefone: telefone.replace(/\D/g, ''),
-                ativo: document.querySelector('input[name="ativo"]:checked').value === 'true',
-                senha: document.getElementById('senha').value || undefined,
-                confirmarSenha: document.getElementById('confirmarSenha').value || undefined
-            };
+        if (senha || confirmarSenha) {
+            if (senha.length < 6) {
+                document.getElementById('senha').classList.add('is-invalid');
+                isValid = false;
+            }
 
-            const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioAtual.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            if (!response.ok) throw new Error(`Erro ${response.status}: ${response.statusText}`);
-
-            showAlert('Usuário atualizado com sucesso!', 'success');
-        } catch (error) {
-            console.error('Erro ao atualizar usuário:', error);
-            showAlert(`Falha ao atualizar usuário: ${error.message}`, 'danger');
-        } finally {
-            toggleLoading(false);
+            if (senha !== confirmarSenha) {
+                document.getElementById('confirmarSenha').classList.add('is-invalid');
+                isValid = false;
+            }
         }
-    });
+
+        return isValid;
+    }
 
     function validarCPF(cpf) {
         cpf = cpf.replace(/[^\d]+/g, '');
@@ -519,17 +555,66 @@
         return telefone.length === 10 || telefone.length === 11;
     }
 
-    function limparFormulario() {
-        document.getElementById('formUsuario').reset();
-        if (usuarioAtual) {
-            document.getElementById('nome').value = usuarioAtual.nome || '';
-            document.getElementById('login').value = usuarioAtual.login || '';
-            document.getElementById('cpf').value = formatarCPF(usuarioAtual.cpf || '');
-            document.getElementById('telefone').value = formatarTelefone(usuarioAtual.telefone || '');
-            document.getElementById(usuarioAtual.ativo ? 'ativoSim' : 'ativoNao').checked = true;
-            document.getElementById('senha').value = '';
-            document.getElementById('confirmarSenha').value = '';
+    async function salvarUsuario() {
+        if (!validarFormulario()) {
+            showAlert('Por favor, preencha todos os campos obrigatórios corretamente.', 'danger');
+            return;
         }
+
+        toggleLoading(true);
+
+        try {
+            const formData = {
+                nome: document.getElementById('nome').value.trim(),
+                login: document.getElementById('login').value.trim(),
+                cpf: document.getElementById('cpf').value.replace(/\D/g, ''),
+                telefone: document.getElementById('telefone').value.replace(/\D/g, ''),
+                ativo: document.querySelector('input[name="ativo"]:checked').value === 'true',
+                nivelAcesso: document.getElementById('nivelAcesso').value
+            };
+
+            // Adiciona senha apenas se foi informada
+            const senha = document.getElementById('senha').value;
+            if (senha) {
+                formData.senha = senha;
+                formData.confirmarSenha = document.getElementById('confirmarSenha').value;
+            }
+
+            const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioAtual.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Erro ${response.status}: ${response.statusText}`);
+            }
+
+            showAlert('Usuário atualizado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao atualizar usuário:', error);
+            showAlert(`Falha ao atualizar usuário: ${error.message}`, 'danger');
+        } finally {
+            toggleLoading(false);
+        }
+    }
+
+    function limparFormulario() {
+        if (usuarioAtual) {
+            preencherFormulario(usuarioAtual);
+        } else {
+            document.getElementById('formUsuario').reset();
+        }
+        document.getElementById('senha').value = '';
+        document.getElementById('confirmarSenha').value = '';
+
+        // Remove classes de validação
+        document.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
     }
 
     // Toggle para mostrar/esconder senha
@@ -555,6 +640,12 @@
             confirmarSenhaInput.type = 'password';
             icon.classList.replace('fa-eye-slash', 'fa-eye');
         }
+    });
+
+    // Event listeners
+    document.getElementById('formUsuario')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        salvarUsuario();
     });
 
     // Carregar usuário quando a página for carregada

@@ -1,4 +1,3 @@
-// src/main/resources/static/js/conciliacao.js
 
 // Array para armazenar os itens não conciliados e seus estados temporários
 let itensNaoConciliados = [];
@@ -14,10 +13,7 @@ let confirmActionParams = null; // Parâmetros para a função de callback
 
 // Adiciona um listener para carregar os itens de conciliação quando a página estiver pronta
 document.addEventListener("DOMContentLoaded", () => {
-    // A lógica para adicionar o link "Conciliação" à sidebar foi removida daqui.
-    // Certifique-se de que o link 'conciliacao.html' esteja presente diretamente
-    // no HTML da sua sidebar, se você ainda deseja que ele apareça.
-    carregarItensConciliacao(); // Carrega os dados ao carregar a página
+    carregarItensConciliacao();
 });
 
 
@@ -99,18 +95,14 @@ async function carregarItensConciliacao() {
             throw new Error(data.erro);
         }
 
-        // Se a resposta for uma lista vazia ou nula (sem "ok" ou "erro"),
-        // ou se o 'ok' estiver vazio, trate como sem itens
         if (!data || data.length === 0) {
             itensNaoConciliados = []; // Garante que a lista está vazia
         } else {
-            // Se houver "ok", assume que o array de itens está dentro dele (como no seu TipoDespesasView)
-            // Caso contrário, assume que a própria 'data' é o array de itens
             const itensRecebidos = data.ok ? data.ok : data;
             itensNaoConciliados = itensRecebidos.map(item => {
                 let status = item.statusConciliacao;
                 if (status === null) {
-                    status = 'AGUARDANDO';
+                    status = 'Aguardando';
                 }
                 return {
                     id: item.id,
@@ -193,7 +185,7 @@ function renderizarTabelaConciliacao() {
         // Botão PENDENTE
         const pendingButton = document.createElement('button');
         pendingButton.textContent = 'Pendente';
-        pendingButton.className = 'btn btn-sm btn-warning ms-2'; // Estilo Bootstrap com margem
+        pendingButton.className = 'btn btn-sm btn-warning ms-2';
         pendingButton.onclick = function() {
             handleConciliacaoPendente(item.id, item.tipo);
         };
@@ -375,6 +367,6 @@ async function salvarConciliacoesPendentes() {
 const authManager = {
     logout: function() {
         showMessage('Função Deslogar simulada. Redirecionaria para a página de login.', 'green');
-        // window.location.href = 'login.html'; // Descomente para redirecionar
+        window.location.href = 'login.html';
     }
 };
