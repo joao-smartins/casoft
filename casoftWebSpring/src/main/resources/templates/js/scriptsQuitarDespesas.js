@@ -287,17 +287,17 @@ function criarCardDespesa(despesa) {
         classVencimento = 'text-muted';
     }
 
-    return `
+        return `
     <div class="col-md-6 col-lg-4 mb-3">
         <div class="card card-despesa h-100 ${isVencida ? 'border-danger' : ''}">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-2">
-            <h6 class="card-title mb-0 text-truncate" title="${descricao}">
-                ${descricao}
-            </h6>
-            <span class="badge ${isVencida ? 'bg-danger' : 'bg-warning'} ms-2">
-                ${status}
-            </span>
+                <h6 class="card-title mb-0" style="flex-grow: 1; margin-right: 10px;"> 
+                    ${descricao}
+                </h6>
+                <span class="badge ${isVencida ? 'bg-danger' : 'bg-warning'}" style="flex-shrink: 0;">
+                    ${status}
+                </span>
             </div>
             
             <div class="mb-2">
@@ -329,7 +329,7 @@ function criarCardDespesa(despesa) {
             
             <div class="mt-auto">
             <button class="btn btn-quitar btn-success w-100" 
-                    onclick="abrirModalQuitacao(${safeGet(despesa, 'id', 0)})">
+                            onclick="abrirModalQuitacao(${safeGet(despesa, 'id', 0)})">
                 <i class="fas fa-money-bill-wave me-2"></i>
                 Quitar Despesa
             </button>

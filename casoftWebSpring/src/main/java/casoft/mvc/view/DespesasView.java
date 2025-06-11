@@ -79,8 +79,8 @@ public class DespesasView {
         }
         return ResponseEntity.badRequest().body(new Mensagem("Usuario nao autenticado"));
     }
-    @PutMapping
-    public ResponseEntity<Object> uptde(@RequestParam int id,@RequestParam String valor, @RequestParam String data_venc, @RequestParam String data_lanc, @RequestParam String pagamento, @RequestParam String descricao, @RequestParam String status_conci, @RequestParam String tipoDespesa_id, @RequestParam String usuario_id, @RequestParam String evento_id,HttpServletRequest httpServletRequest){
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> uptde(@PathVariable int id,@RequestParam String valor, @RequestParam String data_venc, @RequestParam String data_lanc, @RequestParam String pagamento, @RequestParam String descricao, @RequestParam String status_conci, @RequestParam String tipoDespesa_id, @RequestParam String usuario_id, @RequestParam String evento_id,HttpServletRequest httpServletRequest){
         String token = httpServletRequest.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer "))
             token = token.substring(7);
