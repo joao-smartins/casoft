@@ -1,6 +1,9 @@
 // --- ESCOPO DO SCRIPT ---
 let todasAsMovimentacoes = [];
 
+// --- CONTROLE DE ORDEM ---
+let ordemMov = { coluna: null, direcao: 'asc' };
+
 
 // --- INICIALIZAÇÃO ---
 document.addEventListener("DOMContentLoaded", async () => {
@@ -34,9 +37,15 @@ function renderizarTabela(movimentacoesParaRenderizar) {
             <td>${mov.data || ""}</td>
             <td>${mov.usuarioId || ""}</td>
             <td>${mov.contaBancariaId || ""}</td>
-            <td>
-              <button class="btn btn-sm btn-warning" onclick='editarMovimentacao(${JSON.stringify(mov)})'>Editar</button>
-              <button class="btn btn-sm btn-danger" onclick='excluirMovimentacao(${mov.id})'>Excluir</button>
+            <td class="d-flex flex-column align-items-center justify-content-center gap-1">
+              <button class="btn btn-sm btn-warning w-100 mb-1 d-flex align-items-center justify-content-center"
+                onclick='editarMovimentacao(${JSON.stringify(mov)})'>
+                <i class="bi bi-pencil-square me-1"></i> Editar
+              </button>
+              <button class="btn btn-sm btn-danger w-100 d-flex align-items-center justify-content-center"
+                onclick='excluirMovimentacao(${mov.id})'>
+                <i class="bi bi-trash me-1"></i> Excluir
+              </button>
             </td>
           </tr>
         `;
@@ -321,6 +330,7 @@ function editarMovimentacao(mov) {
 
 async function salvarMovimentacao(event) {
     event.preventDefault();
+    if (!validarMovimentacao()) return false;
     const id = document.getElementById("idMovimentacao").value;
     const movimentacao = {
         movbancTotal: parseFloat(document.getElementById("total").value),
@@ -374,6 +384,66 @@ function limparFormulario() {
     document.getElementById("usuarioId").value = ""; 
 }
 
+// --- ORDENAR TABELA ---
+function ordenarMovimentacoes(coluna) {
+    if (ordemMov.coluna === coluna) {
+        ordemMov.direcao = ordemMov.direcao === 'asc' ? 'desc' : 'asc';
+    } else {
+        ordemMov.coluna = coluna;
+        ordemMov.direcao = 'asc';
+    }
+
+    let lista = [...todasAsMovimentacoes];
+    lista.sort((a, b) => {
+        let valA = a[coluna];
+        let valB = b[coluna];
+
+        // Tenta converter para número se possível
+        if (!isNaN(valA) && !isNaN(valB) && valA !== null && valB !== null && valA !== "" && valB !== "") {
+            valA = Number(valA);
+            valB = Number(valB);
+        }
+
+        if (valA === undefined || valA === null) valA = '';
+        if (valB === undefined || valB === null) valB = '';
+
+        if (valA < valB) return ordemMov.direcao === 'asc' ? -1 : 1;
+        if (valA > valB) return ordemMov.direcao === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    renderizarTabela(lista);
+    atualizarSetasOrdenacaoMov();
+}
+
+// --- ATUALIZA ÍCONES DE ORDEM ---
+function atualizarSetasOrdenacaoMov() {
+    document.querySelectorAll('#tabelaMovimentacoes th.sortable').forEach(th => {
+        const span = th.querySelector('.sort-icons');
+        if (!span) return;
+        if (th.dataset.col === ordemMov.coluna) {
+            if (ordemMov.direcao === 'asc') {
+                span.innerHTML = '<i class="bi bi-caret-up-fill"></i>';
+            } else {
+                span.innerHTML = '<i class="bi bi-caret-down-fill"></i>';
+            }
+        } else {
+            span.innerHTML = '<i class="bi bi-caret-up"></i><i class="bi bi-caret-down"></i>';
+        }
+    });
+}
+
+// --- EVENTO PARA ORDENAR AO CLICAR NO TH ---
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('#tabelaMovimentacoes th.sortable').forEach(th => {
+        th.style.cursor = "pointer";
+        th.addEventListener('click', () => {
+            ordenarMovimentacoes(th.dataset.col);
+        });
+    });
+});
+
+// --- FUNÇÃO DE TESTE (COMENTADA) ---
 // async function ff() {
 //     // Define the parameters
 //     const statusReceita = 'PAGO';
@@ -400,3 +470,103 @@ function limparFormulario() {
 //         throw error;
 //     }
 // }
+
+// --- VALIDAÇÃO AUTOMÁTICA DOS INPUTS ---
+
+function validarUsuario() {
+    const select = document.getElementById("usuario");
+    let erro = document.getElementById("erroUsuario");
+    if (!erro) {
+        erro = document.createElement("span");
+        erro.id = "erroUsuario";
+        erro.className = "text-danger small";
+        select.parentNode.appendChild(erro);
+    }
+    if (!select.value) {
+        erro.innerHTML = "<strong>Selecione um usuário.</strong>";
+        select.classList.add("is-invalid");
+        select.style.borderColor = "red";
+        return false;
+    } else {
+        erro.innerHTML = "";
+        select.classList.remove("is-invalid");
+        select.style.borderColor = "";
+        return true;
+    }
+}
+
+function validarData() {
+    const input = document.getElementById("data");
+    let erro = document.getElementById("erroDataMov");
+    if (!erro) {
+        erro = document.createElement("span");
+        erro.id = "erroDataMov";
+        erro.className = "text-danger small";
+        input.parentNode.appendChild(erro);
+    }
+    const valor = input.value;
+    if (!valor) {
+        erro.innerHTML = "<strong>Data é obrigatória.</strong>";
+        input.classList.add("is-invalid");
+        input.style.borderColor = "red";
+        return false;
+    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+        erro.innerHTML = "<strong>Data inválida.</strong>";
+        input.classList.add("is-invalid");
+        input.style.borderColor = "red";
+        return false;
+    } else {
+        erro.innerHTML = "";
+        input.classList.remove("is-invalid");
+        input.style.borderColor = "";
+        return true;
+    }
+}
+
+function validarConta() {
+    const select = document.getElementById("conta");
+    let erro = document.getElementById("erroConta");
+    if (!erro) {
+        erro = document.createElement("span");
+        erro.id = "erroConta";
+        erro.className = "text-danger small";
+        select.parentNode.appendChild(erro);
+    }
+    if (!select.value) {
+        erro.innerHTML = "<strong>Selecione uma conta bancária.</strong>";
+        select.classList.add("is-invalid");
+        select.style.borderColor = "red";
+        return false;
+    } else {
+        erro.innerHTML = "";
+        select.classList.remove("is-invalid");
+        select.style.borderColor = "";
+        return true;
+    }
+}
+
+// Máscara para data (YYYY-MM-DD)
+document.addEventListener("DOMContentLoaded", () => {
+    const dataInput = document.getElementById("data");
+    if (dataInput) {
+        dataInput.addEventListener("input", function () {
+            // Aceita apenas números e hífens, limita a 10 caracteres
+            this.value = this.value.replace(/[^\d-]/g, '').slice(0, 10);
+        });
+    }
+
+    // Validação automática
+    document.getElementById("usuario").addEventListener("change", validarUsuario);
+    document.getElementById("data").addEventListener("input", validarData);
+    document.getElementById("data").addEventListener("blur", validarData);
+    document.getElementById("conta").addEventListener("change", validarConta);
+});
+
+// Validação geral antes de salvar
+function validarMovimentacao() {
+    let valido = true;
+    if (!validarUsuario()) valido = false;
+    if (!validarData()) valido = false;
+    if (!validarConta()) valido = false;
+    return valido;
+}
