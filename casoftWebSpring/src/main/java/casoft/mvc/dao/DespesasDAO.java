@@ -97,6 +97,39 @@ public class DespesasDAO {
         return despesas;
     }
 
+
+    public Despesas get(int id, Singleton conexao) {
+            Despesas despesas = null;
+            String sql = "SELECT * FROM despesa WHERE despesa_id = " + id;
+
+            var rs = conexao.getConexao().consultar(sql);
+            try {
+                while (rs.next()) {
+                    Despesas d = new Despesas();
+                    d.setId(rs.getInt("despesa_id"));
+                    d.setValor(rs.getDouble("despesa_val"));
+                    d.setData_venc(rs.getString("despesa_dt_venc"));
+                    d.setData_lanc(rs.getString("despesa_dt_lanc"));
+                    d.setPagamento(rs.getDouble("despesa_pagamento"));
+                    d.setDescricao(rs.getString("despesa_desc"));
+                    d.setStatus_conci(rs.getString("despesa_statusconci"));
+                    d.setTipoDespesa_id(rs.getInt("catdesp_id"));
+                    d.setUsuario_id(rs.getInt("user_id"));
+                    String evento_id = rs.getString("evento_id");
+                    if (evento_id != null) {
+                        d.setEvento_id(rs.getInt("evento_id"));
+                    } else {
+                        d.setEvento_id(0);
+                    }
+                    despesas = d;
+                }
+            } catch(Exception er) {
+                System.out.println("Erro ao carregar despesas: " + er.getMessage());
+            }
+            return despesas;
+    }
+
+
     public boolean apagar(int id, Singleton conexao) {
         String sql = "DELETE FROM despesa WHERE despesa_id = "+id;
         if(conexao.getConexao().manipular(sql)) {
