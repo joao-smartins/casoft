@@ -28,8 +28,8 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.categoriadesp (
-    catdesp_id integer NOT NULL,
-    catdesp_nome character varying(30) NOT NULL
+                                      catdesp_id integer NOT NULL,
+                                      catdesp_nome character varying(30) NOT NULL
 );
 
 
@@ -66,8 +66,8 @@ ALTER SEQUENCE public.categoriadesp_catdesp_id_seq OWNED BY public.categoriadesp
 --
 
 CREATE TABLE public.categoriarec (
-    catresc_id integer NOT NULL,
-    catresc_nome character varying(30) NOT NULL
+                                     catresc_id integer NOT NULL,
+                                     catresc_nome character varying(30) NOT NULL
 );
 
 
@@ -104,14 +104,14 @@ ALTER SEQUENCE public.categoriarec_catresc_id_seq OWNED BY public.categoriarec.c
 --
 
 CREATE TABLE public.contabancaria (
-    contab_id integer NOT NULL,
-    contab_agencia integer NOT NULL,
-    contab_numero character varying(10),
-    contab_banco character varying(20),
-    contab_telefone character varying(20),
-    contab_endereco character varying(30),
-    contab_ende_num integer,
-    contab_gerente character varying(20)
+                                      contab_id integer NOT NULL,
+                                      contab_agencia integer NOT NULL,
+                                      contab_numero character varying(10),
+                                      contab_banco character varying(20),
+                                      contab_telefone character varying(20),
+                                      contab_endereco character varying(30),
+                                      contab_ende_num integer,
+                                      contab_gerente character varying(20)
 );
 
 
@@ -148,16 +148,16 @@ ALTER SEQUENCE public.contabancaria_contab_id_seq OWNED BY public.contabancaria.
 --
 
 CREATE TABLE public.despesa (
-    despesa_id integer NOT NULL,
-    despesa_val numeric NOT NULL,
-    despesa_dt_venc date NOT NULL,
-    despesa_dt_lanc date NOT NULL,
-    despesa_pagamento numeric,
-    despesa_desc character varying(100) NOT NULL,
-    despesa_statusconci character varying(20),
-    catdesp_id integer NOT NULL,
-    user_id integer NOT NULL,
-    evento_id integer NOT NULL
+                                despesa_id integer NOT NULL,
+                                despesa_val numeric NOT NULL,
+                                despesa_dt_venc date NOT NULL,
+                                despesa_dt_lanc date NOT NULL,
+                                despesa_pagamento numeric,
+                                despesa_desc character varying(100) NOT NULL,
+                                despesa_statusconci character varying(20),
+                                catdesp_id integer NOT NULL,
+                                user_id integer NOT NULL,
+                                evento_id integer NOT NULL
 );
 
 
@@ -194,11 +194,11 @@ ALTER SEQUENCE public.despesa_despesa_id_seq OWNED BY public.despesa.despesa_id;
 --
 
 CREATE TABLE public.email (
-    email_id integer NOT NULL,
-    email_data date NOT NULL,
-    email_dest character varying(50) NOT NULL,
-    email_assunto character varying(40),
-    email_texto text NOT NULL
+                              email_id integer NOT NULL,
+                              email_data date NOT NULL,
+                              email_dest character varying(50) NOT NULL,
+                              email_assunto character varying(40),
+                              email_texto text NOT NULL
 );
 
 
@@ -235,16 +235,18 @@ ALTER SEQUENCE public.email_email_id_seq OWNED BY public.email.email_id;
 --
 
 CREATE TABLE public.evento (
-    evento_id integer NOT NULL,
-    evento_nome character varying(30),
-    evento_desc character varying(30),
-    evento_status character varying(10),
-    evento_data date,
-    evento_total numeric
+                               evento_id integer NOT NULL,
+                               evento_nome character varying(30),
+                               evento_desc character varying(30),
+                               evento_status character varying(10),
+                               evento_data date,
+                               evento_total numeric,
+                                evento_id_resp integer
 );
 
 
 ALTER TABLE public.evento OWNER TO postgres;
+
 
 --
 -- TOC entry 222 (class 1259 OID 16751)
@@ -277,11 +279,11 @@ ALTER SEQUENCE public.evento_evento_id_seq OWNED BY public.evento.evento_id;
 --
 
 CREATE TABLE public.movimentacaobancaria (
-    movbanc_id integer NOT NULL,
-    movbanc_total numeric,
-    movbanc_data date NOT NULL,
-    usuario_user_id integer NOT NULL,
-    contabancaria_contab_id integer NOT NULL
+                                             movbanc_id integer NOT NULL,
+                                             movbanc_total numeric,
+                                             movbanc_data date NOT NULL,
+                                             usuario_user_id integer NOT NULL,
+                                             contabancaria_contab_id integer NOT NULL
 );
 
 
@@ -318,17 +320,17 @@ ALTER SEQUENCE public.movimentacaobancaria_movbanc_id_seq OWNED BY public.movime
 --
 
 CREATE TABLE public.parametrizacao (
-    id integer NOT NULL,
-    nome_empresa character varying(100) NOT NULL,
-    cnpj numeric(14,0) NOT NULL,
-    logradouro character varying(100),
-    numero integer,
-    bairro character varying(50),
-    cidade character varying(50),
-    estado character(2),
-    cep numeric(8,0),
-    telefone numeric(11,0),
-    email character varying(100)
+                                       id integer NOT NULL,
+                                       nome_empresa character varying(100) NOT NULL,
+                                       cnpj numeric(14,0) NOT NULL,
+                                       logradouro character varying(100),
+                                       numero integer,
+                                       bairro character varying(50),
+                                       cidade character varying(50),
+                                       estado character(2),
+                                       cep numeric(8,0),
+                                       telefone numeric(11,0),
+                                       email character varying(100)
 );
 
 
@@ -365,16 +367,16 @@ ALTER SEQUENCE public.parametrizacao_id_seq OWNED BY public.parametrizacao.id;
 --
 
 CREATE TABLE public.receita (
-    receita_id integer NOT NULL,
-    receita_val numeric NOT NULL,
-    receita_dt_venc date NOT NULL,
-    receita_lancamento date NOT NULL,
-    receita_pagamento numeric,
-    receita_desc character varying(100) NOT NULL,
-    receita_statusconci character varying(20),
-    categoriarec_catresc_id integer NOT NULL,
-    usuario_user_id integer NOT NULL,
-    evento_evento_id integer NOT NULL
+                                receita_id integer NOT NULL,
+                                receita_val numeric NOT NULL,
+                                receita_dt_venc date NOT NULL,
+                                receita_lancamento date NOT NULL,
+                                receita_pagamento numeric,
+                                receita_desc character varying(100) NOT NULL,
+                                receita_statusconci character varying(20),
+                                categoriarec_catresc_id integer NOT NULL,
+                                usuario_user_id integer NOT NULL,
+                                evento_evento_id integer NOT NULL
 );
 
 
@@ -411,15 +413,15 @@ ALTER SEQUENCE public.receita_receita_id_seq OWNED BY public.receita.receita_id;
 --
 
 CREATE TABLE public.usuario (
-    id integer NOT NULL,
-    nome character varying(50) NOT NULL,
-    login character varying(20) NOT NULL,
-    senha character varying(100) NOT NULL,
-    ativo boolean DEFAULT true,
-    nivel_acesso character varying(20),
-    cpf character varying(14) NOT NULL,
-    telefone character varying(20),
-    CONSTRAINT usuario_nivel_acesso_check CHECK (((nivel_acesso)::text = ANY ((ARRAY['ADMIN'::character varying, 'USER'::character varying, 'GUEST'::character varying])::text[])))
+                                id integer NOT NULL,
+                                nome character varying(50) NOT NULL,
+                                login character varying(20) NOT NULL,
+                                senha character varying(100) NOT NULL,
+                                ativo boolean DEFAULT true,
+                                nivel_acesso character varying(20),
+                                cpf character varying(14) NOT NULL,
+                                telefone character varying(20),
+                                CONSTRAINT usuario_nivel_acesso_check CHECK (((nivel_acesso)::text = ANY ((ARRAY['ADMIN'::character varying, 'USER'::character varying, 'GUEST'::character varying])::text[])))
 );
 
 
@@ -456,8 +458,8 @@ ALTER SEQUENCE public.usuario_id_seq OWNED BY public.usuario.id;
 --
 
 CREATE TABLE public.volun_even (
-    evento_evento_id integer NOT NULL,
-    voluntario_volu_id integer NOT NULL
+                                   evento_evento_id integer NOT NULL,
+                                   voluntario_volu_id integer NOT NULL
 );
 
 
@@ -469,14 +471,16 @@ ALTER TABLE public.volun_even OWNER TO postgres;
 --
 
 CREATE TABLE public.voluntario (
-    volu_id integer NOT NULL,
-    volu_nome character varying(35) NOT NULL,
-    volu_cell integer,
-    volu_email character varying(40) NOT NULL,
-    volu_logradouro character varying(40),
-    volu_bairro character varying(20),
-    volu_comp character varying(30),
-    volu_cep integer
+                                   volu_id integer NOT NULL,
+                                   volu_nome character varying(35) NOT NULL,
+                                   volu_cell numeric,
+                                   volu_email character varying(40) NOT NULL,
+                                   volu_logradouro character varying(40),
+                                   volu_bairro character varying(20),
+                                   volu_comp character varying(30),
+                                   volu_cep numeric,
+                                   volu_numero_end numeric,
+                                   volu_cpf numeric
 );
 
 
@@ -507,16 +511,17 @@ ALTER SEQUENCE public.voluntario_volu_id_seq OWNER TO postgres;
 ALTER SEQUENCE public.voluntario_volu_id_seq OWNED BY public.voluntario.volu_id;
 
 
+--
+-- Name: conciliacao; Type: TABLE; Schema: public; Owner: postgres
+--
 CREATE TABLE public.conciliacao (
-    conc_id SERIAL PRIMARY KEY,
-    conc_dt_problema DATE NOT NULL,
-    conc_desc_problema VARCHAR(40) NOT NULL,
-    conc_dt_solucao DATE,
-    conc_desc_solucao VARCHAR(40),
-    conc_receita_id INTEGER,
-    conc_despesa_id INTEGER,
-    CONSTRAINT fk_conc_receita FOREIGN KEY (conc_receita_id) REFERENCES public.receita(receita_id),
-    CONSTRAINT fk_conc_despesa FOREIGN KEY (conc_despesa_id) REFERENCES public.despesa(despesa_id)
+                                    conc_id SERIAL PRIMARY KEY,
+                                    conc_dt_problema DATE NOT NULL,
+                                    conc_desc_problema VARCHAR(40) NOT NULL,
+                                    conc_dt_solucao DATE,
+                                    conc_desc_solucao VARCHAR(40),
+                                    conc_receita_id INTEGER,
+                                    conc_despesa_id INTEGER
 );
 
 
@@ -936,7 +941,7 @@ ALTER TABLE ONLY public.voluntario
 --
 
 ALTER TABLE ONLY public.despesa
-    ADD CONSTRAINT despesa_categoriadesp_catdesp_id_fkey FOREIGN KEY (categoriadesp_catdesp_id) REFERENCES public.categoriadesp(catdesp_id);
+    ADD CONSTRAINT despesa_categoriadesp_catdesp_id_fkey FOREIGN KEY (catdesp_id) REFERENCES public.categoriadesp(catdesp_id);
 
 
 --
@@ -945,7 +950,7 @@ ALTER TABLE ONLY public.despesa
 --
 
 ALTER TABLE ONLY public.despesa
-    ADD CONSTRAINT despesa_evento_evento_id_fkey FOREIGN KEY (evento_evento_id) REFERENCES public.evento(evento_id);
+    ADD CONSTRAINT despesa_evento_evento_id_fkey FOREIGN KEY (evento_id) REFERENCES public.evento(evento_id);
 
 
 --
@@ -954,7 +959,7 @@ ALTER TABLE ONLY public.despesa
 --
 
 ALTER TABLE ONLY public.despesa
-    ADD CONSTRAINT despesa_usuario_user_id_fkey FOREIGN KEY (usuario_user_id) REFERENCES public.usuario(id);
+    ADD CONSTRAINT despesa_usuario_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.usuario(id);
 
 
 --
@@ -1024,6 +1029,12 @@ ALTER TABLE public.parametrizacao
     ADD COLUMN complemento VARCHAR(255);
 
 
+--
+-- Name: conciliacao fk_conc_receita; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+ALTER TABLE public.conciliacao
+    ADD CONSTRAINT fk_conc_receita FOREIGN KEY (conc_receita_id) REFERENCES public.receita(receita_id);
+
 ALTER TABLE public.despesa
     ADD COLUMN despesa_dt_pag DATE;
 
@@ -1040,7 +1051,19 @@ ALTER TABLE public.despesa
 
 -- Completed on 2025-05-16 14:23:47 -03
 
+
+--
+-- Name: conciliacao fk_conc_despesa; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+ALTER TABLE public.conciliacao
+    ADD CONSTRAINT fk_conc_despesa FOREIGN KEY (conc_despesa_id) REFERENCES public.despesa(despesa_id);
+
+
+ALTER TABLE ONLY public.evento
+    ADD CONSTRAINT evento_volu_volu_id_fkey FOREIGN KEY (evento_id_resp) REFERENCES public.voluntario(volu_id);
+
+-- Completed on 2025-05-16 14:23:47 -03
+
 --
 -- PostgreSQL database dump complete
 --
-

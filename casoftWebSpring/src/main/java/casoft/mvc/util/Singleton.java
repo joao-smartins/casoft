@@ -14,13 +14,17 @@ public class Singleton {
     }
     public boolean conectar()
     {
-        if (conexao==null) {
-            conexao=new Conexao();
-            return conexao.conectar("jdbc:postgresql://localhost:5432/","casofa_db","postgres","postgres123");
-            //return conexao.conectar("jdbc:postgresql://aws-0-sa-east-1.pooler.supabase.com:5432/","postgres","postgres.txzqfrvdwaucmdcbnzfg","postgres123");
+        if (conexao == null) {
+            conexao = new Conexao();
+            boolean conectado = conexao.conectar("jdbc:postgresql://localhost:5432/", "casofa_db", "postgres", "postgres123");
+            if (!conectado) {
+                conexao = null;  // impede uso de conexão inválida
+            }
+            return conectado;
         }
-        return true;
+        return conexao.getEstadoConexao();
     }
+
     public boolean Desconectar() {
         if (conexao!=null) {
             boolean resultado=conexao.desconectar();

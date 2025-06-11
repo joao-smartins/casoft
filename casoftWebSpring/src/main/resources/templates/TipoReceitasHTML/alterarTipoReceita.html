@@ -38,9 +38,11 @@
 </div>
 
 <script>
-    const id = localStorage.getItem("tipoReceitaEditId");
-    const nome = localStorage.getItem("tipoReceitaEditNome");
-
+    const tp_receita = localStorage.getItem("tp_receitaSelecionada")
+    const tp_receitaEx = tp_receita ? JSON.parse(tp_receita) : {};
+    const id = tp_receitaEx.id
+    const nome = tp_receitaEx.nome;
+    console.log(nome);
     // Preenche o campo com o nome atual
     document.getElementById("nome").value = nome;
 
@@ -75,5 +77,8 @@
 </script>
 
 <script src="../js/authManager.js"></script>
+<script src="../js/authenticatedClient.js"></script>
+<script src="../js/tokenVerification.js"></script>
+<script src="../js/funcoes.js"></script>
 </body>
 </html>

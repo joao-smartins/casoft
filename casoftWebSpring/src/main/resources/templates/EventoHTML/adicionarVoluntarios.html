@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Voluntários do Evento</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/estilo.css" rel="stylesheet">
+  <script src="../js/Auth.js" defer></script>
+</head>
+
+<body class="bg-light">
+
+<!-- Header -->
+<header class="header">
+  <div class="container">
+    <div class="header-container d-flex align-items-center">
+      <img src="../img/logo.png" alt="Logo">
+      <button class="menu-toggle d-md-none" id="menu-toggle" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger ms-auto">Deslogar</button>
+    </div>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <h4 class="p-3">Menu Eventos</h4>
+  <a href="exibirEvento.html">Eventos</a>
+  <a href="../home.html">Voltar</a>
+</div>
+
+<!-- Conteúdo principal -->
+<div class="content pt-5">
+  <div class="container mt-4">
+    <div class="card shadow p-4">
+      <h2 class="text-center mb-4">Editar Voluntários do Evento</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center">
+          <thead class="table-light">
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Ação</th>
+          </tr>
+          </thead>
+          <tbody id="listaVoluntarios">
+          <!-- Conteúdo dinâmico aqui -->
+          </tbody>
+        </table>
+      </div>
+      <div class="text-end">
+        <a href="exibirEvento.html" class="btn btn-secondary mt-3">Voltar</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+  const apiBase = "http://localhost:8080/apis";
+  let voluntariosAssociados = new Set();
+  let eventoId = null;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    eventoId = urlParams.get("eventoId");
+    if (!eventoId) {
+      alert("Evento inválido");
+      return;
+    }
+
+    carregarVoluntarios(eventoId);
+  });
+
+  async function carregarVoluntarios(eventoId) {
+    try {
+      const [todosResp, associadosResp] = await Promise.all([
+        fetch(`${apiBase}/voluntario`).then(res => res.json()),
+        fetch(`${apiBase}/eventos/${eventoId}/voluntario`).then(res => res.json())
+      ]);
+
+      voluntariosAssociados = new Set(associadosResp.map(v => String(v.id)));
+
+      const tabela = document.getElementById("listaVoluntarios");
+      tabela.innerHTML = "";
+
+      todosResp.forEach(vol => {
+        const linha = document.createElement("tr");
+
+        const estaAssociado = voluntariosAssociados.has(String(vol.id));
+
+        linha.innerHTML = `
+          <td>${vol.nome}</td>
+          <td>${vol.email}</td>
+          <td>
+            <button class="btn ${estaAssociado ? 'btn-danger' : 'btn-primary'} btn-sm">
+              ${estaAssociado ? 'Remover' : 'Adicionar'}
+            </button>
+          </td>
+        `;
+
+        const btn = linha.querySelector("button");
+        btn.addEventListener("click", () => {
+          if (estaAssociado) {
+            removerVoluntario(eventoId, vol.id, btn);
+          } else {
+            adicionarVoluntario(eventoId, vol.id, btn);
+          }
+        });
+
+        tabela.appendChild(linha);
+      });
+
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao carregar voluntários.");
+    }
+  }
+
+  function adicionarVoluntario(eventoId, voluntarioId) {
+    console.log("Adicionando voluntário:", voluntarioId, "ao evento:", eventoId);
+    fetch(`${apiBase}/eventos/${eventoId}/voluntario/${voluntarioId}`, {
+      method: "POST"
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("Erro ao adicionar voluntário.");
+              location.reload();
+            })
+            .catch(err => alert(err.message));
+  }
+
+  function removerVoluntario(eventoId, voluntarioId) {
+    console.log("Removendo voluntário:", voluntarioId, "do evento:", eventoId);
+    fetch(`${apiBase}/eventos/${eventoId}/voluntario/${voluntarioId}`, {
+      method: "DELETE"
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("Erro ao remover voluntário.");
+              location.reload();
+            })
+            .catch(err => alert(err.message));
+  }
+
+
+  function atualizarBotao(btn, associado) {
+    btn.className = `btn ${associado ? 'btn-danger' : 'btn-primary'} btn-sm`;
+    btn.textContent = associado ? 'Remover' : 'Adicionar';
+  }
+</script>
+
+
+<script src="../js/funcoes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/scripts.js"></script>
+<script src="../js/authManager.js"></script>
+<script src="../js/authenticatedClient.js"></script>
+<script src="../js/tokenVerification.js"></script>
+
+</body>
+</html>
