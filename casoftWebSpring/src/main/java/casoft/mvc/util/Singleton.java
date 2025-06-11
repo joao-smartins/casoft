@@ -16,7 +16,7 @@ public class Singleton {
     {
         if (conexao==null) {
             conexao=new Conexao();
-            return conexao.conectar("jdbc:postgresql://localhost:5432/","casofa_db","postgres","postgres123");
+            return conexao.conectar("jdbc:postgresql://localhost:5432/","casofa_db","postgres","123456");
             //return conexao.conectar("jdbc:postgresql://aws-0-sa-east-1.pooler.supabase.com:5432/","postgres","postgres.txzqfrvdwaucmdcbnzfg","postgres123");
         }
         return true;
