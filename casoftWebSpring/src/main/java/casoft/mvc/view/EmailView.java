@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/email")
+@RequestMapping("/apis/email")
 @CrossOrigin(origins = "*") // ajuste conforme necessário para CORS
 public class EmailView{
 

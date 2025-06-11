@@ -86,7 +86,7 @@
             mensagem: form.mensagem.value
         };
 
-        fetch("http://localhost:8081/api/email", {
+        fetch("http://localhost:8080/apis/email", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(email)
