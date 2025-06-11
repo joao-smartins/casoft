@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conciliações Pendentes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/Conciliacao.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="top-menu">
+    <img src="../img/logo.png" alt="Logo da Empresa">
+    <button id="btnLogout" onclick="authManager.logout()" class="btn btn-danger">Deslogar</button>
+</div>
+
+<div class="sidebar" id="sidebar">
+    <h4 class="p-3">Menu</h4>
+    <a href="../home.html">Home</a>
+    <a href="../cadastroEmpresa.html">Empresa</a>
+    <a href="../ConciliacaoHTML/conciliacao.html">Conciliação</a>
+    <a href="../ConciliacaoHTML/conciliacaoPendentes.html">Conciliações Pendentes</a>
+    <a href="../EventoHTML/homeEvento.html">Eventos</a>
+    <a href="../TipoReceitasHTML/homeTPReceita.html">Tipos de Receita</a>
+    <a href="../TipoDespesasHTML/tipoDespesa.html">Tipos de Despesas</a>
+    <a href="#">Relatórios</a>
+    <a href="#">Configurações</a>
+    <a href="../gerenciarContas.html">Contas Bancárias</a>
+</div>
+
+<div class="main">
+    <h2>Conciliações Pendentes</h2>
+
+    <div id="mensagem" class="mensagem"></div>
+
+    <div class="form-container">
+        <input type="text" id="filtro" placeholder="Filtro de Problemas">
+    </div>
+
+    <table class="conciliacao-table">
+        <thead>
+        <tr>
+            <th>ID Conc.</th>
+            <th>Tipo Item</th>
+            <th>ID Item</th>
+            <th>Valor Item</th>
+            <th>Descrição Item</th>
+            <th>Data Problema</th>
+            <th>Descrição Problema</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody id="problemasTableBody">
+        </tbody>
+    </table>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeConfirmModal()">&times;</span>
+            <h3>Confirmação</h3>
+            <p id="confirmModalMessage"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="confirmModalYesButton">Sim</button>
+                <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="solucaoProblemaModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeSolucaoProblemaModal()">&times;</span>
+            <h3>Registrar Solução do Problema</h3>
+            <label for="dataSolucao">Data da Solução:</label>
+            <input type="date" id="dataSolucao" class="form-control">
+            <label for="descricaoSolucao">Descrição da Solução:</label>
+            <textarea id="descricaoSolucao" rows="4" placeholder="Descreva como o problema foi resolvido..." class="form-control"></textarea>
+            <button id="btnConfirmarSolucao" class="btn btn-success mt-3">Confirmar Solução</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/authManager.js"></script>
+<script src="../js/authenticatedClient.js"></script>
+<script src="../js/tokenVerification.js"></script>
+<script src="../js/scriptsConciliacaoPendentes.js"></script>
+</body>
+</html>

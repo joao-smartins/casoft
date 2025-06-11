@@ -5,6 +5,7 @@ import casoft.mvc.util.Singleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 @Repository
 public class Evento {
@@ -88,5 +89,5 @@ public class Evento {
         return dao.gravar(evento, conexao);
     }
 
-
+    public void inativarEventos(LocalDate hoje, Singleton conexao){dao.inativarEventos(hoje,conexao);}
 }

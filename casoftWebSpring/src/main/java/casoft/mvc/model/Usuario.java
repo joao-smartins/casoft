@@ -24,12 +24,9 @@ public class Usuario {
     private String cpf;
     private String telefone;
 
-
-
     // Construtores
-    public Usuario() {
-        usuarioDAO=new UsuarioDAO();
-    }
+    public Usuario() {}
+
 
     public Usuario(String nome, String login, String senha, boolean ativo, String nivelAcesso, String cpf, String telefone) {
         this.nome = nome;
@@ -53,69 +50,29 @@ public class Usuario {
     }
 
     // Getters e Setters
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getLogin() { return login; }
+    public void setLogin(String login) { this.login = login; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
 
-    public String getLogin() {
-        return login;
-    }
+    public boolean isAtivo() { return ativo; }
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
+    public String getNivelAcesso() { return nivelAcesso; }
+    public void setNivelAcesso(String nivelAcesso) { this.nivelAcesso = nivelAcesso; }
 
-    public String getSenha() {
-        return senha;
-    }
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
-    public boolean isAtivo() {
-        return ativo;
-    }
-
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
-
-    public String getNivelAcesso() {
-        return nivelAcesso;
-    }
-
-    public void setNivelAcesso(String nivelAcesso) {
-        this.nivelAcesso = nivelAcesso;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
 
     @Override
     public boolean equals(Object o) {
@@ -124,31 +81,28 @@ public class Usuario {
         Usuario usuario = (Usuario) o;
         return login.equals(usuario.login);
     }
-
-    public String autenticar(String login, String senha, Singleton conexao) {
+    public String autenticar(String login, String senha,Singleton conexao){
         String token;
-        List<Usuario> usuarios = usuarioDAO.get("login = " + "'" + login + "'", conexao);
-        if (!usuarios.isEmpty()) {
-            Usuario usuario = usuarios.getFirst();
-            if (usuario != null && usuario.getSenha().equals(senha)) {
-                token = JWTTokenProvider.getToken(login, "" + usuario.getNivelAcesso());
+        List<Usuario> usuarios=usuarioDAO.get("login = "+"'"+login+"'",conexao);
+        if(!usuarios.isEmpty()){
+            Usuario usuario= usuarios.getFirst();
+            if(usuario!=null && usuario.getSenha().equals(senha)){
+                token= JWTTokenProvider.getToken(login,""+usuario.getNivelAcesso());
                 return token;
             }
         }
         return null;
     }
-
-    public String getNivel(String login, Singleton conexao) {
-        List<Usuario> usuarios = usuarioDAO.get("login = " + "'" + login + "'", conexao);
-        if (!usuarios.isEmpty()) {
-            Usuario usuario = usuarios.getFirst();
-            if (usuario != null) {
+    public String getNivel(String login,Singleton conexao){
+        List<Usuario> usuarios=usuarioDAO.get("login = "+"'"+login+"'",conexao);
+        if(!usuarios.isEmpty()){
+            Usuario usuario= usuarios.getFirst();
+            if(usuario!=null){
                 return usuario.getNivelAcesso();
             }
         }
         return null;
     }
-
     public Usuario gravar(Usuario usuario, Singleton conexao) {
         return usuarioDAO.gravar(usuario, conexao);
     }
@@ -188,5 +142,11 @@ public class Usuario {
     public List<Usuario> get(String filtro,Singleton conexao) {
         return usuarioDAO.get(filtro,conexao);
     }
-
+    public Usuario getUsuario(String login,Singleton conexao){
+        List<Usuario> usuarios=usuarioDAO.get("login = "+"'"+login+"'",conexao);
+        if(!usuarios.isEmpty()){
+            return usuarios.getFirst();
+        }
+        return null;
+    }
 }
